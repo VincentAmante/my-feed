@@ -2,17 +2,61 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  // NOTE: You probably want to change this to another database later on
+  provider = "mongodb"
+
+  // This value is read from the .env file.
+  url = env("DATABASE_URL")
 }
 
 model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  details String
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  email        String   @unique
+  name         String
+  password     String
+  Post         Post[]   @relation("PostAuthor")
+  PostLikes    Post[]   @relation("UserLikes", fields: [PostLikesIds], references: [id])
+  PostLikesIds String[] @db.ObjectId
+
+  followedBy    User[]    @relation("UserFollows", fields: [followedByIDs], references: [id])
+  followedByIDs String[]  @db.ObjectId
+  following     User[]    @relation("UserFollows", fields: [followingIDs], references: [id])
+  followingIDs  String[]  @db.ObjectId
+  Comment       Comment[]
+}
+
+model Post {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  image     String?
+  published Boolean   @default(true)
+  author    User?     @relation("PostAuthor", fields: [authorId], references: [id])
+  authorId  String?   @db.ObjectId
+  Comment   Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  likedBy    User[]   @relation("UserLikes", fields: [likedByIDs], references: [id])
+  likedByIDs String[] @default([]) @db.ObjectId
+  likesCount Int      @default(0)
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  author    User?    @relation(fields: [authorId], references: [id])
+  authorId  String   @db.ObjectId
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
