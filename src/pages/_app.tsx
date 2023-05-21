@@ -7,9 +7,7 @@ import { api } from "~/utils/api";
 import "~/styles/globals.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  return <ClerkProvider {...pageProps}>
-            <Component {...pageProps} />
-          </ClerkProvider>;
+  return <Component {...pageProps} />;
 };
 
 export default api.withTRPC(MyApp);
