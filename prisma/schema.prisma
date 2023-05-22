@@ -22,32 +22,51 @@ model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   email        String   @unique
   name         String
-  password     String
   Post         Post[]   @relation("PostAuthor")
   PostLikes    Post[]   @relation("UserLikes", fields: [PostLikesIds], references: [id])
   PostLikesIds String[] @db.ObjectId
 
-  followedBy    User[]    @relation("UserFollows", fields: [followedByIDs], references: [id])
-  followedByIDs String[]  @db.ObjectId
-  following     User[]    @relation("UserFollows", fields: [followingIDs], references: [id])
-  followingIDs  String[]  @db.ObjectId
-  Comment       Comment[]
+  Comment Comment[]
+
+  followedFeedsIds String[] @db.ObjectId
+  FollowedFeeds    Feed[]   @relation("FieldsFollowed", fields: [followedFeedsIds], references: [id])
+
+  FeedsOwned Feed[] @relation("FieldsOwned")
+}
+
+model Feed {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  owner   User?  @relation("FieldsOwned", fields: [ownerId], references: [id])
+  ownerId String @db.ObjectId
+
+  followersIds String[] @db.ObjectId
+  followers    User[]   @relation("FieldsFollowed", fields: [followersIds], references: [id])
+
+  Post       Post[]
+  visibility String @default("public")
 }
 
 model Post {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
   content   String
-  image     String?
-  published Boolean   @default(true)
-  author    User?     @relation("PostAuthor", fields: [authorId], references: [id])
-  authorId  String?   @db.ObjectId
-  Comment   Comment[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  image     String? @default("")
+  published Boolean @default(true)
+
+  author   User?   @relation("PostAuthor", fields: [authorId], references: [id])
+  authorId String? @db.ObjectId
+
+  Comment Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   likedBy    User[]   @relation("UserLikes", fields: [likedByIDs], references: [id])
   likedByIDs String[] @default([]) @db.ObjectId
   likesCount Int      @default(0)
+
+  Feed   Feed?   @relation(fields: [feedId], references: [id])
+  feedId String? @db.ObjectId
 }
 
 model Comment {
