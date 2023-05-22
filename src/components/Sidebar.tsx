@@ -7,7 +7,9 @@ interface Props {
 }
 
 const defaultProps = {
-  handleSelectFeed: (feed: string) => {},
+  handleSelectFeed: (feed: string) => {
+    return feed;
+  },
 };
 
 const Sidebar = (sidebarProps: Props) => {

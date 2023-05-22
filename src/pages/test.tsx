@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Sidebar from "~/components/Sidebar";
-import SwitchTheme from "~/components/SwitchTheme";
+// import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
 
 const Test = () => {

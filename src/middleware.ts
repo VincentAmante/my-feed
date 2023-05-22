@@ -1,5 +1,5 @@
 import { authMiddleware } from "@clerk/nextjs";
-import { NextResponse } from "next/server";
+// import { NextResponse } from "next/server";
 
 export default authMiddleware({
   publicRoutes: ["/", "/test"],
