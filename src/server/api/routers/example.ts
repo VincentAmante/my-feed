@@ -10,7 +10,15 @@ export const exampleRouter = createTRPCRouter({
         greeting: `Hello ${input.text}`,
       };
     }),
-  getAll: publicProcedure.query(({ ctx }) => {
-    return ctx.prisma.example.findMany();
+
+  getGlobalPosts: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.post.findMany({
+      take: 10,
+      where: {
+        Feed: {
+          visibility: "global",
+        },
+      },
+    });
   }),
 });
