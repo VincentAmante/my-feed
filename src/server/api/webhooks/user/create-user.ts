@@ -41,17 +41,12 @@ interface UserInterface extends Omit<User , UnwantedKeys>{
     // Handle the webhook
     const eventType: EventType = evt.type;
     if (eventType === "user.created" || eventType === "user.updated") {
-        const { first_name,last_name} = evt.data;
+        // const { first_name,last_name} = evt.data;
 
-        await prisma.user.upsert({
-          where: { authId: id },
-          update: {
-            name: ``,
-          },
-          create: {
-            authId: id,
-            name: `${first_name || ""} ${last_name || ""}`,
-          },
+        await prisma.user.create({
+            data: {
+              authId: id,
+            }
         });
       }
       console.log(`User ${id} was ${eventType}`);
