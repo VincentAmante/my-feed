@@ -32,6 +32,7 @@ async function handler(request: Request) {
   }
 
   const eventType: EventType = evt.type;
+  console.log(eventType)
   if (eventType === "user.created") {
     console.log(evt.data)
     const { id } = evt.data;
