@@ -1,60 +1,59 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { prisma } from "~/server/db";
 import type { IncomingHttpHeaders } from "http";
-import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import type { NextApiRequest, NextApiResponse } from "next";
+import type { WebhookRequiredHeaders } from "svix";
 import { Webhook } from "svix";
-import type { WebhookRequiredHeaders } from "svix"
+import { prisma } from "~/server/db";
+import type { Prisma } from "@prisma/client";
 
-const webhookSecret = process.env.WEBHOOK_SECRET || "";
+const webhookSecret: string = process.env.WEBHOOK_SECRET || "";
 
-async function handler(request: Request) {
-  console.log('webhook')
-
-  const payload = await request.json();
-  const headersList = headers();
-  const heads = {
-    "svix-id": headersList.get("svix-id"),
-    "svix-timestamp": headersList.get("svix-timestamp"),
-    "svix-signature": headersList.get("svix-signature"),
-  };
+export default async function handler(
+  req: NextApiRequestWithSvixRequiredHeaders,
+  res: NextApiResponse,
+) {
+  const payload = JSON.stringify(req.body);
+  const headers = req.headers;
   const wh = new Webhook(webhookSecret);
   let evt: Event | null = null;
-
   try {
-    evt = wh.verify(
-      JSON.stringify(payload),
-      heads as IncomingHttpHeaders & WebhookRequiredHeaders
-    ) as Event;
-  } catch (err) {
-    console.error((err as Error).message);
-    return NextResponse.json({}, { status: 400 });
+    evt = wh.verify(payload, headers) as Event;
+  } catch (_) {
+    return res.status(400).json({});
   }
 
+  const { id } = evt.data;
+  // Handle the webhook
   const eventType: EventType = evt.type;
-  console.log(eventType)
-  if (eventType === "user.created") {
-    console.log(evt.data)
+
+  if (eventType === "user.created" || eventType === "user.updated") {
     const { id } = evt.data;
 
-    await prisma.user.create({
-        data: {
-            authId: id as string,
-        }
+    if (!id) {
+      return res.status(400).json({});
+    }
+
+    await prisma.user.upsert({
+      where: { authId: id },
+      update: {
+      },
+      create: {
+        authId: id,
+      },
     });
   }
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+  console.log(`User ${id} was ${eventType}`);
+  res.status(201).json({});
 }
 
-type EventType = "user.created" | "*";
+type NextApiRequestWithSvixRequiredHeaders = NextApiRequest & {
+  headers: IncomingHttpHeaders & WebhookRequiredHeaders;
+};
 
 type Event = {
-  data: Record<string, string | number>;
+  data: Prisma.UserCreateInput;
   object: "event";
   type: EventType;
 };
 
-export const GET = handler;
-export const POST = handler;
-export const PUT = handler;
+type EventType = "user.created" | "user.updated" | "*";
