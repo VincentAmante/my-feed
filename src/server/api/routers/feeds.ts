@@ -47,4 +47,22 @@ export const feedsRouter = createTRPCRouter({
         },
       });
     }),
+
+  createFeed: publicProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        visibility: z.string(),
+        ownerId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      return await ctx.prisma.feed.create({
+        data: {
+          name: input.name,
+          visibility: input.visibility,
+          ownerId: input.ownerId,
+        },
+      });
+    }),
 });
