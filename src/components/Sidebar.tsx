@@ -1,6 +1,7 @@
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { useState } from "react";
-// import SwitchTheme from "~/components/SwitchTheme";
+import { useEffect, useState } from "react";
+import { api } from "~/utils/api";
+import SwitchTheme from "~/components/SwitchTheme";
 
 interface Props {
   handleSelectFeed?: (feed: string) => void;
@@ -12,7 +13,19 @@ const defaultProps = {
   },
 };
 
+const CreateFeed = () => {
+  console.log("create feed");
+
+  return <></>;
+};
+
 const Sidebar = (sidebarProps: Props) => {
+  // api.feeds.createFeed.useQuery({
+  //   name: "New Feed",
+  //   visibility: "public",
+  //   ownerId: "646b7816ff0ae2653aad9f27",
+  // });
+
   const props = { ...defaultProps, ...sidebarProps };
 
   const [isToggled, setIsToggled] = useState(false);
@@ -33,6 +46,12 @@ const Sidebar = (sidebarProps: Props) => {
 
   const feedOnClick = (feedId: string) => {
     props.handleSelectFeed(feedId);
+  };
+
+  const createFeed = () => {
+    console.log("creating feed");
+
+    return <CreateFeed />;
   };
 
   return (
@@ -70,10 +89,10 @@ const Sidebar = (sidebarProps: Props) => {
               Global
             </li>
             <li
-              onClick={() => feedOnClick("646b7816ff0ae2653aad9f27")}
+              onClick={() => feedOnClick("646bbfc1039787362a4d850c")}
               className="btn-ghost btn justify-start font-normal normal-case"
             >
-              Announcements
+              MyHighlightsFeed
             </li>
           </ul>
         </div>
