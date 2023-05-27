@@ -1,24 +1,16 @@
-import { Webhook } from "svix";
-const webhookSecret: string = process.env.WEBHOOK_SECRET || "";
 
-// import type { IncomingHttpHeaders } from "http";
+
 import type { NextApiRequest, NextApiResponse } from "next";
-// import type { WebhookRequiredHeaders } from "svix";
-// import type { User } from "@clerk/nextjs/dist/api";
-// import { Webhook } from "svix";
-// import { prisma } from "~/server/db";
 
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const payload = JSON.stringify(req.body);
-  const headers = req.headers;
-  // const wh = new Webhook(webhookSecret);
-  // const evt: Event | null = null;
+  // const payload = JSON.stringify(req.body);
+  // const headers = req.headers;
 
-  console.log("payload", payload);
-  console.log("headers", headers);
+  // console.log("payload", payload);
+  // console.log("headers", headers);
 
   res.status(201).json({});
 }
