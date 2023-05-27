@@ -3,10 +3,20 @@ const webhookSecret: string = process.env.WEBHOOK_SECRET || "";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+// export default function handler(
+//   req: NextApiRequest,
+//   res: NextApiResponse
+// ) {
+//   const payload = JSON.stringify(req.body);
+//   const headers = req.headers;
+
+//   console.log("payload", payload);
+//   console.log("headers", headers);
+
+//   res.status(201).json({});
+// }
+
+export default function POST (req: NextApiRequest, res: NextApiResponse) {
   const payload = JSON.stringify(req.body);
   const headers = req.headers;
 
