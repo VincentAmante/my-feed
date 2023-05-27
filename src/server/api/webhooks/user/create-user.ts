@@ -8,7 +8,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 // import { Webhook } from "svix";
 // import { prisma } from "~/server/db";
 
-export default async function handler(
+export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
@@ -19,6 +19,8 @@ export default async function handler(
 
   console.log("payload", payload);
   console.log("headers", headers);
+
+  res.status(201).json({});
 }
 
 // type UnwantedKeys = "emailAddresses" | "firstName" | "lastName" | "primaryEmailAddressId" | "primaryPhoneNumberId" | "phoneNumbers";
