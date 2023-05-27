@@ -1,4 +1,5 @@
-
+import { Webhook } from "svix";
+const webhookSecret: string = process.env.WEBHOOK_SECRET || "";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -6,11 +7,11 @@ export default function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // const payload = JSON.stringify(req.body);
-  // const headers = req.headers;
+  const payload = JSON.stringify(req.body);
+  const headers = req.headers;
 
-  // console.log("payload", payload);
-  // console.log("headers", headers);
+  console.log("payload", payload);
+  console.log("headers", headers);
 
   res.status(201).json({});
 }

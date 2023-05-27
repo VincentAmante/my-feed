@@ -31,15 +31,15 @@ type CreateContextOptions = Record<string, never>;
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (opts: CreateNextContextOptions) => {
-  const { req } = opts
-  const sesh = getAuth(req)
+const createInnerTRPCContext = (_opts: CreateNextContextOptions) => {
+  // const { req } = opts
+  // const sesh = getAuth(req)
 
-  const userId = sesh.userId
+  // const userId = sesh.userId
 
   return {
-    prisma,
-    userId
+    prisma
+    // userId
   };
 };
 
