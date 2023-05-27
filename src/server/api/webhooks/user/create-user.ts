@@ -14,8 +14,8 @@ export default function handler(
 ) {
   const payload = JSON.stringify(req.body);
   const headers = req.headers;
-  const wh = new Webhook(webhookSecret);
-  let evt: Event | null = null;
+  // const wh = new Webhook(webhookSecret);
+  // const evt: Event | null = null;
 
   console.log("payload", payload);
   console.log("headers", headers);
