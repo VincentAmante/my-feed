@@ -10,21 +10,21 @@ import { api } from "~/utils/api";
 import SwitchTheme from "~/components/SwitchTheme";
 
 interface Props {
-  handleSelectFeed?: (feedOrSpace: string, type: string) => void;
+  handleSelectFeed?: (id: string, type: string, name: string, ownerId: string) => void;
 }
 
 const defaultProps = {
-  handleSelectFeed: (feedOrSpace: string, type: string) => {
+  handleSelectFeed: (id: string, type: string, name: string, ownerId: string) => {
     return {
-      id: feedOrSpace,
+      id,
       type,
+      name,
+      ownerId
     };
   },
 };
 
 const Sidebar = (sidebarProps: Props) => {
- 
-
   const props = { ...defaultProps, ...sidebarProps };
 
   const [isToggled, setIsToggled] = useState(false);
@@ -43,12 +43,12 @@ const Sidebar = (sidebarProps: Props) => {
     }
   };
 
-  const spaceOnClick = (spaceId: string) => {
-    props.handleSelectFeed(spaceId, "space");
+  const spaceOnClick = (spaceId: string, name: string, ownerId: string) => {
+    props.handleSelectFeed(spaceId, "space", name, ownerId);
   }
 
-  const feedOnClick = (feedId: string) => {
-    props.handleSelectFeed(feedId, "feed");
+  const feedOnClick = (feedId: string, name: string, ownerId: string) => {
+    props.handleSelectFeed(feedId, "feed", name, ownerId);
   };
   return (
     <>
@@ -80,7 +80,7 @@ const Sidebar = (sidebarProps: Props) => {
           <div className="px-3 py-2 text-xl">Feeds</div>
           <ul className="flex flex-col gap-2 py-2 text-lg">
             <li
-              onClick={() => feedOnClick("global")}
+              onClick={() => feedOnClick("global", "Global", "global")}
               className="btn-ghost btn justify-start font-normal normal-case"
             >
               Global
@@ -103,7 +103,7 @@ const Sidebar = (sidebarProps: Props) => {
 };
 
 type SpaceListProp = {
-  onClick: (spaceId: string) => void;
+  onClick: (spaceId: string, name: string, ownerId: string) => void;
 }
 const SpaceList = ({ onClick }: SpaceListProp) => {
   const { userId } = useAuth();
@@ -121,15 +121,12 @@ const SpaceList = ({ onClick }: SpaceListProp) => {
     );
   if (!data) return <div>Something went wrong</div>;
 
-  if (data) {
-    console.log(data);
-  }
   return <ul className="flex flex-col gap-2 py-2 text-lg">
     {data.map((space) => {
       return <li
         className="btn-ghost btn justify-start font-normal normal-case"
         key={space.id}
-        onClick={() => onClick(space.id)}>{space.name}</li>;
+        onClick={() => onClick(space.id, space.name || "Space", space.ownerId || "")}>{space.name}</li>;
     })}
   </ul>;
 };

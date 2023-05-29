@@ -10,25 +10,21 @@ import { User } from "@clerk/nextjs/dist/server";
 const Feed = () => {
   const [currentFeed, setCurrentFeed] = useState("global");
   const [currentFeedType, setCurrentFeedType] = useState("feed");
+  const [ownerId, setOwnerId] = useState("");
+  const [feedName, setFeedName] = useState("Global");
 
-  function setFeed (feedId: string, feedType: string) {
+  function setFeed(feedId: string, feedType: string, feedName: string, ownerId: string) {
+    console.log("setFeed", feedId, feedType, ownerId, feedName);
     setCurrentFeed(feedId);
     setCurrentFeedType(feedType);
+    setOwnerId(ownerId);
+    setFeedName(feedName);
   }
   
   return (
     <>
       <div className="flex h-full w-full flex-row-reverse items-stretch">
-        <main className="relative flex min-h-screen w-full flex-col items-center">
-          <div className="flex w-full items-center justify-center bg-slate-900 bg-opacity-80 py-6 pb-4">
-            Feed Name
-          </div>
-          <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
-            <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4">
-              <FeedData id={currentFeed} type={currentFeedType}></FeedData>
-            </div>
-          </div>
-        </main>
+        <FeedPage feedId={currentFeed} feedType={currentFeedType} feedName={feedName} ownerId={ownerId}></FeedPage>
         <Sidebar handleSelectFeed={setFeed}></Sidebar>
       </div>
     </>
@@ -38,14 +34,19 @@ const Feed = () => {
 type FeedPageProps = {
   feedId: string;
   feedType: string;
+  feedName: string;
+  ownerId: string;
 }
 const FeedPage = (props: FeedPageProps) => {
-  const { feedId, feedType } = props;
-  
-  useMemo(() => { 
-    return <main>
+  const { feedId, feedType, feedName, ownerId } = props;
+  const { userId } = useAuth();
+
+  const canMakePost = (feedType == "space" && ownerId == userId) ? true : false;
+
+  return useMemo(() => { 
+    return <main className="relative flex min-h-screen w-full flex-col items-center">
       <div className="flex w-full items-center justify-center bg-slate-900 bg-opacity-80 py-6 pb-4">
-        Feed Name
+        {feedName}
       </div>
       <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
         <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4">
@@ -53,8 +54,10 @@ const FeedPage = (props: FeedPageProps) => {
         </div>
       </div>
     </main>
-  }, [feedId, feedType])
+  }, [feedId, feedType, feedName])
 }
+
+
 type FeedDataProps = {
   id: string;
   type: string;
@@ -85,6 +88,11 @@ const FeedData = (props: FeedDataProps) => {
   }
    </div>
  )
+}
+
+type PostWizardProps = {
+  spaceId: string;
+  content: string;
 }
 
 export default Feed;
