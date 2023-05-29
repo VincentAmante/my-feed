@@ -11,130 +11,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  content   String? @default("")
-  image     String? @default("")
-  published Boolean @default(true)
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId     String   @unique 
+  softDeleted Boolean  @default(false) 
+  createdAt   DateTime @default(now())
 
-  author   User?   @relation(fields: [authorId], references: [authId])
+  Comment Comment[]
+  Post    Post[]
+  Feed    Feed[]
+  Space   Space[]
+}
+
+model Post {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  content   String?   @default("")
+  image     String?   @default("")
+  published Boolean   @default(true)
+  Comment   Comment[]
+
+  author   User?   @relation(fields: [authorId], references: [clerkId])
   authorId String?
-  Feed     Feed?   @relation(fields: [feedId], references: [id])
-  feedId   String? @db.ObjectId
+  Space    Space?  @relation(fields: [spaceId], references: [id])
+  spaceId  String? @db.ObjectId
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  likedBy    User[]   @relation("UserLikes", fields: [likedByIDs], references: [id])
-  likedByIDs String[] @default([]) @db.ObjectId
-}
+  likedByIDs String[] @default([])
 
-model User {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  authId String @unique
-  Post   Post[]
-  name   String?
-
-  SpacesOwned    Space[]  @relation("UserOwns")
-  spacesOwnedIds String[] @default([]) @db.ObjectId
-
-  SpacesFollowed    Space[]  @relation("UserFollows", fields: [spacesFollowedIds], references: [id])
-  spacesFollowedIds String[] @default([]) @db.ObjectId
-
-  FeedsFollowed    Feed[]   @relation("UserFollows", fields: [feedsFollowedIds], references: [id])
-  feedsFollowedIds String[] @default([]) @db.ObjectId
-
-  FeedsOwned Feed[]
-
-  PostLikes   Post[]   @relation("UserLikes", fields: [postLikesIds], references: [id])
-  postLikesIds String[] @default([]) @db.ObjectId
+  softDeleted Boolean @default(false)
 }
 
 model Feed {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  owner   User?   @relation(fields: [ownerId], references: [authId])
+  owner   User?   @relation(fields: [ownerId], references: [clerkId])
   ownerId String?
 
-  followers    User[]   @relation("UserFollows", fields: [followersIds], references: [id])
   followersIds String[] @default([]) @db.ObjectId
 
-  Posts      Post[]
-  visibility String  @default("public")
-
-  Space      Space?  @relation(fields: [spaceId], references: [id])
-  spaceId    String? @db.ObjectId
+  visibility String @default("public")
 
   icon   String? @default("")
   banner String? @default("")
+
+  softDeleted Boolean       @default(false)
+  SpaceInFeed SpaceInFeed[]
+}
+
+model SpaceInFeed {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  feed   Feed?   @relation(fields: [feedId], references: [id])
+  feedId String? @db.ObjectId
+
+  space   Space?  @relation(fields: [spaceId], references: [id])
+  spaceId String? @db.ObjectId
 }
 
 model Space {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  name    String? @default("")
-  owner   User?   @relation("UserOwns", fields: [ownerId], references: [authId])
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String? @default("")
+
+  owner   User?   @relation(fields: [ownerId], references: [clerkId])
   ownerId String?
 
-  followers    User[]   @relation("UserFollows", fields: [followersIds], references: [id])
   followersIds String[] @default([]) @db.ObjectId
 
-  Feeds      Feed[]
   visibility String @default("public")
+
+  icon   String? @default("")
+  banner String? @default("")
+
+  softDeleted Boolean       @default(false)
+  Post        Post[]
+  SpaceInFeed SpaceInFeed[]
 }
 
-// model User {
-//   id    String @id @default(auto()) @map("_id") @db.ObjectId
-//   authId String @unique
-//   Post  Post[] @relation("PostAuthor")
+model Comment {
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  content String? @default("")
 
-//   PostLikesIds String[] @default([]) @db.ObjectId
-//   PostLikes    Post[]   @relation("UserLikes", fields: [PostLikesIds], references: [id])
+  author   User?  @relation(fields: [authorId], references: [clerkId])
+  authorId String
 
-//   Comment Comment[]
-//   FeedsOwned Feed[]  @relation("FieldsOwned")
-//   feedId     String? @db.ObjectId
-// }
+  post   Post?  @relation(fields: [postId], references: [id])
+  postId String @db.ObjectId
 
-// model Feed {
-//   id      String  @id @default(auto()) @map("_id") @db.ObjectId
-//   name    String? @default("")
-//   owner   User?   @relation("FieldsOwned", fields: [ownerId], references: [authId])
-//   ownerId String?
-
-//   Post       Post[]
-//   visibility String @default("public")
-// }
-
-// model Post {
-//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-
-//   content   String? @default("")
-//   image     String? @default("")
-//   published Boolean @default(true)
-
-//   author   User?   @relation("PostAuthor", fields: [authorId], references: [authId])
-//   authorId String? 
-
-//   Comment Comment[]
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-
-//   likedBy    User[]   @relation("UserLikes", fields: [likedByIDs], references: [id])
-//   likedByIDs String[] @default([]) @db.ObjectId
-
-//   likesCount Int      @default(0)
-//   Feed   Feed   @relation(fields: [feedId], references: [id])
-//   feedId String @db.ObjectId
-// }
-
-// model Comment {
-//   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-//   content   String?  @default("")
-//   author    User?    @relation(fields: [authorId], references: [authId])
-//   authorId  String 
-//   post      Post?    @relation(fields: [postId], references: [id])
-//   postId    String   @db.ObjectId
-//   createdAt DateTime @default(now())
-//   updatedAt DateTime @updatedAt
-// }
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

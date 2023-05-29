@@ -31,15 +31,15 @@ type CreateContextOptions = Record<string, never>;
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = (_opts: CreateNextContextOptions) => {
-  // const { req } = opts
-  // const sesh = getAuth(req)
+const createInnerTRPCContext = (opts: CreateNextContextOptions) => {
+  const { req } = opts
+  const sesh = getAuth(req)
 
-  // const userId = sesh.userId
+  const userId = sesh.userId
 
   return {
-    prisma
-    // userId
+    prisma,
+    userId
   };
 };
 
@@ -101,18 +101,18 @@ export const createTRPCRouter = t.router;
  */
 export const publicProcedure = t.procedure;
 
-// const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-//   if (!ctx.userId) {
-//     throw new TRPCError({
-//       code: "UNAUTHORIZED",
-//     });
-//   }
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.userId) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
 
-//   return next({
-//     ctx: {
-//       userId: ctx.userId,
-//     },
-//   });
-// });
+  return next({
+    ctx: {
+      userId: ctx.userId,
+    },
+  });
+});
 
-// export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
+export const privateProcedure = t.procedure.use(enforceUserIsAuthed);

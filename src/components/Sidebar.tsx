@@ -1,30 +1,29 @@
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useAuth,
+} from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import SwitchTheme from "~/components/SwitchTheme";
 
 interface Props {
-  handleSelectFeed?: (feed: string) => void;
+  handleSelectFeed?: (feedOrSpace: string, type: string) => void;
 }
 
 const defaultProps = {
-  handleSelectFeed: (feed: string) => {
-    return feed;
+  handleSelectFeed: (feedOrSpace: string, type: string) => {
+    return {
+      id: feedOrSpace,
+      type,
+    };
   },
 };
 
-const CreateFeed = () => {
-  console.log("create feed");
-
-  return <></>;
-};
-
 const Sidebar = (sidebarProps: Props) => {
-  // api.feeds.createFeed.useQuery({
-  //   name: "New Feed",
-  //   visibility: "public",
-  //   ownerId: "646b7816ff0ae2653aad9f27",
-  // });
+ 
 
   const props = { ...defaultProps, ...sidebarProps };
 
@@ -44,16 +43,13 @@ const Sidebar = (sidebarProps: Props) => {
     }
   };
 
+  const spaceOnClick = (spaceId: string) => {
+    props.handleSelectFeed(spaceId, "space");
+  }
+
   const feedOnClick = (feedId: string) => {
-    props.handleSelectFeed(feedId);
+    props.handleSelectFeed(feedId, "feed");
   };
-
-  const createFeed = () => {
-    console.log("creating feed");
-
-    return <CreateFeed />;
-  };
-
   return (
     <>
       <aside
@@ -72,6 +68,7 @@ const Sidebar = (sidebarProps: Props) => {
             </SignedOut>
           </div>
         </div>
+        
         <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
           <ul className="flex flex-col gap-2 py-2 text-lg">
             <li className="btn-ghost btn justify-start font-normal normal-case">
@@ -88,13 +85,11 @@ const Sidebar = (sidebarProps: Props) => {
             >
               Global
             </li>
-            <li
-              onClick={() => feedOnClick("646bbfc1039787362a4d850c")}
-              className="btn-ghost btn justify-start font-normal normal-case"
-            >
-              MyHighlightsFeed
-            </li>
           </ul>
+        </div>
+        <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
+          <div className="px-3 py-2 text-xl">Spaces</div>
+          <SpaceList onClick={spaceOnClick} />
         </div>
         <div
           onClick={handleOnClick}
@@ -106,4 +101,37 @@ const Sidebar = (sidebarProps: Props) => {
     </>
   );
 };
+
+type SpaceListProp = {
+  onClick: (spaceId: string) => void;
+}
+const SpaceList = ({ onClick }: SpaceListProp) => {
+  const { userId } = useAuth();
+
+  const { data, isLoading: postsLoading } =
+    api.spaces.getSpacesByUserId.useQuery({
+      ownerId: userId || "",
+    });
+
+  if (postsLoading)
+    return (
+      <div className="flex grow">
+        <div>..Loading</div>
+      </div>
+    );
+  if (!data) return <div>Something went wrong</div>;
+
+  if (data) {
+    console.log(data);
+  }
+  return <ul className="flex flex-col gap-2 py-2 text-lg">
+    {data.map((space) => {
+      return <li
+        className="btn-ghost btn justify-start font-normal normal-case"
+        key={space.id}
+        onClick={() => onClick(space.id)}>{space.name}</li>;
+    })}
+  </ul>;
+};
+
 export default Sidebar;

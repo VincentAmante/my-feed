@@ -16,42 +16,31 @@ export const feedsRouter = createTRPCRouter({
   getFeedPostsById: publicProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.post.findMany({
-        where: {
-          feedId: input.feedId,
-        },
-      });
-    }),
-
-  getGlobalPosts: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.post.findMany({
-      take: 10,
-      where: {
-        Feed: {
-          visibility: "public",
-        },
-      },
-    });
-  }),
-
-  continueGlobalPosts: publicProcedure
-    .input(z.object({ pageOffset: z.number() }))
-    .query(async ({ input, ctx }) => {
-      return await ctx.prisma.post.findMany({
-        skip: input.pageOffset * 10,
-        take: 10,
-        where: {
-          Feed: {
-            visibility: "public",
+      if (input.feedId === "global") {
+        return await ctx.prisma.post.findMany({
+          where: {
+            Space: {
+              visibility: "public",
+              softDeleted: false,
+            }
+          }
+        });
+      } else {
+        return await ctx.prisma.post.findMany({
+          where: {
+            Space: {
+              id: input.feedId,
+              softDeleted: false,
+            },
           },
-        },
-      });
+        });
+      }
     }),
 
   createFeed: publicProcedure
     .input(
       z.object({
-        name: z.string(),
+        name: z.string().min(1).max(64),
         visibility: z.string(),
         ownerId: z.string(),
       })

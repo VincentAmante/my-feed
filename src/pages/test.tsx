@@ -1,57 +1,36 @@
-import { useState } from "react";
-import Sidebar from "~/components/Sidebar";
-// import SwitchTheme from "~/components/SwitchTheme";
-import { api } from "~/utils/api";
+import { useAuth } from "@clerk/nextjs";
+import UserPost from "~/components/UserPost";
 
 const Test = () => {
-  const [currentFeed, setCurrentFeed] = useState("global");
+  const example = {
+    id: "1",
+    content: "This is a sample post",
+    image: "https://picsum.photos/200",
+    createdAt: new Date(),
+    authorId: "1",
+    feedId: "1",
+    likedByIDs: ["1", "2"],
+    updatedAt: new Date(),
+  };
+  const likesCount = example.likedByIDs.length;
+
   return (
     <>
-      <div className="flex h-full w-full flex-row-reverse items-stretch">
-        <main className="relative flex min-h-screen w-full flex-col items-center">
-          <div className="flex w-full items-center justify-center bg-slate-900 bg-opacity-80 py-6 pb-4">
-            Feed Name
-          </div>
-          <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
-            <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4">
-              <Feed feedId={currentFeed}></Feed>
-            </div>
-          </div>
-        </main>
-        <Sidebar handleSelectFeed={setCurrentFeed}></Sidebar>
-      </div>
+      <main>
+        <UserPost
+          id={example.id}
+          content={example.content}
+          image={""}
+          published={true}
+          authorId={example.authorId}
+          createdAt={example.createdAt}
+          updatedAt={example.updatedAt}
+          likedByIDs={[]}
+          feedId={example.feedId}
+        ></UserPost>
+      </main>
     </>
   );
 };
 
-type FeedProps = {
-  feedId: string;
-};
-
-const Feed = (props: FeedProps) => {
-  const { feedId } = props;
-
-  const { data, isLoading: postsLoading } =
-    feedId === "global"
-      ? api.feeds.getGlobalPosts.useQuery()
-      : api.feeds.getFeedPostsById.useQuery({
-          feedId: feedId,
-        });
-
-  if (postsLoading) return <div>Loading..</div>;
-
-  if (!data) return <div>Something went wrong</div>;
-
-  return (
-    <div>
-      {[...data].map((post) => (
-        <div className="card  bg-slate-800" key={post.id}>
-          <div className="card-body">
-            <div>{post.content}</div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
 export default Test;
