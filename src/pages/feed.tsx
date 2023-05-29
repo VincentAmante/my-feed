@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Sidebar from "~/components/Sidebar";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
@@ -6,6 +6,22 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
 import type {Post} from '@prisma/client'
 import { User } from "@clerk/nextjs/dist/server";
+import Image from 'next/image'
+
+const CreatePostWizard = () => {
+  const { user } = useUser();
+
+  if (!user) {
+    return <></>;
+  }
+  
+  return (
+    <div className="flex items-center gap-2">
+      <img src={user.profileImageUrl} alt="Profile Image" className="h-14 w-14 rounded-full" />
+      <input className="input input-ghost w-full" placeholder="Hello"></input>
+    </div>
+  )
+}
 
 const Feed = () => {
   const [currentFeed, setCurrentFeed] = useState("global");
@@ -43,18 +59,19 @@ const FeedPage = (props: FeedPageProps) => {
 
   const canMakePost = (feedType == "space" && ownerId == userId) ? true : false;
 
-  return useMemo(() => { 
-    return <main className="relative flex min-h-screen w-full flex-col items-center">
+  return <>
+    <main className="relative flex min-h-screen w-full flex-col items-center">
       <div className="flex w-full items-center justify-center bg-slate-900 bg-opacity-80 py-6 pb-4">
         {feedName}
       </div>
       <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
-        <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4">
+        <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4 flex-col">
+          {canMakePost && <CreatePostWizard></CreatePostWizard>}
           <FeedData id={feedId} type={feedType}></FeedData>
         </div>
       </div>
     </main>
-  }, [feedId, feedType, feedName])
+  </>
 }
 
 

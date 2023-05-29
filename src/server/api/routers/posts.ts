@@ -9,7 +9,7 @@ export const postsRouter = createTRPCRouter({
         content: z.string().min(1).max(280),
         image: z.string(),
         authorId: z.string(),
-        feedId: z.string(),
+        spaceId: z.string(),
       })
     )
     .query(async ({ input, ctx }) => {
@@ -18,7 +18,7 @@ export const postsRouter = createTRPCRouter({
           content: input.content,
           image: input.image,
           authorId: input.authorId,
-          feedId: input.feedId,
+          spaceId: input.spaceId,
         },
       });
     }),
