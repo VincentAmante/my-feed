@@ -1,7 +1,8 @@
-  import type { Post } from "@prisma/client";
+import type { Post } from "@prisma/client";
 import App from "next/app";
 import Image from "next/image";
 import { useState, useMemo } from "react";
+
 
 type ImageType = {
   src: string | undefined | null;
@@ -22,14 +23,26 @@ const AppImage = (props: ImageType) => {
     );
 };
 
-const UserPost = (props: Post) => {
+type Author = {
+  id: string;
+  username: string | null;
+  profileImageUrl: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+type PostWithUser = Post & {
+  author: Author | undefined;
+}
+
+const UserPost = (props: PostWithUser) => {
   const {
     id,
     content,
     image,
     createdAt,
     authorId,
-    feedId,
+    spaceId,
     likedByIDs,
     updatedAt,
   } = props;
@@ -39,17 +52,19 @@ const UserPost = (props: Post) => {
     [createdAt]
   );
 
+  if (!props.author) return <></>;
+
   return (
     <div className="card w-full bg-slate-800 shadow-xl min-w-[18rem]">
       <div className="card-body py-6 gap-6 px-0">
         <div className="flex items-center gap-2 px-4">
-          <div className="placeholder avatar">
-            <div className="w-10 rounded-full bg-neutral-focus text-neutral-content">
-              <span className="text-xs">AA</span>
+          <div className="avatar">
+            <div className="w-16 rounded-full bg-neutral-focus text-neutral-content">
+              <img src={props.author.profileImageUrl} alt="Profile Picture" />
             </div>
           </div>
           <div>
-            <p>Name goes here</p>
+            <p>@{props.author.username}</p>
             <p className="text-xs italic opacity-50">{dateCreated}</p>
           </div>
         </div>

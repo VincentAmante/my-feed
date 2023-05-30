@@ -1,6 +1,20 @@
 import { z } from "zod";
+import type { User as ClerkUser } from '@clerk/nextjs/server'
+import { clerkClient } from "@clerk/nextjs/server";
+import { Post } from "@prisma/client";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+
+const filterUserForClient = (user: ClerkUser) => {
+  return {
+    id: user.id,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    profileImageUrl: user.profileImageUrl,
+  }
+}
 
 export const feedsRouter = createTRPCRouter({
   getUserFeeds: publicProcedure
@@ -16,8 +30,12 @@ export const feedsRouter = createTRPCRouter({
   getFeedPostsById: publicProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
+      let posts = null;
       if (input.feedId === "global") {
-        return await ctx.prisma.post.findMany({
+        posts = await ctx.prisma.post.findMany({
+          orderBy: {
+            createdAt: "desc",
+          },
           where: {
             Space: {
               visibility: "public",
@@ -26,7 +44,10 @@ export const feedsRouter = createTRPCRouter({
           }
         });
       } else {
-        return await ctx.prisma.post.findMany({
+        posts = await ctx.prisma.post.findMany({
+          orderBy: {
+            createdAt: "desc",
+          },
           where: {
             Space: {
               id: input.feedId,
@@ -35,6 +56,18 @@ export const feedsRouter = createTRPCRouter({
           },
         });
       }
+
+      const users = (
+        await clerkClient.users.getUserList({
+        userId: posts.map((post) => post.authorId),
+        limit: 100
+        }))
+        .map(filterUserForClient)
+
+      return posts.map((post) => ({
+        ...post,
+        author: users.find((user) => user.id === post.authorId)
+      }));
     }),
 
   createFeed: publicProcedure

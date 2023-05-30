@@ -4,22 +4,57 @@ import Sidebar from "~/components/Sidebar";
 import { api } from "~/utils/api";
 import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
-import type {Post} from '@prisma/client'
+import type { Post } from '@prisma/client'
 import { User } from "@clerk/nextjs/dist/server";
 import Image from 'next/image'
 
-const CreatePostWizard = () => {
+type CreatePostWizardProps = {
+  spaceId: string;
+}
+const CreatePostWizard = (props: CreatePostWizardProps) => {
   const { user } = useUser();
+  const [content, setContent] = useState("");
+
+
+  const ctx = api.useContext();
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const { mutate } = api.posts.createPost.useMutation({
+    onSuccess: () => {
+      setContent("");
+      void ctx.spaces.getSpacePostsById.invalidate();
+      void ctx.feeds.getFeedPostsById.invalidate();
+    },
+
+    onError: (error) => {
+      console.log(error);
+    },
+  });
 
   if (!user) {
     return <></>;
   }
-  
+
   return (
     <div className="flex items-center gap-2">
       <img src={user.profileImageUrl} alt="Profile Image" className="h-14 w-14 rounded-full" />
-      <input className="input input-ghost w-full" placeholder="Hello"></input>
-    </div>
+      <input
+        className="input input-ghost w-full"
+        placeholder="Hello"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            mutate({
+              content: content,
+              image: '',
+              spaceId: props.spaceId,
+            });
+          }
+        }}
+      >
+
+      </input>
+    </div >
   )
 }
 
@@ -36,7 +71,7 @@ const Feed = () => {
     setOwnerId(ownerId);
     setFeedName(feedName);
   }
-  
+
   return (
     <>
       <div className="flex h-full w-full flex-row-reverse items-stretch">
@@ -65,8 +100,8 @@ const FeedPage = (props: FeedPageProps) => {
         {feedName}
       </div>
       <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
-        <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4 flex-col">
-          {canMakePost && <CreatePostWizard></CreatePostWizard>}
+        <div className="flex h-full w-full rounded-3xl bg-slate-900 p-4 flex-col gap-4">
+          {canMakePost && <CreatePostWizard spaceId={feedId}></CreatePostWizard>}
           <FeedData id={feedId} type={feedType}></FeedData>
         </div>
       </div>
@@ -84,27 +119,27 @@ const FeedData = (props: FeedDataProps) => {
   const { id, type } = props;
   const { data, isLoading } = (type == "feed") ?
     api.feeds.getFeedPostsById.useQuery({
-    feedId: id
-  }) : api.spaces.getSpacePostsById.useQuery({
-    spaceId: id
-  })
-  if (isLoading)
-  return (
-    <div className="flex grow">
-      <div>..Loading</div>
-    </div>
-  );
-  if (!data) return <div>Something went wrong</div>;
-  else 
-
- return ( 
-  <div>
-    {data.map((post: Post) => {
-      return <UserPost key={post.id} {...post} />
+      feedId: id
+    }) : api.spaces.getSpacePostsById.useQuery({
+      spaceId: id
     })
-  }
-   </div>
- )
+  if (isLoading)
+    return (
+      <div className="flex grow">
+        <div>..Loading</div>
+      </div>
+    );
+  if (!data) return <div>Something went wrong</div>;
+  else
+
+    return (
+      <div className="flex flex-col gap-4">
+        {data.map((post) => {
+          return <UserPost key={post.id} {...post} />
+        })
+        }
+      </div>
+    )
 }
 
 type PostWizardProps = {

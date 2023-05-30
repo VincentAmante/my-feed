@@ -1,6 +1,19 @@
+import type { User as ClerkUser } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
+import { Post } from "@prisma/client";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+
+const filterUserForClient = (user: ClerkUser) => {
+  return {
+    id: user.id,
+    username: user.username,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    profileImageUrl: user.profileImageUrl,
+  }
+}
 
 export const spacesRouter = createTRPCRouter({
   getSpaceById: publicProcedure
@@ -24,11 +37,26 @@ export const spacesRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
-      return await ctx.prisma.post.findMany({
+      const posts = await ctx.prisma.post.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
         where: {
           spaceId: input.spaceId,
         },
       });
+      
+      const users = (
+        await clerkClient.users.getUserList({
+        userId: posts.map((post) => post.authorId),
+        limit: 100
+        }))
+        .map(filterUserForClient)
+
+      return posts.map((post) => ({
+        ...post,
+        author: users.find((user) => user.id === post.authorId)
+      }));
     }),
 
   getSpacesByUserId: publicProcedure
@@ -39,6 +67,7 @@ export const spacesRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       return await ctx.prisma.space.findMany({
+        take: 100,
         where: {
           ownerId: input.ownerId,
           softDeleted: false,
@@ -47,7 +76,7 @@ export const spacesRouter = createTRPCRouter({
           id: true,
           name: true,
           ownerId: true,
-        },
+        }
       });
     }),
 });

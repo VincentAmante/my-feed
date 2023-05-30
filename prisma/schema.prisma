@@ -13,8 +13,8 @@ datasource db {
 
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId     String   @unique 
-  softDeleted Boolean  @default(false) 
+  clerkId     String   @unique
+  softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 
   Comment Comment[]
@@ -30,8 +30,8 @@ model Post {
   published Boolean   @default(true)
   Comment   Comment[]
 
-  author   User?   @relation(fields: [authorId], references: [clerkId])
-  authorId String?
+  author   User    @relation(fields: [authorId], references: [clerkId])
+  authorId String
   Space    Space?  @relation(fields: [spaceId], references: [id])
   spaceId  String? @db.ObjectId
 
@@ -47,8 +47,8 @@ model Feed {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  owner   User?   @relation(fields: [ownerId], references: [clerkId])
-  ownerId String?
+  owner   User   @relation(fields: [ownerId], references: [clerkId])
+  ownerId String
 
   followersIds String[] @default([]) @db.ObjectId
 
@@ -64,19 +64,19 @@ model Feed {
 model SpaceInFeed {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  feed   Feed?   @relation(fields: [feedId], references: [id])
-  feedId String? @db.ObjectId
+  feed   Feed   @relation(fields: [feedId], references: [id])
+  feedId String @db.ObjectId
 
-  space   Space?  @relation(fields: [spaceId], references: [id])
-  spaceId String? @db.ObjectId
+  space   Space  @relation(fields: [spaceId], references: [id])
+  spaceId String @db.ObjectId
 }
 
 model Space {
   id   String  @id @default(auto()) @map("_id") @db.ObjectId
   name String? @default("")
 
-  owner   User?   @relation(fields: [ownerId], references: [clerkId])
-  ownerId String?
+  owner   User   @relation(fields: [ownerId], references: [clerkId])
+  ownerId String
 
   followersIds String[] @default([]) @db.ObjectId
 
