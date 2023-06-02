@@ -38,6 +38,18 @@ const ImageTestPage = () => {
             }
         }
 
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
+        const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ""}/image/upload`,
+            {
+                method: 'POST',
+                body: formData
+            })
+            .then((r: any) => r.json());
+
+        setImageSrc(data.secure_url);
+        setUploadData(data);
+
+
         console.log(event);
         console.log('fileInput', fileInput);
     }
