@@ -64,9 +64,9 @@ const UserPost = (props: PostWithUser) => {
     [createdAt]
   );
   const spaceUrl = useMemo(() => {
-    if (spaceId && Space.name) return `/space/${spaceId}`;
+    if (spaceId && Space?.name) return `/space/${spaceId}`;
     else return "";
-  }, [spaceId, Space.name]);
+  }, [spaceId, Space?.name]);
 
   if (!props.author) return <></>;
 
@@ -91,7 +91,7 @@ const UserPost = (props: PostWithUser) => {
         <div className="flex items-start gap-2 px-4">
           <Link href={spaceUrl} className="flex gap-1">
             <span className="underline">
-              {Space.name}
+              {Space?.name}
             </span>
           </Link>
         </div>
