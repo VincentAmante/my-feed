@@ -19,7 +19,8 @@ const ImageTestPage = () => {
             reader.readAsDataURL(e.target.files[0]);
     };
 
-    const handleOnSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const form = event.currentTarget;
@@ -40,8 +41,10 @@ const ImageTestPage = () => {
     }
 
     return <>
-        <form method="post" onChange={handleOnChange} onSubmit={handleOnSubmit}>
-            <input type="file" name="file" className="file-input" />
+        <form method="post"
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onSubmit={(e) => handleOnSubmit(e)}>
+            <input onChange={handleOnChange} type="file" name="file" className="file-input" />
 
             <img src={imageSrc}></img>
             {imageSrc && uploadData && <button className="button">Upload Files</button>}
