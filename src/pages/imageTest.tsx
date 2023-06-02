@@ -23,6 +23,7 @@ const ImageTestPage = () => {
             setUploadData(undefined);
         };
 
+
         if (e.target.files && e.target.files.length > 0 && e.target.files[0])
             reader.readAsDataURL(e.target.files[0]);
     };
@@ -67,7 +68,7 @@ const ImageTestPage = () => {
             <input onChange={handleOnChange} type="file" name="file" className="file-input" />
 
             <img src={imageSrc}></img>
-            {imageSrc && uploadData && <button className="button">Upload Files</button>}
+            {imageSrc && !uploadData && <button className="button">Upload Files</button>}
             {uploadData && (
                 <code><pre>{JSON.stringify(uploadData, null, 2)}</pre></code>
             )}
