@@ -29,7 +29,7 @@ const ImageTestPage = () => {
 
         const formData = new FormData();
 
-        if (fileInput) {
+        if (fileInput && fileInput.files) {
             for (const file of fileInput.files) {
                 formData.append('file', file);
             }
