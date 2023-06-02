@@ -1,10 +1,10 @@
 import { useState, } from "react";
-import type { ChangeEvent, FormEvent } from "react";
+import type { ChangeEvent } from "react";
 
 const ImageTestPage = () => {
     const [imageSrc, setImageSrc] = useState<string | undefined>();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const [uploadData, setUploadData] = useState<unknown>();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+    const [uploadData, setUploadData] = useState<any>();
 
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
         console.log('running handleOnChange');
@@ -41,8 +41,6 @@ const ImageTestPage = () => {
         console.log(event);
         console.log('fileInput', fileInput);
     }
-
-    if (!uploadData) return <></>
 
     return <>
         <form method="post"
