@@ -6,7 +6,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { useState, } from "react";
 import type { ChangeEvent } from "react";
+import Image from "next/image";
 
+// Allows parent component to trigger upload and receive image url
 type _ImageUploader = {
     onUpload: (imageUrl: string | null) => void;
     submitRef: React.RefObject<HTMLButtonElement>;
@@ -14,22 +16,15 @@ type _ImageUploader = {
 
 const UploadWidget = (props: _ImageUploader) => {
     const { onUpload, submitRef } = props;
-
     const [imageSrc, setImageSrc] = useState<string | undefined>();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    const [uploadData, setUploadData] = useState<any>();
+
 
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('running handleOnChange');
         const reader = new FileReader();
-
         reader.onload = function (onLoadEvent) {
             if (!onLoadEvent.target) return;
             setImageSrc(onLoadEvent.target.result as string);
-            setUploadData(undefined);
         };
-
-
         if (e.target.files && e.target.files.length > 0 && e.target.files[0])
             reader.readAsDataURL(e.target.files[0]);
     };
@@ -37,25 +32,29 @@ const UploadWidget = (props: _ImageUploader) => {
     // eslint-disable-next-line @typescript-eslint/require-await
     const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+
+        // To ensure that the post uploads with an image if existing, this component will always upload
         if (!imageSrc) {
             console.log('imageSrc is undefined');
             onUpload(null);
             return;
         }
 
+
+        // Handles retrieval of form data
         const form = event.currentTarget;
         const fileInput = Array.from(form.elements).find(
             (element) => (element as HTMLInputElement).name === 'file'
         ) as HTMLInputElement | undefined;
-
         const formData = new FormData();
-
         if (fileInput && fileInput.files) {
             for (const file of fileInput.files) {
                 formData.append('file', file);
             }
         }
 
+
+        // TODO: Check to see if env is exposed
         formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
         const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ""}/image/upload`,
             {
@@ -64,12 +63,10 @@ const UploadWidget = (props: _ImageUploader) => {
             })
             .then((r: any) => r.json());
 
+        // Resets
         setImageSrc(undefined);
-        setUploadData(undefined);
-        onUpload(data.secure_url);
 
-        console.log(event);
-        console.log('fileInput', fileInput);
+        onUpload(data.secure_url);
     }
 
     return (
@@ -78,7 +75,12 @@ const UploadWidget = (props: _ImageUploader) => {
             onSubmit={(e) => handleOnSubmit(e)}>
             <input onChange={handleOnChange} type="file" name="file" className="file-input" />
 
-            <img src={imageSrc} />
+            {imageSrc && <Image
+                width={300}
+                alt="An image you're uploadeding"
+                height={300}
+                className="rounded-lg max-w-sm"
+                src={imageSrc} />}
             <button className="button hidden" ref={submitRef}>Upload Files</button>
         </form>
     )
