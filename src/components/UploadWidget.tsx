@@ -64,8 +64,8 @@ const UploadWidget = (props: _ImageUploader) => {
             })
             .then((r: any) => r.json());
 
-        setImageSrc(data.secure_url);
-        setUploadData(data);
+        setImageSrc(undefined);
+        setUploadData(undefined);
         onUpload(data.secure_url);
 
         console.log(event);
