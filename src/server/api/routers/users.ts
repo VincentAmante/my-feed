@@ -16,7 +16,7 @@ export const usersRouter = createTRPCRouter({
         },
       });
 
-      if (doesUserExist.length == 0) {
+      if (!doesUserExist.length) {
         const user = await ctx.prisma.user.create({
           data: {
             clerkId: input.clerkId,

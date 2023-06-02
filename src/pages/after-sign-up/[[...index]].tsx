@@ -8,11 +8,12 @@ import { useRouter } from "next/router";
 const PostSignUp = () => {
     const router = useRouter()
     const { userId } = useAuth()
+    console.log(userId)
     const user = api.users.initUser.useQuery({
         clerkId: userId || ""
     })
     useEffect(() => {
-        if (user){
+        if (user) {
             void router.push('/feed')
         }
     }, [user, router])

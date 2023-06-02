@@ -21,6 +21,8 @@ export const FeedContext = createContext({
 type CreatePostWizardProps = {
   spaceId: string;
 }
+
+// Handler for creating a post
 const CreatePostWizard = (props: CreatePostWizardProps) => {
   const { user } = useUser();
   const [content, setContent] = useState("");
@@ -44,6 +46,8 @@ const CreatePostWizard = (props: CreatePostWizardProps) => {
   if (!user) {
     return <></>;
   }
+
+  // TODO: Improve the flow of the component when uploading with or without an image
 
   function handleUpload(imageUrl: string | null) {
     if (imageUrl) {
