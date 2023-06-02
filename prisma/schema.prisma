@@ -72,8 +72,8 @@ model SpaceInFeed {
 }
 
 model Space {
-  id   String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String? @default("")
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @default("")
 
   owner   User   @relation(fields: [ownerId], references: [clerkId])
   ownerId String

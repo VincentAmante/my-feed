@@ -42,7 +42,7 @@ type PostWithUser = Post & {
   author: Author | undefined;
   Space: {
     name: string;
-  }
+  } | undefined | null;
 }
 
 const UserPost = (props: PostWithUser) => {

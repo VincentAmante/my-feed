@@ -5,7 +5,6 @@ import { api } from "~/utils/api";
 import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
 import type { Post } from '@prisma/client'
-import { User } from "@clerk/nextjs/dist/server";
 import Image from 'next/image'
 
 
@@ -132,6 +131,7 @@ type FeedDataProps = {
   id: string;
   type: string;
 }
+
 
 const FeedData = (props: FeedDataProps) => {
   const { id, type } = props;
