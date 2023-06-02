@@ -8,8 +8,8 @@ import "~/styles/globals.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return <ClerkProvider {...pageProps}>
-            <Component {...pageProps} />
-          </ClerkProvider>;
+    <Component {...pageProps} />
+  </ClerkProvider>;
 };
 
 export default api.withTRPC(MyApp);
