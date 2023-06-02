@@ -47,7 +47,8 @@ export const feedsRouter = createTRPCRouter({
               visibility: "public",
               softDeleted: false,
             }
-          }
+          },
+          take: 12,
         });
       } else {
         posts = await ctx.prisma.post.findMany({
