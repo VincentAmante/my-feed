@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import Sidebar from "~/components/Sidebar";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
@@ -6,6 +6,7 @@ import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
 import type { Post } from '@prisma/client'
 import Image from 'next/image'
+import UploadWidget from "~/components/UploadWidget";
 
 
 import { useContext, createContext } from "react";
@@ -24,6 +25,7 @@ const CreatePostWizard = (props: CreatePostWizardProps) => {
   const { user } = useUser();
   const [content, setContent] = useState("");
 
+  const submitRef = useRef<HTMLButtonElement>(null);
 
   const ctx = api.useContext();
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
@@ -43,31 +45,49 @@ const CreatePostWizard = (props: CreatePostWizardProps) => {
     return <></>;
   }
 
+  function handleUpload(imageUrl: string | null) {
+    if (imageUrl) {
+      mutate({
+        content: content,
+        image: imageUrl,
+        spaceId: props.spaceId,
+      });
+    } else if (imageUrl === null) {
+      mutate({
+        content: content,
+        image: '',
+        spaceId: props.spaceId,
+      });
+    }
+  }
+
+  function triggerUpload() {
+    submitRef.current?.click();
+  }
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex gap-2 flex-col w-full">
 
-      <Image
-        width={128}
-        height={128}
-        src={user.profileImageUrl}
-        alt="Profile Image" className="h-14 w-14 rounded-full" />
-      <input
-        className="input input-ghost w-full"
-        placeholder="Hello"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            mutate({
-              content: content,
-              image: '',
-              spaceId: props.spaceId,
-            });
-          }
-        }}
-      >
-
-      </input>
+      <div className="flex items-center gap-2">
+        <Image
+          width={128}
+          height={128}
+          src={user.profileImageUrl}
+          alt="Profile Image" className="h-14 w-14 rounded-full" />
+        <input
+          className="input input-ghost w-full"
+          placeholder="Hello"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              triggerUpload();
+            }
+          }}
+        >
+        </input>
+      </div>
+      <UploadWidget submitRef={submitRef} onUpload={handleUpload}></UploadWidget>
     </div >
   )
 }
