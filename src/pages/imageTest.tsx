@@ -5,11 +5,10 @@ const ImageTestPage = () => {
     const [uploadData, setUploadData] = useState<any>();
 
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-        console.log('running handleOnChange')
+        console.log('running handleOnChange');
         const reader = new FileReader();
 
         reader.onload = function (onLoadEvent) {
-
             if (!onLoadEvent.target) return;
 
             setImageSrc(onLoadEvent.target.result as string);
@@ -20,20 +19,21 @@ const ImageTestPage = () => {
             reader.readAsDataURL(e.target.files[0]);
     };
 
-    async function handleOnSubmit(event: FormEvent<HTMLFormElement>) {
+    const handleOnSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const form = event.currentTarget;
-        const fileInput = Array.from(form.elements).find(({
-            name
-        }) => name === 'file');
+        const fileInput = Array.from(form.elements).find(
+            (element) => (element as HTMLInputElement).name === 'file'
+        ) as HTMLInputElement | undefined;
 
         const formData = new FormData();
 
-        for (const file of fileInput.files) {
-            formData.append('file', file);
+        if (fileInput) {
+            for (const file of fileInput.files) {
+                formData.append('file', file);
+            }
         }
-
 
         console.log(event);
         console.log('fileInput', fileInput);
