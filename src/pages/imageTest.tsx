@@ -1,49 +1,55 @@
-import { useState } from 'react';
-import type { FormEvent, FormEventHandler } from 'react';
-import Head from 'next/head'
+import { useState, ChangeEvent, FormEvent } from "react";
 
-type ImageSrc = string | undefined;
-type ChangeEvent = {
-    target: {
-        files: Blob[] | undefined;
+const ImageTestPage = () => {
+    const [imageSrc, setImageSrc] = useState<string | undefined>();
+    const [uploadData, setUploadData] = useState<any>();
+
+    const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+        console.log('running handleOnChange')
+        const reader = new FileReader();
+
+        reader.onload = function (onLoadEvent) {
+
+            if (!onLoadEvent.target) return;
+
+            setImageSrc(onLoadEvent.target.result as string);
+            setUploadData(undefined);
+        };
+
+        if (e.target.files && e.target.files.length > 0 && e.target.files[0])
+            reader.readAsDataURL(e.target.files[0]);
     };
+
+    async function handleOnSubmit(event: FormEvent<HTMLFormElement>) {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const fileInput = Array.from(form.elements).find(({
+            name
+        }) => name === 'file');
+
+        const formData = new FormData();
+
+        for (const file of fileInput.files) {
+            formData.append('file', file);
+        }
+
+
+        console.log(event);
+        console.log('fileInput', fileInput);
+    }
+
+    return <>
+        <form method="post" onChange={handleOnChange} onSubmit={handleOnSubmit}>
+            <input type="file" name="file" className="file-input" />
+
+            <img src={imageSrc}></img>
+            {imageSrc && uploadData && <button className="button">Upload Files</button>}
+            {uploadData && (
+                <code><pre>{JSON.stringify(uploadData, null, 2)}</pre></code>
+            )}
+        </form>
+    </>
 }
 
-const UploadTest = () => {
-    const [imgSrc, setImgSrc] = useState("" as ImageSrc)
-    // const [uploadData, setUploadData] = useState({} as any)
-
-    // function handleOnChange(changeEvent: FormEventHandler<HTMLFormElement>) {
-    //     const reader = new FileReader();
-    //     reader.onload = (onloadEvent) => {
-    //         if (onloadEvent.target && changeEvent.target) {
-    //             setImgSrc(onloadEvent.target.result)
-    //             setUploadData(undefined)
-    //         }
-    //     }
-    //     if (changeEvent.target.files && changeEvent.target.files[0]) {
-    //         reader.readAsDataURL(changeEvent.target.files[0])
-    //     }
-    // }
-
-    // async function handleOnSubmit(event: FormEvent<HTMLFormElement>) {
-    //     event.preventDefault();
-    // }
-
-
-    return (
-        <div className="">
-            <Head>
-                <title>Image Uploader</title>
-                <meta name="description" content="Upload your image to Cloudinary!" />
-                <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <main>
-                <h1>Image Uploader</h1>
-                <p>Upload image to Cloudinary</p>
-            </main>
-        </div>
-    )
-}
-
-export default UploadTest;
+export default ImageTestPage;
