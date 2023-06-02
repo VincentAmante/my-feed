@@ -1,11 +1,13 @@
 import { useAuth } from "@clerk/nextjs";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { api } from "~/utils/api";
 import SwitchTheme from "~/components/SwitchTheme";
 import UserDisplay from "~/components/UserDisplay";
+import Feed, { FeedContext } from "~/pages/feed";
+import { useMemo } from "react";
 
 interface Props {
-  handleSelectFeed?: (
+  handleSelectFeed: (
     id: string,
     type: string,
     name: string,
@@ -13,21 +15,21 @@ interface Props {
   ) => void;
 }
 
-const defaultProps = {
-  handleSelectFeed: (
-    id: string,
-    type: string,
-    name: string,
-    ownerId: string
-  ) => {
-    return {
-      id,
-      type,
-      name,
-      ownerId,
-    };
-  },
-};
+// const defaultProps = {
+//   handleSelectFeed: (
+//     id: string,
+//     type: string,
+//     name: string,
+//     ownerId: string
+//   ) => {
+//     return {
+//       id,
+//       type,
+//       name,
+//       ownerId,
+//     };
+//   },
+// };
 
 // TODO: Move this to a custom hook or refactor
 const useSidebarToggle = () => {
@@ -70,15 +72,20 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
   )
 };
 const Sidebar = (sidebarProps: Props) => {
-  const props = { ...defaultProps, ...sidebarProps };
-
-  const spaceOnClick = (spaceId: string, name: string, ownerId: string) => {
-    props.handleSelectFeed(spaceId, "space", name, ownerId);
-  };
+  const props = useMemo(() => ({ ...sidebarProps }), [sidebarProps]);
 
   const feedOnClick = (feedId: string, name: string, ownerId: string) => {
     props.handleSelectFeed(feedId, "feed", name, ownerId);
   };
+
+  const SpaceListElement = useMemo(() => {
+
+    const spaceOnClick = (spaceId: string, name: string, ownerId: string) => {
+      props.handleSelectFeed(spaceId, "space", name, ownerId);
+    };
+    return <SpaceList onClick={spaceOnClick} />;
+  }
+    , [props]);
   return (
     <SidebarWrapper>
       <div>
@@ -86,7 +93,7 @@ const Sidebar = (sidebarProps: Props) => {
       </div>
       <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
         <div className="px-3 py-2 text-xl">Your Feeds</div>
-        <SpaceList onClick={spaceOnClick} />
+        {SpaceListElement}
       </div>
       <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
         <div className="px-3 py-2 text-xl">Feeds</div>
@@ -107,11 +114,11 @@ type SpaceListProp = {
   onClick: (spaceId: string, name: string, ownerId: string) => void;
 };
 const SpaceList = ({ onClick }: SpaceListProp) => {
-  const { userId } = useAuth();
+  const { userId } = useContext(FeedContext);
 
   const { data, isLoading: postsLoading } =
     api.spaces.getSpacesByUserId.useQuery({
-      ownerId: userId || "",
+      ownerId: userId,
     });
 
   if (postsLoading)

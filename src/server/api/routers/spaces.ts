@@ -41,6 +41,13 @@ export const spacesRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
+        include: {
+          Space: {
+            select: {
+              name: true,
+            }
+          }
+        },
         where: {
           spaceId: input.spaceId,
         },

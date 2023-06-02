@@ -3,9 +3,8 @@ import type { User as ClerkUser } from '@clerk/nextjs/server'
 import { clerkClient } from "@clerk/nextjs/server";
 import { Post } from "@prisma/client";
 
+
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-
-
 const filterUserForClient = (user: ClerkUser) => {
   return {
     id: user.id,
@@ -36,6 +35,13 @@ export const feedsRouter = createTRPCRouter({
           orderBy: {
             createdAt: "desc",
           },
+          include: {
+            Space: {
+              select: {
+                name: true,
+              }
+            }
+          },
           where: {
             Space: {
               visibility: "public",
@@ -47,6 +53,13 @@ export const feedsRouter = createTRPCRouter({
         posts = await ctx.prisma.post.findMany({
           orderBy: {
             createdAt: "desc",
+          },
+          include: {
+            Space: {
+              select: {
+                name: true,
+              }
+            }
           },
           where: {
             Space: {

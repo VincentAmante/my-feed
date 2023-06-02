@@ -8,9 +8,12 @@ const Test = () => {
     image: "https://picsum.photos/200",
     createdAt: new Date(),
     authorId: "1",
-    feedId: "1",
+    spaceId: "1",
     likedByIDs: ["1", "2"],
     updatedAt: new Date(),
+    Space: {
+      name: 'Test Space'
+    }
   };
   const likesCount = example.likedByIDs.length;
 
@@ -20,13 +23,22 @@ const Test = () => {
         <UserPost
           id={example.id}
           content={example.content}
-          image={""}
+          image={"https://picsum.photos/500"}
           published={true}
           authorId={example.authorId}
           createdAt={example.createdAt}
           updatedAt={example.updatedAt}
           likedByIDs={[]}
-          feedId={example.feedId}
+          spaceId={example.spaceId}
+          softDeleted={false}
+          author={{
+            id: "1",
+            username: "test",
+            profileImageUrl: "https://picsum.photos/100",
+            firstName: "Test",
+            lastName: "User",
+          }}
+          Space={example.Space}
         ></UserPost>
       </main>
     </>
