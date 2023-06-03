@@ -20,7 +20,7 @@ const PostSignUp = () => {
     })
 
     useEffect(() => {
-        if (user.data) {
+        if (user.data && userId !== undefined || userId !== "") {
             console.log("pushing to feed")
             void router.push('/feed')
         }
@@ -28,7 +28,9 @@ const PostSignUp = () => {
 
     return (
         <main className="flex flex-col items-center justify-center w-screen h-screen text-white">
-            <h1 className="text-4xl">Initialising your account please wait</h1>
+            <h1 className="text-6xl">
+                <span className="loading loading-bars loading-lg text-primary"></span>
+            </h1>
         </main>
     )
 }
