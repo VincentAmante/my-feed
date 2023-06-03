@@ -11,6 +11,7 @@ import { api } from "~/utils/api";
 import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
+
   return (
     <>
       <Head>
@@ -28,7 +29,12 @@ const Home: NextPage = () => {
           </h2>
         </section>
         <section>
-          <SignUp afterSignUpUrl={'/handle-sign-in'} afterSignInUrl={'/handle-sign-in'} />
+          <Link className="btn btn-primary" href={'/sign-in'}>
+            Sign In
+          </Link>
+          <Link className="btn btn-primary" href={'/sign-up'}>
+            Sign Up
+          </Link>
           <SignedIn>
             <AuthenticateWithRedirectCallback />
           </SignedIn>

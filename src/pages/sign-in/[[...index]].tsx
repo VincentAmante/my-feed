@@ -1,6 +1,4 @@
-import { SignIn, SignedIn, AuthenticateWithRedirectCallback } from "@clerk/nextjs";
-import { useRouter } from "next/router";
-
+import { SignIn } from "@clerk/nextjs";
 
 export default function Page() {
   return (
@@ -14,10 +12,7 @@ export default function Page() {
         </h2>
       </section>
       <section>
-        <SignIn afterSignUpUrl={'/handle-sign-in'} afterSignInUrl={'/handle-sign-in'} />
-        <SignedIn>
-          <AuthenticateWithRedirectCallback />
-        </SignedIn>
+        <SignIn />
       </section>
     </main>
   );
