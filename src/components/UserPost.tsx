@@ -1,7 +1,7 @@
 import type { Post } from "@prisma/client";
 import App from "next/app";
 import Image from "next/image";
-import { useState, useMemo, useRef, forwardRef, ForwardedRef } from "react";
+import { useMemo, useRef, ForwardedRef } from "react";
 import Link from "next/link";
 import { CldImage } from 'next-cloudinary';
 import { useAuth } from "@clerk/clerk-react";
@@ -36,26 +36,11 @@ const AppImage = (props: ImageType) => {
     );
 };
 
-type Author = {
-  id: string;
-  username: string | null;
-  profileImageUrl: string;
-  firstName: string | null;
-  lastName: string | null;
-}
-
-type PostWithUser = Post & {
-  author: Author | undefined;
-  Space: {
-    name: string;
-  } | undefined | null;
-}
 
 const DeleteModal = React.forwardRef(function DeleteModal(
   props: { id: string }, ref: ForwardedRef<HTMLDialogElement>,) {
   const ctx = api.useContext();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
   const { mutate } = api.posts.deletePost.useMutation({
     onSuccess: () => {
       void ctx.spaces.getSpacePostsById.invalidate();
@@ -90,6 +75,22 @@ const DeleteModal = React.forwardRef(function DeleteModal(
 
 })
 
+
+type Author = {
+  id: string;
+  username: string | null;
+  profileImageUrl: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
+type PostWithUser = Post & {
+  author: Author | undefined;
+  Space: {
+    name: string;
+  } | undefined | null;
+}
+
 const UserPost = (props: PostWithUser) => {
   const {
     id,
@@ -120,7 +121,7 @@ const UserPost = (props: PostWithUser) => {
     , [userId, authorId]);
 
   const nameDisplay = useMemo(() => {
-    if (isOwnedByUser) return "You";
+    if (isOwnedByUser) return <span className="italic">You</span>;
     else if (author?.username) return `@${author.username}`;
   }, [isOwnedByUser, author?.username])
 

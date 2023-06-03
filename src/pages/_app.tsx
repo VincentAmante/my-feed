@@ -21,7 +21,8 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
 
   return <ClerkProvider
     appearance={{
-      baseTheme: 'dark',
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      baseTheme: dark,
     }}
     {...pageProps}>
     {getLayout(<Component {...pageProps} />)}
