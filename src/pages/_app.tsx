@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { type AppType } from "next/app";
 import { ClerkProvider } from "@clerk/nextjs";
 import { api } from "~/utils/api";
+import { dark } from '@clerk/themes';
 
 import "~/styles/globals.css";
 
@@ -18,7 +19,11 @@ type AppPropsWithLayout = AppProps & {
 const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
 
-  return <ClerkProvider {...pageProps}>
+  return <ClerkProvider
+    appearance={{
+      baseTheme: 'dark',
+    }}
+    {...pageProps}>
     {getLayout(<Component {...pageProps} />)}
   </ClerkProvider>;
 };

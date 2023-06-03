@@ -5,6 +5,8 @@ import SwitchTheme from "~/components/SwitchTheme";
 import UserDisplay from "~/components/UserDisplay";
 import Feed, { FeedContext } from "~/pages/feed";
 import { useMemo } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   handleSelectFeed: (
@@ -43,7 +45,7 @@ const useSidebarToggle = () => {
     setIsToggled(!isToggled);
 
     if (isToggled) {
-      setSidebarStyle("transform-none");
+      setSidebarStyle("transform-none drop-shadow-xl");
     } else {
       setSidebarStyle("-translate-x-full");
     }
@@ -60,13 +62,13 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
 
   return (
     <aside className={`fixed left-0 flex h-full w-full max-w-xs md:h-auto ${sidebarStyle} transform flex-col
-    gap-4 bg-base-100  p-4 py-8 backdrop-blur-sm transition-all md:static md:transform-none`}>
+    gap-4 bg-base-100  p-4 py-8 md:drop-shadow-none  transition-all md:static md:transform-none `}>
       {props.children}
       <div
         onClick={handleOnClick}
-        className="absolute right-0 top-0 mt-2 flex aspect-square translate-x-full transform flex-col items-center justify-center rounded-r-lg bg-slate-900 bg-opacity-80 p-2 md:hidden"
+        className="absolute z-10 right-0 top-0 mt-4 flex aspect-square  transform translate-x-full bg-base-100 scale-x-110 flex-col items-center justify-center rounded-r-lg pl-3  p-2 md:hidden text-2xl"
       >
-        Show
+        <FontAwesomeIcon icon={faBars} />
       </div>
     </aside>
   )
@@ -123,8 +125,8 @@ const SpaceList = ({ onClick }: SpaceListProp) => {
 
   if (postsLoading)
     return (
-      <div className="flex grow">
-        <div>..Loading</div>
+      <div className="flex w-full px-2 items-center grow">
+        <span className="loading loading-dots text-accent"></span>
       </div>
     );
   if (!data) return <div>Something went wrong</div>;

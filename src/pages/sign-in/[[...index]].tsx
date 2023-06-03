@@ -1,5 +1,11 @@
-import { SignIn } from "@clerk/nextjs";
+import { SignIn, SignedIn } from "@clerk/nextjs";
+import { useRouter } from "next/router";
 
+const Redirect = () => {
+  void useRouter().push("/handle-sign-in");
+
+  return <></>;
+}
 export default function Page() {
   return (
     <main className="grid lg:grid-cols-2 min-h-screen items-center justify-center">
@@ -13,6 +19,9 @@ export default function Page() {
       </section>
       <section>
         <SignIn />
+        <SignedIn>
+          <Redirect />
+        </SignedIn>
       </section>
     </main>
   );

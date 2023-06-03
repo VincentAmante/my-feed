@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId     String   @unique
+  clerkId     String   @unique 
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 
@@ -30,9 +30,9 @@ model Post {
   published Boolean   @default(true)
   Comment   Comment[]
 
-  author   User    @relation(fields: [authorId], references: [clerkId])
+  author   User    @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
   authorId String
-  Space    Space?  @relation(fields: [spaceId], references: [id])
+  Space    Space?  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceId  String? @db.ObjectId
 
   createdAt DateTime @default(now())
@@ -47,7 +47,7 @@ model Feed {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String
 
-  owner   User   @relation(fields: [ownerId], references: [clerkId])
+  owner   User   @relation(fields: [ownerId], references: [clerkId], onDelete: Cascade)
   ownerId String
 
   followersIds String[] @default([]) @db.ObjectId
@@ -94,10 +94,10 @@ model Comment {
   id      String  @id @default(auto()) @map("_id") @db.ObjectId
   content String? @default("")
 
-  author   User?  @relation(fields: [authorId], references: [clerkId])
+  author   User?  @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
   authorId String
 
-  post   Post?  @relation(fields: [postId], references: [id])
+  post   Post?  @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String @db.ObjectId
 
   createdAt DateTime @default(now())

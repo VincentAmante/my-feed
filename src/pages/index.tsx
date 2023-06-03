@@ -3,13 +3,9 @@ import Head from "next/head";
 import Link from "next/link";
 // import { UserButton } from "@clerk/clerk-react";
 import {
-  SignedOut, SignUp, SignedIn,
-  AuthenticateWithRedirectCallback,
+  SignedIn,
 } from "@clerk/nextjs";
-
-import { api } from "~/utils/api";
 import { useRouter } from "next/router";
-import { Suspense } from "react";
 
 const Redirect = () => {
   void useRouter().push("/handle-sign-in");
@@ -25,22 +21,24 @@ const Home: NextPage = () => {
         <meta name="description" content="Your space, your content, your experience." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="grid lg:grid-cols-2 min-h-screen items-center justify-center">
-        <section className="px-4 flex flex-col items-center text-center gap-2">
-          <h1 className="text-6xl max-w-md">
+      <main className="flex flex-col gap-4 min-h-screen items-center justify-center">
+        <section className="px-4 flex flex-col items-center text-center gap-2 border-b-primary border-b-2 py-4">
+          <h1 className="text-6xl font-semibold">
             Welcome to Kiurate
           </h1>
           <h2 className="text-2xl max-w-sm">
             Your space, your content, your experience.
           </h2>
         </section>
-        <section>
-          <Link className="btn btn-primary" href={'/sign-in'}>
-            Sign In
-          </Link>
-          <Link className="btn btn-primary" href={'/sign-up'}>
-            Sign Up
-          </Link>
+        <section className="flex flex-col items-center">
+          <div className="flex flex-col gap-4 items-center">
+            <Link className="btn btn-primary flex flex-col items-center p-8 text-2xl" href={'/sign-up'}>
+              Sign Up
+            </Link>
+            <Link className="" href={'/sign-in'}>
+              Sign In
+            </Link>
+          </div>
           <SignedIn>
             <Redirect />
           </SignedIn>

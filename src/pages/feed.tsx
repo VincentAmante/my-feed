@@ -70,9 +70,9 @@ const CreatePostWizard = (props: CreatePostWizardProps) => {
   }
 
   return (
-    <div className="flex gap-2 flex-col w-full">
+    <div className="flex gap-2 flex-col w-full max-w-lg">
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 w-full">
         <Image
           width={128}
           height={128}
@@ -80,7 +80,7 @@ const CreatePostWizard = (props: CreatePostWizardProps) => {
           alt="Profile Image" className="h-14 w-14 rounded-full" />
         <input
           className="input input-ghost w-full"
-          placeholder="Hello"
+          placeholder="Write your thoughts here.."
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onKeyDown={(e) => {
@@ -105,7 +105,7 @@ const Feed = () => {
   if (!userId) return (
     <>
       <main className="w-full h-screen flex flex-col items-center justify-center">
-        <p className="text-4xl">Loading..</p>
+        <span className="loading loading-bars loading-lg text-primary"></span>
       </main>
     </>
   );
@@ -140,8 +140,8 @@ const FeedPage = () => {
         {feedName}
       </div>
 
-      <div className=" h-full w-full bg-base-100">
-        <div className="grid h-full w-full rounded-3xl p-4 flex-col gap-0 bg-base-300">
+      <div className="h-full w-full bg-base-100">
+        <div className="flex flex-col items-center justify-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
           {canMakePost && <CreatePostWizard spaceId={currentFeed}></CreatePostWizard>}
           <FeedData id={currentFeed} type={currentFeedType}></FeedData>
         </div>
@@ -167,8 +167,8 @@ const FeedData = (props: FeedDataProps) => {
     })
   if (isLoading)
     return (
-      <div className="flex grow">
-        <div>..Loading</div>
+      <div className="flex flex-col items-center justify-center w-full h-full">
+        <span className="loading loading-bars loading-lg text-primary"></span>
       </div>
     );
 

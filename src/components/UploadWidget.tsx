@@ -73,13 +73,13 @@ const UploadWidget = (props: _ImageUploader) => {
         <form method="post"
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             onSubmit={(e) => handleOnSubmit(e)}>
-            <input onChange={handleOnChange} type="file" name="file" className="file-input" />
+            <input onChange={handleOnChange} type="file" name="file" className="file-input w-full" />
 
             {imageSrc && <Image
                 width={300}
                 alt="An image you're uploadeding"
                 height={300}
-                className="rounded-lg max-w-sm"
+                className="rounded-lg w-full"
                 src={imageSrc} />}
             <button className="button hidden" ref={submitRef}>Upload Files</button>
         </form>

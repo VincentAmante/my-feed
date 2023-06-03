@@ -23,4 +23,21 @@ export const postsRouter = createTRPCRouter({
         },
       });
     }),
+  
+  deletePost: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+        })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const authorId = ctx.userId;
+      return await ctx.prisma.post.deleteMany({
+        where: {
+          id: input.postId,
+          authorId,
+        },
+      });
+    }
+  ),
 });
