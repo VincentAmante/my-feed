@@ -8,18 +8,27 @@ import { useRouter } from "next/router";
 const PostSignUp = () => {
     const router = useRouter()
     const { userId } = useAuth()
+    const { user: clerkUser } = useUser()
+
+    console.log(clerkUser)
     console.log(userId)
     const user = api.users.initUser.useQuery({
-        clerkId: userId || ""
+        clerkId: userId || "",
+        firstName: clerkUser?.firstName || "",
+        lastName: clerkUser?.lastName || "",
+        username: clerkUser?.username || "",
     })
+
     useEffect(() => {
-        if (user) {
+        if (user.data) {
+            console.log("pushing to feed")
             void router.push('/feed')
         }
-    }, [user, router])
+    }, [user, router, userId])
+
     return (
-        <main className="flex flex-col items-center justify-center w-screen h-screen bg-slate-900">
-            <h1 className="text-4xl">Initialising... your account please wait</h1>
+        <main className="flex flex-col items-center justify-center w-screen h-screen text-white">
+            <h1 className="text-4xl">Initialising your account please wait</h1>
         </main>
     )
 }

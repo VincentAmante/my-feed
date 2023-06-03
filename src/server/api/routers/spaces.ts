@@ -1,7 +1,6 @@
 import type { User as ClerkUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
-import { Post } from "@prisma/client";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 

@@ -17,9 +17,9 @@ const AppImage = (props: ImageType) => {
   else
     return (
       <>
-        <figure className="w-full bg-black">
+        <figure className="w-full">
           <Image
-            className="image object-cover w-full h-auto"
+            className="image object-cover w-full select-none"
             src={image}
             width={400}
             height={400}
@@ -71,11 +71,11 @@ const UserPost = (props: PostWithUser) => {
   if (!props.author) return <></>;
 
   return (
-    <div className="card w-full bg-slate-800 shadow-xl min-w-[18rem] max-w-sm">
-      <div className="card-body py-6 gap-2   px-0">
+    <div className="card w-full shadow-xl max-w-md bg-base-100">
+      <div className="card-body py-6 gap-4   px-0">
         <div className="flex items-center gap-2 px-4">
           <div className="avatar">
-            <div className="w-8 rounded-full bg-neutral-focus text-neutral-content">
+            <div className="w-12 rounded-full bg-neutral-focus text-neutral-content">
               <Image
                 width={64}
                 height={64}
@@ -83,19 +83,21 @@ const UserPost = (props: PostWithUser) => {
                 alt="Profile Picture" />
             </div>
           </div>
-          <div>
-            <p>@{props.author.username}</p>
-            <p className="text-xs italic opacity-50">{dateCreated}</p>
+          <div className="flex flex-col justify-center">
+            <div className="flex gap-2 items-center">
+              <p>@{props.author.username}</p>
+
+              <p className="text-xs italic opacity-50">{dateCreated}</p>
+            </div>
+            <Link href={spaceUrl} className="flex gap-1">
+              <span className="badge badge-primary hover:badge-secondary">
+                {Space?.name}
+              </span>
+            </Link>
           </div>
         </div>
-        <div className="flex items-start gap-2 px-4">
-          <Link href={spaceUrl} className="flex gap-1">
-            <span className="underline">
-              {Space?.name}
-            </span>
-          </Link>
-        </div>
-        <AppImage src={image} alt="" />
+        <AppImage
+          src={image} alt="" />
         <div className="px-4">{content}</div>
       </div>
     </div>

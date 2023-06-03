@@ -2,9 +2,22 @@ import z from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { clerkClient } from "@clerk/nextjs/server";
 
+// For creating spaces
+function addPossessiveSuffix(name: string): string {
+  if (name.endsWith('s') || name.endsWith('S')) {
+    return `${name}'`;
+  }
+  return `${name}'s`;
+}
+
 export const usersRouter = createTRPCRouter({
   initUser: publicProcedure
-    .input(z.object({ clerkId: z.string() }))
+    .input(z.object({
+      clerkId: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+      username: z.string(),
+    }))
     .query(async ({ input, ctx }) => {
 
         // Clause guard
@@ -16,21 +29,24 @@ export const usersRouter = createTRPCRouter({
         },
       });
 
-      if (!doesUserExist.length) {
+      if (doesUserExist.length < 1) {
         const user = await ctx.prisma.user.create({
           data: {
             clerkId: input.clerkId,
           },
         });
 
+        const userName = (input.firstName) ? addPossessiveSuffix(input.firstName) : addPossessiveSuffix(input.username);
+
         await ctx.prisma.space.create({
           data: {
-            name: "Your Space",
+            name: `${userName} Space`,
             ownerId: input.clerkId,
           },
         });
 
         return user;
+
       } else {
         return doesUserExist[0];
       }

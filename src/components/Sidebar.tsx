@@ -60,7 +60,7 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
 
   return (
     <aside className={`fixed left-0 flex h-full w-full max-w-xs md:h-auto ${sidebarStyle} transform flex-col
-    gap-4 bg-slate-900 bg-opacity-80 p-4 py-8 backdrop-blur-sm transition-all md:static md:transform-none`}>
+    gap-4 bg-base-100  p-4 py-8 backdrop-blur-sm transition-all md:static md:transform-none`}>
       {props.children}
       <div
         onClick={handleOnClick}
@@ -91,11 +91,11 @@ const Sidebar = (sidebarProps: Props) => {
       <div>
         <UserDisplay />
       </div>
-      <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
+      <div className=" rounded-lg p-2 font-light">
         <div className="px-3 py-2 text-xl">Your Feeds</div>
         {SpaceListElement}
       </div>
-      <div className=" rounded-lg bg-slate-900 bg-opacity-40 p-2 font-light">
+      <div className=" rounded-lg p-2 font-light">
         <div className="px-3 py-2 text-xl">Feeds</div>
         <ul className="flex flex-col gap-2 py-2 text-lg">
           <li
@@ -134,7 +134,7 @@ const SpaceList = ({ onClick }: SpaceListProp) => {
       {data.map((space) => {
         return (
           <li
-            className="btn-ghost btn justify-start font-normal normal-case"
+            className="btn justify-start font-normal normal-case"
             key={space.id}
             onClick={() =>
               onClick(space.id, space.name || "Space", space.ownerId || "")

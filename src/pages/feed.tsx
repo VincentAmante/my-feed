@@ -119,12 +119,12 @@ const Feed = () => {
 
   return (
     <>
-      <div className="flex h-full w-full flex-row-reverse items-stretch">
+      <main className="flex h-full w-full flex-row-reverse items-stretch">
         <FeedContext.Provider value={{ currentFeed, currentFeedType, ownerId, feedName, userId }}>
           <FeedPage></FeedPage>
           <Sidebar handleSelectFeed={setFeed}></Sidebar>
         </FeedContext.Provider>
-      </div>
+      </main>
     </>
   );
 };
@@ -136,12 +136,12 @@ const FeedPage = () => {
 
   return <>
     <main className="relative flex min-h-screen w-full flex-col items-center">
-      <div className="flex w-full items-center justify-center bg-slate-900 bg-opacity-80 py-6 pb-4">
+      <div className="flex w-full items-center justify-center py-6 pb-4 bg-base-100">
         {feedName}
       </div>
 
-      <div className=" h-full w-full bg-slate-900 bg-opacity-80 p-2 px-4 pb-4">
-        <div className="grid h-full w-full rounded-3xl bg-slate-900 p-4 flex-col gap-4">
+      <div className=" h-full w-full bg-base-100">
+        <div className="grid h-full w-full rounded-3xl p-4 flex-col gap-0 bg-base-300">
           {canMakePost && <CreatePostWizard spaceId={currentFeed}></CreatePostWizard>}
           <FeedData id={currentFeed} type={currentFeedType}></FeedData>
         </div>
