@@ -9,7 +9,13 @@ import {
 
 import { api } from "~/utils/api";
 import { useRouter } from "next/router";
+import { Suspense } from "react";
 
+const Redirect = () => {
+  void useRouter().push("/handle-sign-in");
+
+  return <></>;
+}
 const Home: NextPage = () => {
 
   return (
@@ -36,7 +42,7 @@ const Home: NextPage = () => {
             Sign Up
           </Link>
           <SignedIn>
-            <AuthenticateWithRedirectCallback />
+            <Redirect />
           </SignedIn>
         </section>
       </main>
