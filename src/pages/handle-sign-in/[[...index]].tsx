@@ -10,8 +10,6 @@ const PostSignUp = () => {
     const { userId } = useAuth()
     const { user: clerkUser } = useUser()
 
-    console.log(clerkUser)
-    console.log(userId)
     const user = api.users.initUser.useQuery({
         clerkId: userId || "",
         firstName: clerkUser?.firstName || "",
@@ -21,7 +19,6 @@ const PostSignUp = () => {
 
     useEffect(() => {
         if (user.data && userId !== undefined || userId !== "") {
-            console.log("pushing to feed")
             void router.push('/feed')
         }
     }, [user, router, userId])

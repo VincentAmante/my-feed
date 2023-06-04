@@ -11,14 +11,7 @@ const TestPage = () => {
     const submitRef = useRef<HTMLButtonElement>(null);
 
     const handleOnUpload = (imageUrl: string | null) => {
-        console.log('running handleOnUpload');
-        if (imageUrl) {
-            console.log('running onUpload');
-            console.log('imageUrl', imageUrl);
-        } else if (imageUrl === null) {
-            console.log('running onUpload');
-            console.log('imageUrl is null');
-        }
+        return <></>
     }
 
 

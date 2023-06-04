@@ -3,10 +3,11 @@ import { useContext, useState } from "react";
 import { api } from "~/utils/api";
 import SwitchTheme from "~/components/SwitchTheme";
 import UserDisplay from "~/components/UserDisplay";
-import Feed, { FeedContext } from "~/pages/feed";
+import Feed from "~/pages/feed";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { FeedContext } from "./Layouts";
 
 interface Props {
   handleSelectFeed: (
@@ -41,7 +42,6 @@ const useSidebarToggle = () => {
   );
 
   const handleOnClick = () => {
-    console.log(isToggled);
     setIsToggled(!isToggled);
 
     if (isToggled) {
@@ -94,7 +94,7 @@ const Sidebar = (sidebarProps: Props) => {
         <UserDisplay />
       </div>
       <div className=" rounded-lg p-2 font-light">
-        <div className="px-3 py-2 text-xl">Your Feeds</div>
+        <div className="px-3 py-2 text-xl">Your Spaces</div>
         {SpaceListElement}
       </div>
       <div className=" rounded-lg p-2 font-light">
@@ -116,11 +116,11 @@ type SpaceListProp = {
   onClick: (spaceId: string, name: string, ownerId: string) => void;
 };
 const SpaceList = ({ onClick }: SpaceListProp) => {
-  const { userId } = useContext(FeedContext);
+  const { ctxUserId } = useContext(FeedContext);
 
   const { data, isLoading: postsLoading } =
     api.spaces.getSpacesByUserId.useQuery({
-      ownerId: userId,
+      ownerId: ctxUserId,
     });
 
   if (postsLoading)
