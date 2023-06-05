@@ -78,9 +78,9 @@ const UserPost = (props: PostWithUser) => {
   const handleLike = () => {
 
     void animate(likeScope.current, {
-      scale: [1, 1.25, 1],
+      scale: [1, 1.15, 1],
     }, {
-      duration: 0.5,
+      duration: 0.4,
     })
 
     if (isLiked) {
