@@ -43,7 +43,7 @@ const CreatePostWizard = () => {
   const submitRef = useRef<HTMLButtonElement>(null);
 
   const ctx = api.useContext();
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+
   const { mutate } = api.posts.createPost.useMutation({
     onSuccess: () => {
       setContent("");
@@ -109,16 +109,7 @@ const CreatePostWizard = () => {
 
 // Handles collection of posts
 const FeedData = () => {
-  const { ctxFeedType, ctxFeed } = useContext(FeedContext);
-
-  const [id, setId] = useState(ctxFeed);
-  const [type, setType] = useState(ctxFeedType);
-
-  useEffect(() => {
-    setId(ctxFeed);
-    setType(ctxFeedType);
-  }, [ctxFeed, ctxFeedType])
-
+  const { ctxFeedType: type, ctxFeed: id } = useContext(FeedContext);
 
   const { data, isLoading } = (type == "feed") ?
     api.feeds.getFeedPostsById.useQuery({
@@ -133,7 +124,6 @@ const FeedData = () => {
       </div>
     );
 
-  console.log('feedId', id);
   if (!data) return <div>Something went wrong</div>;
 
   else

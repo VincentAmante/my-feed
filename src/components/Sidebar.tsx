@@ -19,22 +19,6 @@ interface Props {
   ) => void;
 }
 
-// const defaultProps = {
-//   handleSelectFeed: (
-//     id: string,
-//     type: string,
-//     name: string,
-//     ownerId: string
-//   ) => {
-//     return {
-//       id,
-//       type,
-//       name,
-//       ownerId,
-//     };
-//   },
-// };
-
 // TODO: Move this to a custom hook or refactor
 const useSidebarToggle = () => {
   const [isToggled, setIsToggled] = useState(false);
@@ -58,6 +42,8 @@ const useSidebarToggle = () => {
 type SidebarWrapperProps = {
   children: React.ReactNode;
 };
+
+// Container
 const SidebarWrapper = (props: SidebarWrapperProps) => {
   const { sidebarStyle, handleOnClick } = useSidebarToggle();
 
@@ -74,6 +60,8 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
     </aside>
   )
 };
+
+
 const Sidebar = (sidebarProps: Props) => {
   const props = useMemo(() => ({ ...sidebarProps }), [sidebarProps]);
 

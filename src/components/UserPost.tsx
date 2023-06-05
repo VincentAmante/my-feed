@@ -10,6 +10,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
 import React from "react";
 
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { date } from "zod";
+dayjs.extend(relativeTime);
+
 type ImageType = {
   src: string | undefined | null;
   alt: string | undefined;
@@ -106,10 +111,7 @@ const UserPost = (props: PostWithUser) => {
   } = props;
 
   const { userId } = useAuth();
-  const dateCreated = useMemo(
-    () => createdAt.toLocaleDateString("en-us"),
-    [createdAt]
-  );
+
   const spaceUrl = useMemo(() => {
     if (spaceId && Space?.name) return `/space/${spaceId}`;
     else return "";
@@ -117,16 +119,15 @@ const UserPost = (props: PostWithUser) => {
 
   const isOwnedByUser = useMemo(() => {
     return userId === authorId;
-  }
-    , [userId, authorId]);
+  }, [userId, authorId]);
 
   const nameDisplay = useMemo(() => {
     if (isOwnedByUser) return <span className="italic">You</span>;
     else if (author?.username) return `@${author.username}`;
   }, [isOwnedByUser, author?.username])
 
-
   const delModal: React.RefObject<HTMLDialogElement> = useRef(null);
+
   if (!props.author) return <></>;
 
   return (
@@ -151,7 +152,7 @@ const UserPost = (props: PostWithUser) => {
               <div className="flex flex-col justify-center">
                 <div className="flex gap-2 items-center">
                   <p className="flex">{nameDisplay}</p>
-                  <p className="text-xs italic opacity-50">{dateCreated}</p>
+                  <p className="text-xs italic opacity-50">{`· ${dayjs(createdAt).fromNow()}`}</p>
                 </div>
                 <Link href={spaceUrl} className="flex gap-1">
                   <span className="badge badge-primary hover:badge-secondary">

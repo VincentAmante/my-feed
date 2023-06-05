@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import { useState, useEffect, createContext, useContext } from 'react';
 import { useAuth } from '@clerk/nextjs';
 
+// Handles shared state between pages
 export const FeedContext = createContext({
     ctxFeed: "global",
     ctxFeedType: 'feed',
