@@ -1,84 +1,19 @@
 import type { Post } from "@prisma/client";
-import App from "next/app";
 import Image from "next/image";
-import { useMemo, useRef, ForwardedRef } from "react";
+import { useMemo, useRef } from "react";
 import Link from "next/link";
-import { CldImage } from 'next-cloudinary';
 import { useAuth } from "@clerk/clerk-react";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
 import React from "react";
+import PostImage from "./PostImage";
+import DeleteModal from "./DeleteModal";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { date } from "zod";
 dayjs.extend(relativeTime);
-
-type ImageType = {
-  src: string | undefined | null;
-  alt: string | undefined;
-};
-const AppImage = (props: ImageType) => {
-  const image = useMemo(() => props.src || "", [props.src]);
-  const alt = useMemo(() => props.alt || "", [props.alt]);
-
-
-  if (!image || image === "") return <></>;
-  else
-    return (
-      <>
-        <figure className="w-full">
-          <Image
-            className="image object-cover w-full select-none"
-            src={image}
-            width={400}
-            height={400}
-            alt={alt}
-          />
-        </figure>
-      </>
-    );
-};
-
-
-const DeleteModal = React.forwardRef(function DeleteModal(
-  props: { id: string }, ref: ForwardedRef<HTMLDialogElement>,) {
-  const ctx = api.useContext();
-
-  const { mutate } = api.posts.deletePost.useMutation({
-    onSuccess: () => {
-      void ctx.spaces.getSpacePostsById.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
-    },
-
-    onError: (error) => {
-      console.log(error);
-    },
-  });
-
-  return (
-    <dialog ref={ref} className="modal">
-      <form method="dialog" className="modal-box flex flex-col  items-center">
-        <h3 className="font-bold text-xl text-error">Delete Post?</h3>
-        <p className="pt-4">You might not be able to recover this again</p>
-        <p className="py-0 text-xs italic text-info opacity-30 text-center max-w-xs">
-          dev-note: If this fails and [comments, likes] are implemented, please contact me.
-        </p>
-        <div className="modal-action flex gap-4">
-          {/* if there is a button in form, it will close the modal */}
-          <button
-            onClick={() => mutate({ postId: props.id })}
-            className="btn btn-error">
-            Delete
-          </button>
-          <button className="btn">Cancel</button>
-        </div>
-      </form>
-    </dialog >
-  )
-
-})
 
 
 type Author = {
@@ -105,7 +40,6 @@ const UserPost = (props: PostWithUser) => {
     authorId,
     spaceId,
     likedByIDs,
-    updatedAt,
     author,
     Space
   } = props;
@@ -128,6 +62,15 @@ const UserPost = (props: PostWithUser) => {
 
   const delModal: React.RefObject<HTMLDialogElement> = useRef(null);
 
+  const ctx = api.useContext();
+  const { mutate: likeUnlikePost } = api.posts.likeUnlikePost.useMutation({
+    onSuccess: () => {
+      void ctx.spaces.getSpacePostsById.invalidate();
+      void ctx.feeds.getFeedPostsById.invalidate();
+    }
+  });
+
+
   if (!props.author) return <></>;
 
   return (
@@ -137,7 +80,7 @@ const UserPost = (props: PostWithUser) => {
         <DeleteModal ref={delModal} id={id} />
       }
       <div className="card w-full shadow-xl max-w-md bg-base-100">
-        <div className="card-body py-6  pt-4 gap-4   px-0">
+        <div className="card-body py-4 gap-4   px-0">
           <div className="flex justify-between w-full px-4">
             <div className="flex items-center gap-2 ">
               <div className="avatar">
@@ -170,8 +113,16 @@ const UserPost = (props: PostWithUser) => {
             </div>
           </div>
           <div className="px-4">{content}</div>
-          <AppImage
+          <PostImage
             src={image} alt="" />
+          <div className="flex px-4 gap-2 items-center">
+            <FontAwesomeIcon
+              className="text-lg text-secondary cursor-pointer"
+              icon={likedByIDs.includes(userId || '') ? faHeart : faHeartOutline}
+              onClick={() => likeUnlikePost({ postId: id })}
+            />
+            <p className="text-lg text-secondary opacity-50 font-bold">{likedByIDs.length}</p>
+          </div>
         </div>
       </div>
     </>

@@ -40,4 +40,54 @@ export const postsRouter = createTRPCRouter({
       });
     }
   ),
+
+  likeUnlikePost: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      const postId = input.postId;
+
+      const isLiked = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+          likedByIDs: {
+            hasEvery: [userId],
+          }
+        },
+      });
+
+      if (isLiked) {
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            likedByIDs: {
+              // Filters out the userId from the likedByIDs array
+              // Done because there is no way to remove an element from an array in Prisma
+              set: isLiked.likedByIDs.filter((id) => id !== userId),
+            },
+          },
+        });
+      }
+
+      if (!isLiked) {
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            likedByIDs: {
+              push: userId,
+            },
+          },
+        });
+      }
+    })
+  
+  
 });
