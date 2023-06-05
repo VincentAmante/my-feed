@@ -10,6 +10,7 @@ import { api } from "~/utils/api";
 import React from "react";
 import PostImage from "./PostImage";
 import DeleteModal from "./DeleteModal";
+import { animate, motion, useAnimate } from "framer-motion"
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -72,8 +73,16 @@ const UserPost = (props: PostWithUser) => {
 
   const [likeCount, setLikeCount] = React.useState(likedByIDs.length);
   const [isLiked, setIsLiked] = React.useState(likedByIDs.includes(userId || ""));
+  const [likeScope, likeAnimate] = useAnimate();
 
   const handleLike = () => {
+    void animate(likeScope.current, {
+      scale: [1, 1.25, 1],
+    }, {
+      duration: 0.3,
+    })
+
+
     if (isLiked) {
       setLikeCount(likeCount - 1);
       setIsLiked(false);
@@ -86,6 +95,7 @@ const UserPost = (props: PostWithUser) => {
   };
 
   if (!props.author) return <></>;
+
 
   return (
     <>
@@ -129,11 +139,12 @@ const UserPost = (props: PostWithUser) => {
           <div className="px-4">{content}</div>
           <PostImage
             src={image} alt="" />
-          <div className="flex px-4 gap-2 items-center">
+          <div className=" flex px-4 gap-2 items-center select-none">
             <FontAwesomeIcon
+              ref={likeScope}
               className="text-lg text-secondary cursor-pointer"
               icon={isLiked ? faHeart : faHeartOutline}
-              onClick={handleLike}
+              onClick={() => handleLike()}
             />
             <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
           </div>
