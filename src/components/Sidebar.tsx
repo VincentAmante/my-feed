@@ -102,11 +102,11 @@ const Sidebar = (sidebarProps: Props) => {
       <div className=" rounded-lg p-2 font-light">
         <div className="px-3 py-2 text-xl">Feeds</div>
         <ul className="flex flex-col gap-2 py-2 text-lg">
-          <li>
+          <li className="w-full">
             <Link
               href="/feed"
               onClick={() => feedOnClick("global", "Global", "global")}
-              className="btn-ghost btn justify-start font-normal normal-case"
+              className="w-full btn-ghost btn justify-start font-normal normal-case"
             >
               Global
             </Link>
