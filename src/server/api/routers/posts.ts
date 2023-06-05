@@ -74,20 +74,5 @@ export const postsRouter = createTRPCRouter({
           },
         });
       }
-
-      if (!isLiked) {
-        await ctx.prisma.post.update({
-          where: {
-            id: postId,
-          },
-          data: {
-            likedByIDs: {
-              push: userId,
-            },
-          },
-        });
-      }
     })
-  
-  
 });

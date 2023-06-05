@@ -76,12 +76,12 @@ const UserPost = (props: PostWithUser) => {
   const [likeScope, likeAnimate] = useAnimate();
 
   const handleLike = () => {
+
     void animate(likeScope.current, {
       scale: [1, 1.25, 1],
     }, {
-      duration: 0.3,
+      duration: 0.5,
     })
-
 
     if (isLiked) {
       setLikeCount(likeCount - 1);
