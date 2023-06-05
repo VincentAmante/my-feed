@@ -14,6 +14,7 @@ import { animate, motion, useAnimate } from "framer-motion"
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { unique } from "next/dist/build/utils";
 dayjs.extend(relativeTime);
 
 
@@ -73,10 +74,14 @@ const UserPost = (props: PostWithUser) => {
 
   const [likeCount, setLikeCount] = React.useState(likedByIDs.length);
   const [isLiked, setIsLiked] = React.useState(likedByIDs.includes(userId || ""));
-  const [likeScope, likeAnimate] = useAnimate();
+  const [likeScope] = useAnimate();
+
+  useMemo(() => {
+    setIsLiked(likedByIDs.includes(userId || ""));
+    setLikeCount(likedByIDs.length);
+  }, [likedByIDs, userId]);
 
   const handleLike = () => {
-
     void animate(likeScope.current, {
       scale: [1, 1.15, 1],
     }, {
@@ -94,8 +99,16 @@ const UserPost = (props: PostWithUser) => {
     }
   };
 
-  if (!props.author) return <></>;
+  // This is a hacky way to check if the likes are unique
+  const isLikesUnique = useMemo(() => {
+    const uniqueLikes = new Set(likedByIDs).size;
+    const answer = likedByIDs.length === uniqueLikes;
+    if (!answer) setLikeCount(uniqueLikes);
 
+    return answer;
+  }, [likedByIDs]);
+
+  if (!props.author) return <></>;
 
   return (
     <>
@@ -144,9 +157,10 @@ const UserPost = (props: PostWithUser) => {
               ref={likeScope}
               className="text-lg text-secondary cursor-pointer"
               icon={isLiked ? faHeart : faHeartOutline}
-              onClick={() => handleLike()}
+              onClick={handleLike}
             />
             <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
+            {!isLikesUnique && <UniqueLikeEnforcer postId={id} />}
           </div>
         </div>
       </div>
@@ -154,4 +168,23 @@ const UserPost = (props: PostWithUser) => {
   );
 };
 
+type UniqueLikeEnforcerProps = {
+  postId: string;
+}
+// if likes are not unique, this sets a call to the server to enforce unique likes
+// This fix is gimmicky and should be fixed on the server side
+const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
+  console.log("enforcing unique likes");
+  const ctx = api.useContext();
+  const { mutate } = api.posts.enforceUniqueLikes.useMutation({
+    onSuccess: () => {
+      void ctx.spaces.getSpacePostsById.invalidate();
+      void ctx.feeds.getFeedPostsById.invalidate();
+    }
+  });
+  useMemo(() => {
+    void mutate({ postId: props.postId });
+  }, [props.postId, mutate]);
+  return <></>
+}
 export default UserPost;

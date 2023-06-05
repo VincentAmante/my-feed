@@ -74,5 +74,46 @@ export const postsRouter = createTRPCRouter({
           },
         });
       }
-    })
+
+      if (!isLiked) {
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            likedByIDs: {
+              push: userId,
+            },
+          },
+        });
+      }
+    }),
+  
+  enforceUniqueLikes: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const postId = input.postId;
+      const isLiked = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (isLiked) {
+        await ctx.prisma.post.update({
+          where: {
+            id: postId,
+          },
+          data: {
+            likedByIDs: {
+              set: [...new Set(isLiked.likedByIDs)],
+            },
+          },
+        });
+      }
+    }),
 });
