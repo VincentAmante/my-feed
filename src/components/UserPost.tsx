@@ -70,6 +70,20 @@ const UserPost = (props: PostWithUser) => {
     }
   });
 
+  const [likeCount, setLikeCount] = React.useState(likedByIDs.length);
+  const [isLiked, setIsLiked] = React.useState(likedByIDs.includes(userId || ""));
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikeCount(likeCount - 1);
+      setIsLiked(false);
+      void likeUnlikePost({ postId: id });
+    } else {
+      setLikeCount(likeCount + 1);
+      setIsLiked(true);
+      void likeUnlikePost({ postId: id });
+    }
+  };
 
   if (!props.author) return <></>;
 
@@ -118,10 +132,10 @@ const UserPost = (props: PostWithUser) => {
           <div className="flex px-4 gap-2 items-center">
             <FontAwesomeIcon
               className="text-lg text-secondary cursor-pointer"
-              icon={likedByIDs.includes(userId || '') ? faHeart : faHeartOutline}
-              onClick={() => likeUnlikePost({ postId: id })}
+              icon={isLiked ? faHeart : faHeartOutline}
+              onClick={handleLike}
             />
-            <p className="text-lg text-secondary opacity-50 font-bold">{likedByIDs.length}</p>
+            <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
           </div>
         </div>
       </div>
