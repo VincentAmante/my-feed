@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactElement } from "react";
+import { useState, useRef, type ReactElement, useEffect } from "react";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
 import { useUser } from "@clerk/nextjs";
@@ -17,11 +17,9 @@ const Feed: NextPageWithLayout = () => {
   const canMakePost = (ctxFeedType == "space" && ctxOwner == ctxUserId) ? true : false;
 
   return <>
-    <div className="h-full w-full bg-base-100">
-      <div className="flex flex-col items-center justify-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
-        {canMakePost && <CreatePostWizard></CreatePostWizard>}
-        <FeedData></FeedData>
-      </div>
+    <div className="flex flex-col items-center justify-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
+      {canMakePost && <CreatePostWizard></CreatePostWizard>}
+      <FeedData></FeedData>
     </div>
   </>
 };
@@ -85,7 +83,6 @@ const CreatePostWizard = () => {
 
   return (
     <div className="flex gap-2 flex-col w-full max-w-lg">
-
       <div className="flex items-center gap-2 w-full">
         <Image
           width={128}
@@ -112,7 +109,17 @@ const CreatePostWizard = () => {
 
 // Handles collection of posts
 const FeedData = () => {
-  const { ctxFeedType: type, ctxFeed: id } = useContext(FeedContext);
+  const { ctxFeedType, ctxFeed } = useContext(FeedContext);
+
+  const [id, setId] = useState(ctxFeed);
+  const [type, setType] = useState(ctxFeedType);
+
+  useEffect(() => {
+    setId(ctxFeed);
+    setType(ctxFeedType);
+  }, [ctxFeed, ctxFeedType])
+
+
   const { data, isLoading } = (type == "feed") ?
     api.feeds.getFeedPostsById.useQuery({
       feedId: id
@@ -125,7 +132,10 @@ const FeedData = () => {
         <span className="loading loading-bars loading-lg text-primary"></span>
       </div>
     );
+
+  console.log('feedId', id);
   if (!data) return <div>Something went wrong</div>;
+
   else
     return (
       <div className="flex flex-col gap-4">

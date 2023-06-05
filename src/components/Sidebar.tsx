@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FeedContext } from "./Layouts";
+import Link from "next/link";
 
 interface Props {
   handleSelectFeed: (
@@ -81,13 +82,14 @@ const Sidebar = (sidebarProps: Props) => {
   };
 
   const SpaceListElement = useMemo(() => {
-
     const spaceOnClick = (spaceId: string, name: string, ownerId: string) => {
       props.handleSelectFeed(spaceId, "space", name, ownerId);
     };
     return <SpaceList onClick={spaceOnClick} />;
   }
     , [props]);
+
+
   return (
     <SidebarWrapper>
       <div>
@@ -100,11 +102,14 @@ const Sidebar = (sidebarProps: Props) => {
       <div className=" rounded-lg p-2 font-light">
         <div className="px-3 py-2 text-xl">Feeds</div>
         <ul className="flex flex-col gap-2 py-2 text-lg">
-          <li
-            onClick={() => feedOnClick("global", "Global", "global")}
-            className="btn-ghost btn justify-start font-normal normal-case"
-          >
-            Global
+          <li>
+            <Link
+              href="/feed"
+              onClick={() => feedOnClick("global", "Global", "global")}
+              className="btn-ghost btn justify-start font-normal normal-case"
+            >
+              Global
+            </Link>
           </li>
         </ul>
       </div>
@@ -135,14 +140,17 @@ const SpaceList = ({ onClick }: SpaceListProp) => {
     <ul className="flex flex-col gap-2 py-2 text-lg">
       {data.map((space) => {
         return (
-          <li
-            className="btn justify-start font-normal normal-case"
+          <li className="w-full"
             key={space.id}
             onClick={() =>
               onClick(space.id, space.name || "Space", space.ownerId || "")
             }
           >
-            {space.name}
+            <Link
+              href="/feed"
+              className="w-full btn justify-start font-normal normal-case">
+              {space.name}
+            </Link>
           </li>
         );
       })}

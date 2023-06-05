@@ -13,7 +13,7 @@ datasource db {
 
 model User {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId     String   @unique 
+  clerkId     String   @unique
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 
@@ -21,6 +21,8 @@ model User {
   Post    Post[]
   Feed    Feed[]
   Space   Space[]
+
+  FeedsFollowed FeedFollower[]
 }
 
 model Post {
@@ -50,15 +52,14 @@ model Feed {
   owner   User   @relation(fields: [ownerId], references: [clerkId], onDelete: Cascade)
   ownerId String
 
-  followersIds String[] @default([]) @db.ObjectId
-
   visibility String @default("public")
 
   icon   String? @default("")
   banner String? @default("")
 
-  softDeleted Boolean       @default(false)
-  SpaceInFeed SpaceInFeed[]
+  softDeleted  Boolean        @default(false)
+  SpaceInFeed  SpaceInFeed[]
+  FeedFollower FeedFollower[]
 }
 
 model SpaceInFeed {
@@ -71,6 +72,15 @@ model SpaceInFeed {
   spaceId String @db.ObjectId
 }
 
+model FeedFollower {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  user   User   @relation(fields: [userId], references: [clerkId])
+  userId String
+  feed   Feed   @relation(fields: [feedId], references: [id])
+  feedId String @db.ObjectId
+}
+
 model Space {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @default("")
@@ -78,7 +88,7 @@ model Space {
   owner   User   @relation(fields: [ownerId], references: [clerkId])
   ownerId String
 
-  followersIds String[] @default([]) @db.ObjectId
+  followersIds String[] @default([])
 
   visibility String @default("public")
 
