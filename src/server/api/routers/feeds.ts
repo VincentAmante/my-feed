@@ -45,7 +45,7 @@ export const feedsRouter = createTRPCRouter({
             Comment: {
               take: 3,
               orderBy: {
-                createdAt: "desc",
+                createdAt: "asc",
               }
             }
           },
@@ -71,7 +71,7 @@ export const feedsRouter = createTRPCRouter({
             Comment: {
               take: 3,
               orderBy: {
-                createdAt: "desc",
+                createdAt: "asc",
               }
             }
           },
@@ -108,7 +108,7 @@ export const feedsRouter = createTRPCRouter({
           ...comment,
           author: userComments.find((user) => user.id === comment.authorId),
         })),
-        
+
         // removed so I don't accidentally use it
         Comment: undefined,
       }));

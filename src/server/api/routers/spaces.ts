@@ -49,7 +49,7 @@ export const spacesRouter = createTRPCRouter({
           Comment: {
             take: 3,
             orderBy: {
-              createdAt: "desc",
+              createdAt: "asc",
             }
           }
         },
