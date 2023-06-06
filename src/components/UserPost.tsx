@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
 import React from "react";
 import PostImage from "./PostImage";
-import DeleteModal from "./DeleteModal";
+import DeletePostModal from "./DeletePostModal";
 import { animate, useAnimate } from "framer-motion"
 
 
@@ -120,7 +120,7 @@ const UserPost = (props: PostWithUser) => {
     <>
       {isOwnedByUser
         &&
-        <DeleteModal ref={delModal} id={id} />
+        <DeletePostModal ref={delModal} id={id} />
       }
       <div className="card w-full shadow-xl max-w-md bg-base-100">
         <div className="card-body py-4 gap-4   px-0">

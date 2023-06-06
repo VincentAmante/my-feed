@@ -90,7 +90,7 @@ model Space {
 
   followersIds String[] @default([])
 
-  visibility String @default("public") 
+  visibility String @default("public")
 
   icon   String? @default("")
   banner String? @default("")

@@ -7,11 +7,17 @@ import { api } from "~/utils/api";
 import Post from "~/components/UserPost";
 import { useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
-
-
+import CreatePost from "~/components/CreatePost";
+import React from "react";
+import UpdateSpaceModal from "~/components/Space/UpdateSpaceModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPenToSquare, faEllipsisVertical, faWind } from "@fortawesome/free-solid-svg-icons";
+import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedSkeletons";
+import { createPortal } from "react-dom";
+import {useRef } from "react";
 
 const SpacePage: NextPageWithLayout = () => {
-    const { setCtxFeedType, setCtxFeedName, setCtxFeed } = useContext(FeedContext);
+    const { setCtxFeedType, setCtxFeedName, setCtxOwner, setCtxFeed, ctxFeedName } = useContext(FeedContext);
     const { userId } = useAuth();
     const router = useRouter();
 
@@ -28,21 +34,29 @@ const SpacePage: NextPageWithLayout = () => {
         spaceId: id
     })
 
+    const spaceModalRef = useRef<HTMLDialogElement>(null);
     // storing is useMemo prevents bug where it stays on the space after re-routing
     useMemo(() => {
         if (data) {
             setCtxFeedType('space');
             setCtxFeedName(data.name);
             setCtxFeed(data.id);
+            setCtxOwner(data.ownerId);
         }
-    }, [data, setCtxFeedType, setCtxFeedName, setCtxFeed])
+    }, [data, setCtxFeedType, setCtxFeedName, setCtxFeed, setCtxOwner])
 
-    if (isLoading)
-        return (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-                <span className="loading loading-bars loading-lg text-primary"></span>
-            </div>
-        );
+    const userOwnsSpace = useMemo(() => {
+        if (data?.ownerId === userId) {
+            return true;
+        }
+    }, [data, userId])
+
+    function openModal() {
+        spaceModalRef.current?.showModal();
+    }
+
+    if (isLoading) return <LoadingSkeleton />;
+    else if (!data) return <ErrorSkeleton />;
     else if (data?.visibility === 'private' && data.ownerId !== userId) {
         return (
             <div className="flex flex-col items-center justify-center w-full h-full">
@@ -52,8 +66,20 @@ const SpacePage: NextPageWithLayout = () => {
         )
     }
     return <>
+        
+        {userOwnsSpace && createPortal(<UpdateSpaceModal spaceId={id} ref={spaceModalRef}></UpdateSpaceModal>, document.body)}
+        <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
+            <span>
+                {ctxFeedName}
+            </span>
+            {userOwnsSpace && 
+            (<button className="btn btn-ghost btn-sm ml-2 btn-circle" onClick={() => openModal()}>
+            <FontAwesomeIcon icon={faPenToSquare} />
+        </button>)}
+        </div>
         <div className="flex flex-col items-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
-            {/* {canMakePost && <CreatePostWizard></CreatePostWizard>} */}
+
+            {userOwnsSpace && <CreatePost></CreatePost>}
             <SpacePosts></SpacePosts>
         </div>
     </>
@@ -67,6 +93,20 @@ SpacePage.getLayout = function getLayout(page) {
     )
 }
 
+
+const EmptySpace = () => {
+    const { userId } = useAuth();
+    const { ctxOwner } = useContext(FeedContext);
+
+    return (
+        <div className="flex flex-col items-center justify-center w-full h-full">
+        <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
+        <span className="text-2xl font-bold opacity-30">This space is empty</span>
+        {userId === ctxOwner && <span className="text-md opacity-30">Fill it up with some posts!</span>}
+    </div>
+    )
+}
+
 const SpacePosts = () => {
     const router = useRouter();
     const id = router.query.id;
@@ -76,18 +116,11 @@ const SpacePosts = () => {
     })
 
     if (isLoading)
-        return (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-                <span className="loading loading-bars loading-lg text-primary"></span>
-            </div>
-        );
+        return <LoadingSkeleton />;
+        
     if (data?.length === 0) {
         console.log('empty')
-        return (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-                <span className="text-2xl font-bold">This space is empty</span>
-            </div>
-        )
+        return <EmptySpace/>
     }
 
     return (

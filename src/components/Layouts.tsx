@@ -76,7 +76,7 @@ const DefaultLayout = ({ children }: LayoutProps) => {
                 }}>
                     <Sidebar handleSelectFeed={handleFeedChange} />
                     <div className='relative flex min-h-screen w-full flex-col items-center'>
-                        <Header></Header>
+
                         <div className='h-full w-full bg-base-100'>
                             {children}
                         </div>

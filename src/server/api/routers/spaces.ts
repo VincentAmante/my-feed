@@ -60,17 +60,17 @@ export const spacesRouter = createTRPCRouter({
       
       const users = (
         await clerkClient.users.getUserList({
-        userId: posts.map((post) => post.authorId),
-        limit: 100
+          userId: posts.map((post) => post.authorId),
+          limit: 100
         }))
         .map(filterUserForClient)
       
-        const userComments = (
-          await clerkClient.users.getUserList({
+      const userComments = (
+        await clerkClient.users.getUserList({
           userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
-            limit: 3
-          }))
-          .map(filterUserForClient)
+          limit: 3
+        }))
+        .map(filterUserForClient)
             
 
       return posts.map((post) => ({
@@ -111,7 +111,7 @@ export const spacesRouter = createTRPCRouter({
         name: z.string(),
         visibility: z.enum(["public", "private", "obscure", "protected"]),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.userId;
 
@@ -123,4 +123,45 @@ export const spacesRouter = createTRPCRouter({
         }
       });
     }),
+  
+
+  updateSpace: privateProcedure
+    .input(
+      z.object({
+        spaceId: z.string(),
+        name: z.string(),
+        visibility: z.enum(["public", "private", "obscure", "protected"]),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      const space = await ctx.prisma.space.updateMany({
+        where: {
+          id: input.spaceId,
+          ownerId: userId,
+        },
+        data: {
+          name: input.name,
+          visibility: input.visibility,
+        }
+      });
+      return space;
+    }),
+  
+  deleteSpace: privateProcedure
+    .input(
+      z.object({
+        spaceId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      const space = await ctx.prisma.space.deleteMany({
+        where: {
+          id: input.spaceId,
+          ownerId: userId,
+        }
+      });
+      return space;
+    })
 });
