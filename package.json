@@ -24,7 +24,7 @@
     "@trpc/next": "^10.18.0",
     "@trpc/react-query": "^10.18.0",
     "@trpc/server": "^10.18.0",
-    "daisyui": "^3.0.0",
+    "daisyui": "^3.0.3",
     "dayjs": "^1.11.8",
     "framer-motion": "^10.12.16",
     "next": "^13.4.1",
