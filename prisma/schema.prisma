@@ -65,10 +65,10 @@ model Feed {
 model SpaceInFeed {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  feed   Feed   @relation(fields: [feedId], references: [id])
+  feed   Feed   @relation(fields: [feedId], references: [id], onDelete: Cascade)
   feedId String @db.ObjectId
 
-  space   Space  @relation(fields: [spaceId], references: [id])
+  space   Space  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceId String @db.ObjectId
 }
 
@@ -77,7 +77,7 @@ model FeedFollower {
 
   user   User   @relation(fields: [userId], references: [clerkId])
   userId String
-  feed   Feed   @relation(fields: [feedId], references: [id])
+  feed   Feed   @relation(fields: [feedId], references: [id]) 
   feedId String @db.ObjectId
 }
 
