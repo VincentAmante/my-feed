@@ -1,8 +1,6 @@
-import { User } from "@clerk/nextjs/server";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { api } from '~/utils/api'
 import { useAuth, useUser } from "@clerk/nextjs";
-import { SignedIn } from "@clerk/nextjs";
 import { useRouter } from "next/router";
 
 const PostSignUp = () => {

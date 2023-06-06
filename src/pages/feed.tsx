@@ -1,7 +1,7 @@
 import { useState, useRef, type ReactElement, useEffect } from "react";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
 import Image from 'next/image'
 import UploadWidget from "~/components/UploadWidget";
@@ -9,6 +9,8 @@ import type { NextPageWithLayout } from "./_app";
 import DefaultLayout from "~/components/Layouts";
 import { useContext } from "react";
 import { FeedContext } from "~/components/Layouts";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faWind } from "@fortawesome/free-solid-svg-icons";
 
 
 // Final output
@@ -109,7 +111,8 @@ const CreatePostWizard = () => {
 
 // Handles collection of posts
 const FeedData = () => {
-  const { ctxFeedType: type, ctxFeed: id } = useContext(FeedContext);
+  const { ctxFeedType: type, ctxFeed: id, ctxOwner } = useContext(FeedContext);
+  const { userId } = useAuth();
 
   const { data, isLoading } = (type == "feed") ?
     api.feeds.getFeedPostsById.useQuery({
@@ -126,9 +129,19 @@ const FeedData = () => {
 
   if (!data) return <div>Something went wrong</div>;
 
+  if (data?.length === 0) {
+    console.log('empty')
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full">
+            <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
+            <span className="text-2xl font-bold opacity-30">This space is empty</span>
+            {userId === ctxOwner && <span className="text-md opacity-30">Fill it up with some posts!</span>}
+        </div>
+    )
+}
   else
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 w-full h-full items-center">
         {data.map((post) => {
           return <UserPost key={post.id} {...post} />
         })

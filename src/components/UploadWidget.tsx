@@ -53,8 +53,6 @@ const UploadWidget = (props: _ImageUploader) => {
             }
         }
 
-
-        // TODO: Check to see if env is exposed
         formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
         const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ""}/image/upload`,
             {
@@ -62,10 +60,8 @@ const UploadWidget = (props: _ImageUploader) => {
                 body: formData
             })
             .then((r: any) => r.json());
-
         // Resets
         setImageSrc(undefined);
-
         onUpload(data.secure_url);
     }
 

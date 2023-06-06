@@ -2,7 +2,7 @@ import type { User as ClerkUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 
 const filterUserForClient = (user: ClerkUser) => {
   return {
@@ -101,6 +101,25 @@ export const spacesRouter = createTRPCRouter({
           id: true,
           name: true,
           ownerId: true,
+        }
+      });
+    }),
+  
+  createSpace: privateProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        visibility: z.enum(["public", "private", "obscure", "protected"]),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+
+      return await ctx.prisma.space.create({
+        data: {
+          name: input.name,
+          visibility: input.visibility,
+          ownerId: userId,
         }
       });
     }),

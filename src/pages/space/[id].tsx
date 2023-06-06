@@ -6,10 +6,14 @@ import DefaultLayout from "~/components/Layouts";
 import { api } from "~/utils/api";
 import Post from "~/components/UserPost";
 import { useMemo } from "react";
+import { useAuth } from "@clerk/nextjs";
+
 
 
 const SpacePage: NextPageWithLayout = () => {
     const { setCtxFeedType, setCtxFeedName, setCtxFeed } = useContext(FeedContext);
+    const { userId } = useAuth();
+    const router = useRouter();
 
     // Parses id from url query
     const routerId = useRouter().query.id;
@@ -39,6 +43,14 @@ const SpacePage: NextPageWithLayout = () => {
                 <span className="loading loading-bars loading-lg text-primary"></span>
             </div>
         );
+    else if (data?.visibility === 'private' && data.ownerId !== userId) {
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+                <span className="text-2xl font-bold">This space is private</span>
+                <button className="btn btn-primary " onClick={() => void router.push('/feed')}>Go Back</button>
+            </div>
+        )
+    }
     return <>
         <div className="flex flex-col items-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
             {/* {canMakePost && <CreatePostWizard></CreatePostWizard>} */}
@@ -69,6 +81,14 @@ const SpacePosts = () => {
                 <span className="loading loading-bars loading-lg text-primary"></span>
             </div>
         );
+    if (data?.length === 0) {
+        console.log('empty')
+        return (
+            <div className="flex flex-col items-center justify-center w-full h-full">
+                <span className="text-2xl font-bold">This space is empty</span>
+            </div>
+        )
+    }
 
     return (
         <>
