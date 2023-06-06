@@ -45,6 +45,12 @@ export const spacesRouter = createTRPCRouter({
             select: {
               name: true,
             }
+          },
+          Comment: {
+            take: 3,
+            orderBy: {
+              createdAt: "desc",
+            }
           }
         },
         where: {
@@ -58,10 +64,23 @@ export const spacesRouter = createTRPCRouter({
         limit: 100
         }))
         .map(filterUserForClient)
+      
+        const userComments = (
+          await clerkClient.users.getUserList({
+          userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
+            limit: 3
+          }))
+          .map(filterUserForClient)
+            
 
       return posts.map((post) => ({
         ...post,
-        author: users.find((user) => user.id === post.authorId)
+        author: users.find((user) => user.id === post.authorId),
+        comments: post.Comment.map((comment) => ({
+          ...comment,
+          author: userComments.find((user) => user.id === comment.authorId),
+        })),
+        Comment: undefined,
       }));
     }),
 

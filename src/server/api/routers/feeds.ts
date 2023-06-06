@@ -5,6 +5,7 @@ import { Post } from "@prisma/client";
 
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import Comment from './../../../components/Comment';
 const filterUserForClient = (user: ClerkUser) => {
   return {
     id: user.id,
@@ -40,13 +41,19 @@ export const feedsRouter = createTRPCRouter({
               select: {
                 name: true,
               }
+            },
+            Comment: {
+              take: 3,
+              orderBy: {
+                createdAt: "desc",
+              }
             }
           },
           where: {
             Space: {
               visibility: "public",
               softDeleted: false,
-            }
+            },
           },
           take: 12,
         });
@@ -59,6 +66,12 @@ export const feedsRouter = createTRPCRouter({
             Space: {
               select: {
                 name: true,
+              }
+            },
+            Comment: {
+              take: 3,
+              orderBy: {
+                createdAt: "desc",
               }
             }
           },
@@ -77,10 +90,27 @@ export const feedsRouter = createTRPCRouter({
         limit: 100
         }))
         .map(filterUserForClient)
+      
+      // Maps users to comments
+      const userComments = (
+        await clerkClient.users.getUserList({
+        userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
+          limit: 3
+        }))
+        .map(filterUserForClient)
+          
 
+      // includes the author and comments in the post
       return posts.map((post) => ({
         ...post,
-        author: users.find((user) => user.id === post.authorId)
+        author: users.find((user) => user.id === post.authorId),
+        comments: post.Comment.map((comment) => ({
+          ...comment,
+          author: userComments.find((user) => user.id === comment.authorId),
+        })),
+        
+        // removed so I don't accidentally use it
+        Comment: undefined,
       }));
     }),
 

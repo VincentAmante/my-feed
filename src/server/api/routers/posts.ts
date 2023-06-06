@@ -40,7 +40,44 @@ export const postsRouter = createTRPCRouter({
       });
     }
   ),
+  
+  createComment: privateProcedure
+    .input(
+      z.object({
+        content: z.string().min(1).max(280),
+        postId: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      const authorId = ctx.userId;
+      const postId = input.postId;
 
+      return await ctx.prisma.comment.create({
+        data: {
+          content: input.content,
+          authorId,
+          postId,
+        },
+      });
+    }),
+
+  
+  deleteComment: privateProcedure
+    .input(
+      z.object({
+        commentId: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      const authorId = ctx.userId;
+      return await ctx.prisma.comment.deleteMany({
+        where: {
+          id: input.commentId,
+          authorId,
+        },
+      });
+    }),
+  
   likeUnlikePost: privateProcedure
     .input(
       z.object({

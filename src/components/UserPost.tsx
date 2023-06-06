@@ -1,20 +1,25 @@
 import type { Post } from "@prisma/client";
 import Image from "next/image";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/clerk-react";
-import { faTrash, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faHeart, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
 import React from "react";
 import PostImage from "./PostImage";
 import DeleteModal from "./DeleteModal";
-import { animate, motion, useAnimate } from "framer-motion"
+import { animate, useAnimate } from "framer-motion"
 
+
+// Comments
+import Comment from "./Comment";
+import type { CommentWithUser } from "./Comment";
+
+// For relative time
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { unique } from "next/dist/build/utils";
 dayjs.extend(relativeTime);
 
 
@@ -25,12 +30,12 @@ type Author = {
   firstName: string | null;
   lastName: string | null;
 }
-
 type PostWithUser = Post & {
   author: Author | undefined;
   Space: {
     name: string;
   } | undefined | null;
+  comments: CommentWithUser[]
 }
 
 const UserPost = (props: PostWithUser) => {
@@ -43,7 +48,8 @@ const UserPost = (props: PostWithUser) => {
     spaceId,
     likedByIDs,
     author,
-    Space
+    Space,
+    comments
   } = props;
 
   const { userId } = useAuth();
@@ -85,7 +91,7 @@ const UserPost = (props: PostWithUser) => {
     void animate(likeScope.current, {
       scale: [1, 1.15, 1],
     }, {
-      duration: 0.4,
+      duration: 0.3,
     })
 
     if (isLiked) {
@@ -152,21 +158,81 @@ const UserPost = (props: PostWithUser) => {
           <div className="px-4">{content}</div>
           <PostImage
             src={image} alt="" />
-          <div className=" flex px-4 gap-2 items-center select-none">
-            <FontAwesomeIcon
-              ref={likeScope}
-              className="text-lg text-secondary cursor-pointer"
-              icon={isLiked ? faHeart : faHeartOutline}
-              onClick={handleLike}
-            />
-            <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
-            {!isLikesUnique && <UniqueLikeEnforcer postId={id} />}
+
+          <div className="px-4 flex flex-col gap-2 pr-8">
+            <div className=" flex gap-2 items-center select-none">
+              <FontAwesomeIcon
+                ref={likeScope}
+                className="text-lg text-secondary cursor-pointer"
+                icon={isLiked ? faHeart : faHeartOutline}
+                onClick={handleLike}
+              />
+              <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
+              {!isLikesUnique && <UniqueLikeEnforcer postId={id} />}
+            </div>
+            {comments.length > 0 && (
+              <>
+            <div className="divider py-0 my-0"></div>
+            <div className="flex flex-col gap-2">
+                  {comments.map((comment) => <Comment key={comment.id} {...comment} userId={userId || ""} />)}
+                </div>
+              </>
+            )}
+            <CommentInput postId={id} />
           </div>
         </div>
       </div>
     </>
   );
 };
+
+type CommentInputProps = {
+  postId: string;
+}
+const CommentInput = (props: CommentInputProps) => {
+  const { postId } = props;
+  const [content, setContent] = useState("");
+  const handleSubmit = () => {
+    if (!content) return;
+
+    console.log("submitting comment");
+    console.log(content);
+    console.log(postId);
+
+    const commentContent = content.trim();
+    setContent("");
+    void mutate({ postId, content: commentContent });
+  }
+  
+  const ctx = api.useContext();
+  const { mutate } = api.posts.createComment.useMutation({
+    onSuccess: () => {
+      void ctx.spaces.getSpacePostsById.invalidate();
+      void ctx.feeds.getFeedPostsById.invalidate();
+    }
+  });
+  
+  return (
+    <div className="join w-full">
+      <input
+        className="input input-bordered input-sm join-item w-full"
+        type="text"
+        placeholder="Comment"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSubmit();
+        }}
+      />
+      <button
+        className="btn join-item btn-sm"
+        onClick={handleSubmit}
+      >
+        <FontAwesomeIcon icon={faPaperPlane} />
+      </button>
+    </div>
+  )
+}
 
 type UniqueLikeEnforcerProps = {
   postId: string;
