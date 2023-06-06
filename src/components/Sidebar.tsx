@@ -257,7 +257,7 @@ const SelectVisibility = () => {
     } else if (selected === 'protected') {
       return <>
         <FontAwesomeIcon icon={faLock} className="mr-2" />
-        <p className="normal-case">Only you and your followers can see this space (Unimplemented)</p>
+        <p className="normal-case">Only you and your friends can see this space (Unimplemented)</p>
       </> 
     }
   }, [selected])
