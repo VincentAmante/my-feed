@@ -11,7 +11,7 @@ import CreatePost from "~/components/CreatePost";
 import React from "react";
 import UpdateSpaceModal from "~/components/Space/UpdateSpaceModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPenToSquare, faEllipsisVertical, faWind } from "@fortawesome/free-solid-svg-icons";
+import { faPenToSquare, faWind } from "@fortawesome/free-solid-svg-icons";
 import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedSkeletons";
 import { createPortal } from "react-dom";
 import {useRef } from "react";

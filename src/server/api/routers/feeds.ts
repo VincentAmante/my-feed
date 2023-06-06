@@ -1,10 +1,10 @@
 import { z } from "zod";
 import type { User as ClerkUser } from '@clerk/nextjs/server'
 import { clerkClient } from "@clerk/nextjs/server";
-import { Post } from "@prisma/client";
+import { Post, Feed } from "@prisma/client";
 
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 import Comment from './../../../components/Comment';
 const filterUserForClient = (user: ClerkUser) => {
   return {
@@ -17,15 +17,60 @@ const filterUserForClient = (user: ClerkUser) => {
 }
 
 export const feedsRouter = createTRPCRouter({
-  getUserFeeds: publicProcedure
-    .input(z.object({ userId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      return await ctx.prisma.feed.findMany({
+  getUserFeeds: privateProcedure
+    .query(async ({ ctx }) => {
+      const userId = ctx.userId;
+      const ownedFeeds = await ctx.prisma.feed.findMany({
         where: {
-          ownerId: input.userId,
+          ownerId: userId,
         },
       });
+
+      const subscribedFeeds = await ctx.prisma.feed.findMany({
+        where: {
+          FeedFollower: {
+            some: {
+              userId: userId,
+            },
+          },
+        },
+      });
+      return [...ownedFeeds, ...subscribedFeeds] as Feed[];
     }),
+  
+  getUnfollowedSpaces: privateProcedure
+    .input(z.object({ feedId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const unownedFeeds = await ctx.prisma.space.findMany({
+        where: {
+          SpaceInFeed: {
+            none: {
+              feedId: input.feedId,
+            }
+          },
+        },
+        take: 6,
+      })
+
+      return unownedFeeds;
+    }),
+
+  
+  getSpacesByFeedId: publicProcedure
+    .input(z.object({ feedId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const spaces = await ctx.prisma.spaceInFeed.findMany({
+        where: {
+          feedId: input.feedId,
+        },
+        include: {
+          space: true
+        },
+      });
+
+      return spaces.map((space) => space.space);
+    }),
+  
 
   getFeedPostsById: publicProcedure
     .input(z.object({ feedId: z.string() }))
@@ -77,11 +122,15 @@ export const feedsRouter = createTRPCRouter({
           },
           where: {
             Space: {
-              id: input.feedId,
-              softDeleted: false,
-            },
-          },
-        });
+              SpaceInFeed: {
+                some: {
+                  feedId: input.feedId,
+                }
+              },
+            }
+          }
+        }
+        );
       }
 
       const users = (
@@ -114,21 +163,99 @@ export const feedsRouter = createTRPCRouter({
       }));
     }),
 
-  createFeed: publicProcedure
+  createFeed: privateProcedure
     .input(
       z.object({
         name: z.string().min(1).max(64),
         visibility: z.string(),
-        ownerId: z.string(),
       })
     )
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+
       return await ctx.prisma.feed.create({
         data: {
           name: input.name,
           visibility: input.visibility,
-          ownerId: input.ownerId,
+          ownerId: userId
         },
       });
     }),
+  
+  getFeedById: publicProcedure
+    .input(z.object({ feedId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      return await ctx.prisma.feed.findUnique({
+        where: {
+          id: input.feedId,
+        },
+      });
+    }
+  ),
+
+  updateFeed: publicProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+        name: z.string().min(1).max(64),
+        visibility: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.feed.update({
+        where: {
+          id: input.feedId,
+        },
+        data: {
+          name: input.name,
+          visibility: input.visibility,
+        },
+      });
+    }
+  ),
+
+  deleteFeed: publicProcedure
+    .input(z.object({ feedId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.feed.delete({
+        where: {
+          id: input.feedId,
+        },
+      });
+    }
+  ),
+
+  addSpaceToFeed: privateProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+        spaceId: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.spaceInFeed.create({
+        data: {
+          feedId: input.feedId,
+          spaceId: input.spaceId,
+        },
+      });
+    }
+  ),
+
+  removeSpaceFromFeed: privateProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+        spaceId: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.spaceInFeed.deleteMany({
+        where: {
+          feedId: input.feedId,
+          spaceId: input.spaceId,
+        },
+      });
+    }
+  ),
 });

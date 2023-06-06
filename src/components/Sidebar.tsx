@@ -9,6 +9,7 @@ import Link from "next/link";
 import React from "react";
 import { createPortal } from "react-dom";
 import CreateSpaceModal from "./Space/CreateSpaceModal";
+import CreateFeedModal from "./Feed/CreateFeedModal";
 
 interface SidebarProps {
   handleSelectFeed: (
@@ -31,6 +32,10 @@ const Sidebar = (sidebarProps: SidebarProps) => {
   }, []);
 
   const [spaceListToggle, setSpaceListToggle] = useState(true);
+  const [feedListToggle, setFeedListToggle] = useState(true);
+
+  const createFeedModal: React.RefObject<HTMLDialogElement> = React.useRef(null);
+
   return (
     <SidebarWrapper>
       <div>
@@ -45,12 +50,18 @@ const Sidebar = (sidebarProps: SidebarProps) => {
           <span>Your Spaces</span>
         </div>
         <div className="collapse-content">
-        {spaceListElement}
+          {spaceListElement}
         </div>
       </div>
-      <div className=" rounded-lg p-2 font-light">
-        <div className="px-3 py-2 text-xl">Feeds</div>
-        <ul className="flex flex-col gap-2 py-2 text-lg">
+      <div className="collapse collapse-arrow rounded-lg p-2 font-light bg-base-200">
+        <input type="checkbox"
+          checked={feedListToggle}
+          onChange={() => setFeedListToggle(!feedListToggle)}
+        />
+        <div className="collapse-title">
+          <div className="px-3 py-2 text-xl">Feeds</div>
+        </div>
+        <ul className="collapse-content flex flex-col gap-2 py-2 text-lg">
           <li className="w-full">
             <Link
               href="/feed"
@@ -59,6 +70,19 @@ const Sidebar = (sidebarProps: SidebarProps) => {
             >
               Global
             </Link>
+          </li>
+          <FeedList handleSelectFeed={feedOnClick} />
+          {
+            createPortal(
+              <CreateFeedModal ref={createFeedModal} />,
+              document.body
+            )
+          }
+          <li className="w-full">
+            <button onClick={() => createFeedModal.current?.show()} className="btn btn-ghost opacity-30 hover:opacity-100 w-full flex justify-start gap-1">
+              <FontAwesomeIcon icon={faPlus} />
+              <span className="text-xs">Create new Feed</span>
+            </button>
           </li>
         </ul>
       </div>
@@ -111,14 +135,45 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
   )
 };
 
-const FeedList = () => {
-  const { ctxUserId } = useContext(FeedContext);
+type FeedListProps = {
+  handleSelectFeed: (
+    id: string,
+    name: string,
+    ownerId: string
+  ) => void;
+};
 
-  const { data, isLoading: postsLoading } =
-    api.feeds.getFeedsByUserId.useQuery({
-      ownerId: ctxUserId,
-    });
-  
+const FeedList = (props: FeedListProps) => {
+  const { data, isLoading: postsLoading } = api.feeds.getUserFeeds.useQuery();
+  const { handleSelectFeed } = props;
+
+  if (postsLoading)
+    return (
+      <div className="flex w-full px-2 items-center grow">
+        <span className="loading loading-dots text-accent"></span>
+      </div>
+    );
+  if (!data) return <div>Something went wrong</div>;
+
+  return (<>
+    {
+      data.map((feed) => {
+        return (
+          <li className="w-full"
+            key={feed.id}
+          >
+            <Link
+              href={`/feed/`}
+              onClick={() => handleSelectFeed(feed.id, feed.name, feed.ownerId)}
+              className="w-full btn btn-ghost justify-start font-normal normal-case">
+              {feed.name}
+            </Link>
+          </li>
+        );
+      })
+    }
+  </>)
+
 }
 
 const SpaceList = () => {
