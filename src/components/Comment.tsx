@@ -73,7 +73,10 @@ const Comment = (props: CommentWithUser & {
                 </div>
             </div>
             <div className="px-0">
-                <button 
+                {
+                    userId === author.id 
+                    && (
+                        <button 
                     onClick={() => {
                         void deleteComment({ commentId: props.id });
                     }}
@@ -84,6 +87,8 @@ const Comment = (props: CommentWithUser & {
                     icon={faTrash}
                 ></FontAwesomeIcon>
                 </button>
+                    )
+                }
             </div>
         </div>
     </>

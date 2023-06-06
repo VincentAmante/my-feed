@@ -217,7 +217,7 @@ const CommentInput = (props: CommentInputProps) => {
       <input
         className="input input-bordered input-sm join-item w-full"
         type="text"
-        placeholder="Comment"
+        placeholder="Write comment!"
         value={content}
         onChange={(e) => setContent(e.target.value)}
         onKeyDown={(e) => {
