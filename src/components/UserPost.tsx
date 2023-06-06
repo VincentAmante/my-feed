@@ -170,7 +170,7 @@ const UserPost = (props: PostWithUser) => {
               <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
               {!isLikesUnique && <UniqueLikeEnforcer postId={id} />}
             </div>
-            {comments.length > 0 && (
+            {comments && comments.length > 0 && (
               <>
             <div className="divider py-0 my-0"></div>
             <div className="flex flex-col gap-2">
