@@ -218,7 +218,7 @@ const CreateSpaceModal = React.forwardRef(function CreateSpaceModal(props, ref: 
           <label className="label">
             <span className="label-text">Name</span>
           </label>
-          <input type="text" name="name" placeholder="My Space" className="input input-bordered w-full max-w-xs" />
+          <input type="text" max={24} name="name" placeholder="My Space" className="input input-bordered w-full max-w-xs" />
         </div>
         <SelectVisibility />
         <button>
