@@ -152,16 +152,16 @@ const FeedSpaceManager = (props: { feedId: string }) => {
   });
   const { mutate: addFeedToSpace } = api.feeds.addSpaceToFeed.useMutation({
     onSuccess: () => {
-      void ctx.feeds.getUnfollowedSpaces.invalidate();
-      void ctx.feeds.getSpacesByFeedId.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getUnfollowedSpaces.refetch();
+      void ctx.feeds.getSpacesByFeedId.refetch();
+      void ctx.feeds.getFeedPostsById.refetch();
     }
   });
   const { mutate: removeFeedFromSpace } = api.feeds.removeSpaceFromFeed.useMutation({
     onSuccess: () => {
-      void ctx.feeds.getSpacesByFeedId.invalidate();
-      void ctx.feeds.getUnfollowedSpaces.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getSpacesByFeedId.refetch();
+      void ctx.feeds.getUnfollowedSpaces.refetch();
+      void ctx.feeds.getFeedPostsById.refetch();
     }
   });
 

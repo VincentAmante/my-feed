@@ -3,8 +3,6 @@ import { useState, useRef, type ReactElement, useEffect } from "react";
 import { api } from "~/utils/api";
 import { useAuth, useUser } from "@clerk/nextjs";
 import UserPost from '~/components/UserPost';
-import Image from 'next/image'
-import UploadWidget from "~/components/UploadWidget";
 import type { NextPageWithLayout } from "./_app";
 import DefaultLayout from "~/components/Layouts";
 import { useContext } from "react";
