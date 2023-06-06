@@ -48,6 +48,7 @@ export const feedsRouter = createTRPCRouter({
               feedId: input.feedId,
             }
           },
+          visibility: "public",
         },
         take: 6,
       })
