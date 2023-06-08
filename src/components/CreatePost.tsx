@@ -10,7 +10,6 @@ import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWind } from "@fortawesome/free-solid-svg-icons";
 
-
 // Handler for creating a post
 const CreatePost = () => {
     const { ctxFeed } = useContext(FeedContext);

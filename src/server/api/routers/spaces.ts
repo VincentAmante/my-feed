@@ -1,18 +1,8 @@
-import type { User as ClerkUser } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
+import { filterUserForClient } from "../helpers/filterUserForClient";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
-
-const filterUserForClient = (user: ClerkUser) => {
-  return {
-    id: user.id,
-    username: user.username,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    profileImageUrl: user.profileImageUrl,
-  }
-}
 
 export const spacesRouter = createTRPCRouter({
   getSpaceById: publicProcedure
