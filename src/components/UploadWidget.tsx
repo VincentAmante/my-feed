@@ -13,11 +13,9 @@ type _ImageUploader = {
     onUpload: (imageUrl: string | null) => void;
     submitRef: React.RefObject<HTMLButtonElement>;
 }
-
 const UploadWidget = (props: _ImageUploader) => {
     const { onUpload, submitRef } = props;
     const [imageSrc, setImageSrc] = useState<string | undefined>();
-
 
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
         const reader = new FileReader();
@@ -39,7 +37,6 @@ const UploadWidget = (props: _ImageUploader) => {
             onUpload(null);
             return;
         }
-
 
         // Handles retrieval of form data
         const form = event.currentTarget;

@@ -2,7 +2,7 @@ import z from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { clerkClient } from "@clerk/nextjs/server";
-import { filterUserForClient } from "../helpers/filterUserForClient";
+import { filterUserForClient } from "../../helpers/filterUserForClient";
 
 // For creating spaces
 function addPossessiveSuffix(name: string): string {

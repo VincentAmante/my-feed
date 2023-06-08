@@ -137,7 +137,9 @@ const UserPost = (props: PostWithUser) => {
               </div>
               <div className="flex flex-col justify-center">
                 <div className="flex gap-2 items-center">
+                  <Link href={`/user/@${props.author.username || ''}`}>
                   <p className="flex">{nameDisplay}</p>
+                  </Link>
                   <p className="text-xs italic opacity-50">{`· ${dayjs(createdAt).fromNow()}`}</p>
                 </div>
                 <Link href={spaceUrl} className="flex gap-1">

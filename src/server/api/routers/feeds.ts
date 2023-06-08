@@ -5,7 +5,6 @@ import { Post, Feed } from "@prisma/client";
 
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
-import Comment from './../../../components/Comment';
 const filterUserForClient = (user: ClerkUser) => {
   return {
     id: user.id,
@@ -36,6 +35,26 @@ export const feedsRouter = createTRPCRouter({
         },
       });
       return [...ownedFeeds, ...subscribedFeeds] as Feed[];
+    }),
+  
+  
+  getProfileFeeds: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const feeds = await ctx.prisma.feed.findMany({
+        where: {
+          ownerId: input.userId,
+          OR: [
+            {
+              visibility: "public",
+            },
+            {
+              visibility: "obscure",
+            }
+          ]
+        },
+      });
+      return feeds;
     }),
   
   getUnfollowedSpaces: privateProcedure

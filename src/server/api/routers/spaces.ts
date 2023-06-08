@@ -1,6 +1,6 @@
 import { clerkClient } from "@clerk/nextjs";
 import { z } from "zod";
-import { filterUserForClient } from "../helpers/filterUserForClient";
+import { filterUserForClient } from "../../helpers/filterUserForClient";
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 
@@ -95,21 +95,46 @@ export const spacesRouter = createTRPCRouter({
       });
     }),
   
+    getProfileSpaces: publicProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const feeds = await ctx.prisma.space.findMany({
+        where: {
+          ownerId: input.userId,
+          OR: [
+            {
+              visibility: "public",
+            },
+            {
+              visibility: "obscure",
+            }
+          ]
+        },
+      });
+      return feeds;
+    }),
+  
   createSpace: privateProcedure
     .input(
       z.object({
         name: z.string(),
         visibility: z.enum(["public", "private", "obscure", "protected"]),
+        iconUrl: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.userId;
+      let icon = input.iconUrl;
+      if (icon === undefined) {
+        icon = null;
+      }
 
       return await ctx.prisma.space.create({
         data: {
           name: input.name,
           visibility: input.visibility,
           ownerId: userId,
+          icon: input.iconUrl,
         }
       });
     }),
@@ -153,5 +178,27 @@ export const spacesRouter = createTRPCRouter({
         }
       });
       return space;
-    })
+    }),
+  
+  updateSpaceIcon: privateProcedure
+    .input(
+      z.object({
+        spaceId: z.string(),
+        icon: z.string(),
+      })
+  )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      const space = await ctx.prisma.space.updateMany({
+        where: {
+          id: input.spaceId,
+          ownerId: userId,
+        },
+        data: {
+          icon: input.icon,
+        }
+      });
+      return space;
+    }
+  ),
 });

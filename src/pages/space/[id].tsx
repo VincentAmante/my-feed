@@ -14,7 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare, faWind } from "@fortawesome/free-solid-svg-icons";
 import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedSkeletons";
 import { createPortal } from "react-dom";
-import {useRef } from "react";
+import { useRef } from "react";
+import SpaceIcon from "~/components/Space/Icon";
 
 const SpacePage: NextPageWithLayout = () => {
     const { setCtxFeedType, setCtxFeedName, setCtxOwner, setCtxFeed, ctxFeedName } = useContext(FeedContext);
@@ -66,10 +67,11 @@ const SpacePage: NextPageWithLayout = () => {
         )
     }
     return <>
-        
         {userOwnsSpace && createPortal(<UpdateSpaceModal spaceId={id} ref={spaceModalRef}></UpdateSpaceModal>, document.body)}
         <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
-            <span>
+
+            <span className="flex  items-center justify-center gap-2">
+            <SpaceIcon imageSrc={data?.icon || undefined}></SpaceIcon>
                 {ctxFeedName}
             </span>
             {userOwnsSpace && 

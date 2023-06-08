@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/nextjs";
-import {useState } from "react";
+import { useState } from "react";
 import { api } from "~/utils/api";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,17 +7,19 @@ import { faShield, faLock, faEye, faPlus, faPenToSquare, faTrash, faExclamationT
 import type { ForwardedRef } from "react";
 import React from "react";
 import { FeedContext } from "../Layouts";
+import UploadWidgetProfile from "../UpdateIcon";
 
 type visibilityType = "public" | "private" | "obscure" | "protected";
 
 type UpdateSpaceModal = {
   spaceId: string;
 }
+
 const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: UpdateSpaceModal, ref: ForwardedRef<HTMLDialogElement>) {
   const { userId } = useAuth();
 
   const { setCtxFeedName } = React.useContext(FeedContext);
-  
+
 
   const ctx = api.useContext();
 
@@ -36,12 +38,12 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const {mutate: updateSpace} = api.spaces.updateSpace.useMutation({
+  const { mutate: updateSpace } = api.spaces.updateSpace.useMutation({
     onSuccess: () => {
       void ctx.spaces.getSpacesByUserId.invalidate();
     }
   });
-  
+
 
   function updateSpaceHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,66 +51,92 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
     if (isLoading) return;
     setIsLoading(true);
     void updateSpace({
-        spaceId: props.spaceId,
-        name,
-        visibility
-      }) 
+      spaceId: props.spaceId,
+      name,
+      visibility
+    })
     setIsLoading(false);
 
     setCtxFeedName(name);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
     (window as any).update_space_ref.close();
-    }
+  }
 
   const [deleteToggled, setDeleteToggled] = useState(false);
   function toggleDelete(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
     setDeleteToggled(!deleteToggled);
   }
-  
+
+
+  const { mutate: updateIcon } = api.spaces.updateSpaceIcon.useMutation({
+    onSuccess: () => {
+      void ctx.spaces.getSpacesByUserId.invalidate({
+        ownerId: userId as string
+      });
+      void ctx.spaces.getSpaceById.invalidate({
+        spaceId: props.spaceId
+      });
+    }
+  });
+
+  const spaceUploadRef = React.useRef<HTMLButtonElement>(null);
+  function handleOnUpload(imgUrl: string | null) {
+    if (!imgUrl) return;
+    void updateIcon({
+      spaceId: props.spaceId,
+      icon: imgUrl
+    })
+  }
+
   useMemo(() => {
     console.log('created')
   }, [])
 
-  
+
   return (
     <dialog id="update_space_ref" ref={ref} className="modal absolute">
-      <form method="dialog" onSubmit={updateSpaceHandler} className="modal-box flex flex-col items-center gap-2">
-        <label className="text-2xl font-bold">Update a Space</label>
-        <div className="form-control w-full max-w-xs">
-          <label className="label">
-            <span className="label-text">Name</span>
-          </label>
-          <input
-            type="text" max={24}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            name="name"
-            placeholder="My Space" className="input input-bordered w-full max-w-xs" />
+      <div className="modal-box flex flex-col">
+        <label className="text-2xl font-bold text-center">Update a Space</label>
+        <div className="w-full max-w-xs self-center flex justify-center gap-2 my-2">
+          <UploadWidgetProfile onUpload={handleOnUpload} submitRef={spaceUploadRef} imageUrl={spaceData?.icon || null} />
         </div>
-        <SelectVisibility selected={visibility} setSelected={setVisibility} />
-        <button className="btn btn-primary">
-          {isLoading ?
-            <span className="loading loading-dots text-accent"></span>
-            : <>
-              <FontAwesomeIcon icon={faPenToSquare} />
-              <span>Update Space</span>
-            </>}
-        </button>
-        <div className="divider divider-error text-error font-bold">Danger Zone</div>
-        {
-          deleteToggled ? (
-            <DeleteSpace spaceId={props.spaceId} toggleDelete={toggleDelete} />) :
-            (<button className="btn btn-error" onClick={toggleDelete}>
-            <FontAwesomeIcon icon={faTrash} />
-            <span>Delete Space</span>
-            </button>)
-        }
-      </form>
+        <form method="dialog" onSubmit={updateSpaceHandler} className="flex flex-col items-center gap-2">
+          <div className="form-control w-full max-w-xs">
+            <label className="label">
+              <span className="label-text">Name</span>
+            </label>
+            <input
+              type="text" max={24}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              name="name"
+              placeholder="My Space" className="input input-bordered w-full max-w-xs" />
+          </div>
+          <SelectVisibility selected={visibility} setSelected={setVisibility} />
+          <button className="btn btn-primary">
+            {isLoading ?
+              <span className="loading loading-dots text-accent"></span>
+              : <>
+                <FontAwesomeIcon icon={faPenToSquare} />
+                <span>Update Space</span>
+              </>}
+          </button>
+          <div className="divider divider-error text-error font-bold">Danger Zone</div>
+          {
+            deleteToggled ? (
+              <DeleteSpace spaceId={props.spaceId} toggleDelete={toggleDelete} />) :
+              (<button className="btn btn-error" onClick={toggleDelete}>
+                <FontAwesomeIcon icon={faTrash} />
+                <span>Delete Space</span>
+              </button>)
+          }
+        </form>
+      </div>
       <form method="dialog" className="modal-backdrop">
-        <button onClick={() => setDeleteToggled(false)}>close</button>
-      </form>
+          <button onClick={() => setDeleteToggled(false)}>close</button>
+        </form>
     </dialog>
   )
 });
@@ -194,16 +222,16 @@ const DeleteSpace = (props: DeleteSpaceProps) => {
       <FontAwesomeIcon icon={faExclamationTriangle} className="text-error text-6xl" />
       <p className="max-w-sm text-center text-error">Are you sure? All your posts in this Space will be lost forever</p>
       <div className="flex gap-6 py-2">
-      <button className="btn btn-error" onClick={() => {
-        void deleteSpace({ spaceId })
-      }
-      }>
+        <button className="btn btn-error" onClick={() => {
+          void deleteSpace({ spaceId })
+        }
+        }>
           <FontAwesomeIcon icon={faTrash} />
           <span>Delete Forever</span>
         </button>
         <button className="btn btn-outline" onClick={toggleDelete}>
-        Cancel
-      </button>
+          Cancel
+        </button>
       </div>
     </div>
   </>
