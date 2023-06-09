@@ -1,3 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,6 +17,7 @@ type Props = {
 const DragAndDropImages = ({ onImageDrop }: Props) => {
     const [images, setImages] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [files, setFiles] = useState<File[]>([]);
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
@@ -40,22 +48,44 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
             (file) => file.type.startsWith('image/')
         );
 
-        // Read uploaded images and call the onImageDrop function with the image data
-        uploadedImages.forEach((image) => {
+        for (const file of uploadedImages) {
             const reader = new FileReader();
             reader.onload = () => {
                 const imageDataUrl = reader.result as string;
-                onImageDrop(imageDataUrl);
+                // onImageDrop(imageDataUrl);
                 setImages((prevImages) => [...prevImages, imageDataUrl]);
+                setFiles((prevFiles) => [...prevFiles, file]);
+                console.log(file);
             };
-            reader.readAsDataURL(image);
-        });
+            reader.readAsDataURL(file);
+        }
 
         // Reset file input value
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
+
+
+    async function uploadToCloudinary(file: File) {
+        const formData = new FormData();
+        formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || '');
+        formData.append('file', file);
+        const data = await fetch(`https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || ""}/image/upload`,
+            {
+                method: 'POST',
+                body: formData
+            })
+            .then((r: any) => r.json());
+        console.log(data);
+        return data.secure_url;
+    }
+    async function submitOnClick() {
+        for (const file of files) {
+            const url = await uploadToCloudinary(file);
+            console.log(url);
+        }
+    }
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
         event.stopPropagation();
@@ -70,6 +100,8 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
     };
 
     return (
+        <>
+        
         <form className='p-4'>
             <div
                 onDrop={handleDrop}
@@ -113,6 +145,8 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
                 ))}
             </div>
         </form>
+            <button onClick={() => void submitOnClick()} className='btn btn-primary'>Submit</button>
+        </>
     );
 };
 
