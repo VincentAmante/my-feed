@@ -9,10 +9,6 @@ const Test = () => {
     setFiles((prevFiles: string[]) => [...prevFiles, acceptedFile]);
   }
 
-  function onUpload() {
-    
-  }
-
   return (
     <>
       <main>
