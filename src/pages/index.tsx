@@ -1,4 +1,4 @@
-@@ -1,51 +0,0 @@
+
 import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
