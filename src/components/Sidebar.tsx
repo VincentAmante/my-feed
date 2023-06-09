@@ -146,14 +146,18 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
         )
       }
       </aside>
-      <div
-        onClick={() => {
-          handleOnClick();
-          setIsToggled(!isToggled);
-        }
-        }
-        className="fixed z-[100] w-screen h-screen bg-black bg-opacity-5">
-      </div>
+      {
+        isToggled && (
+          <div
+          onClick={() => {
+            handleOnClick();
+            setIsToggled(!isToggled);
+          }
+          }
+          className="fixed z-[100] w-screen h-screen bg-black bg-opacity-5">
+          </div>
+        )
+      }
     </>
   )
 };
