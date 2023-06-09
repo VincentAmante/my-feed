@@ -8,15 +8,16 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpFromBracket, faX } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpFromBracket, faImage, faX } from '@fortawesome/free-solid-svg-icons';
 import { on } from 'stream';
 
 type Props = {
     onImagesUploaded: (imageUrls: string[]) => void;
     submitRef: React.RefObject<HTMLButtonElement>;
+    fileBtnRef: React.RefObject<HTMLButtonElement>;
 };
 
-const DragAndDropImages = ({ onImagesUploaded, submitRef }: Props) => {
+const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) => {
     const [images, setImages] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
@@ -26,7 +27,7 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef }: Props) => {
         event.preventDefault();
         const droppedFiles = event.dataTransfer.files;
 
-        if (files.length > 10 || files.length + droppedFiles.length > 10) { 
+        if (files.length > 10 || files.length + droppedFiles.length > 10) {
             return;
         }
 
@@ -51,7 +52,7 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef }: Props) => {
     };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        
+
         const files = event.target.files as FileList;
         const uploadedImages = Array.from(files).filter(
             (file) => file.type.startsWith('image/')
@@ -111,62 +112,61 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef }: Props) => {
 
     const handleImageRemove = (event: React.MouseEvent<HTMLButtonElement>, index: number) => {
         event.stopPropagation();
+        event.preventDefault();
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
+        setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
     };
 
     return (
         <>
-        
-        <form className='p-4'>
-            <div
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onClick={handleClick}
-                    className='border-2 border-info border-opacity-60 transition-all 
-                flex  overflow-x-scroll max-w-lg rounded-md cursor-pointer hover:bg-info hover:bg-opacity-10'
-            >
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    className='hidden'
-                    multiple
-                />
+            <form className='flex flex-col items-center justify-center'>
+                <div
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onClick={handleClick}
+                    className='border-opacity-60 transition-all 
+                grid lg:grid-cols-2 gap-6 rounded-md cursor-pointer hover:bg-white hover:bg-opacity-5 px-2'
+                >
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        className='hidden'
+                        multiple
+                    />
                     {
                         isLoading &&
-                        <div className='select-none flex text-info text-opacity-60 items-center justify-center w-full h-full min-h-[10rem]'>
+                        <div className='select-none flex text-opacity-60 items-center justify-center w-full h-full min-h-[2rem]'>
                             <div className='loading loading-spinner'></div>
                         </div>
-                }
-                {!isLoading && images && images.length == 0 &&
-                    <div className='select-none flex text-info text-opacity-60 items-center justify-center w-full h-full min-h-[10rem]'>
-                        <FontAwesomeIcon icon={faArrowUpFromBracket} />
-                        <p>Drag and drop images here</p>
-                    </div>
-                }
-                {!isLoading && images.map((image, index) => (
-                    <div
-                        key={index}
-                        className='m-1 max-w-[24rem] min-w-[12rem] group transition-all relative  rounded-md'>
-                        <Image
-                            src={image}
-                            alt={`Dropped Image ${index}`}
-                            width={256}
-                            height={256}
-                            className='aspect-square object-cover object-center'
-                        />
-                        <div className='absolute top-0 right-0 w-full h-full flex flex-col items-end'>
-                            <button
-                                
-                            onClick={(event) => handleImageRemove(event, index)}
-                                className='btn hover:btn-error btn-xs btn-circle m-1'>
-                            <FontAwesomeIcon icon={faX} />
-                            </button>
+                    }
+                    {!isLoading && images.map((image, index) => (
+                        <div
+                            key={index}
+                            className='max-w-[24rem] w-full group transition-all relative rounded-md'>
+                            <Image
+                                src={image}
+                                alt={`Dropped Image ${index}`}
+                                width={256}
+                                height={256}
+                                className='aspect-square object-cover object-center rounded-md'
+                            />
+                            <div className='absolute top-0 right-0 w-full h-full flex flex-col items-end'>
+                                <button
+                                    onClick={(event) => handleImageRemove(event, index)}
+                                    className='btn bg-opacity-50 btn-sm btn-circle m-1'>
+                                    <FontAwesomeIcon icon={faX} />
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
-        </form>
+                    ))}
+                </div>
+            </form>
+            <button
+                onClick={() => fileInputRef.current?.click()}
+                ref={fileBtnRef}
+                className='hidden'>
+            </button>
             <button onClick={() => void submitOnClick()} className='btn btn-primary hidden' ref={submitRef}>Submit</button>
         </>
     );

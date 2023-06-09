@@ -61,7 +61,7 @@ const Sidebar = (sidebarProps: SidebarProps) => {
         <div className="collapse-title">
           <div className="px-3 py-2 text-xl">Feeds</div>
         </div>
-        <ul className="collapse-content flex flex-col gap-2 py-2 text-lg">
+        <ul className="collapse-content flex flex-col gap-2 text-lg">
           <li className="w-full">
             <Link
               href="/feed"

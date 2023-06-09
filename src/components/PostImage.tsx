@@ -30,8 +30,8 @@ const PostImages = (props: ImageType) => {
                         <Image
                             className="image object-cover w-full select-none"
                             src={imageUrls[activeImage - 1] || imageUrls[0]}
-                            width={400}
-                            height={400}
+                            width={768}
+                            height={768}
                             alt={"An image"}
                         />
                         <div className="absolute h-full w-full flex items-center">

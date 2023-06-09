@@ -13,7 +13,7 @@ const SpaceIcon = (props: SpaceIconProps) => {
     return <>
         {imageSrc &&
             <div className="avatar bg-base-300 rounded-lg">
-                <div className="w-16">
+                <div className="w-14 lg:w-16">
                     <Image className="rounded-lg" src={imageSrc} alt="Avatar" width={100} height={100} />
                 </div>
             </div>
@@ -21,7 +21,7 @@ const SpaceIcon = (props: SpaceIconProps) => {
         {
             !imageSrc &&
             <div className="avatar placeholder bg-base-300 rounded-lg aspect-square">
-                <div className="w-16">
+                <div className="w-14 lg:w-16">
                     {
                         <FontAwesomeIcon icon={faImage} className="text-4xl text-base-content opacity-20" />
                     }

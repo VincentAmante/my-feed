@@ -66,7 +66,7 @@ const CreateFeedModal = React.forwardRef(function CreateFeedModal(props, ref: Fo
   }
 
   return (
-    <dialog id="create_feed_ref" ref={ref} className="modal absolute">
+    <dialog id="create_feed_ref" ref={ref} className="modal fixed">
       <div className="modal-box">
         <div className="w-full max-w-xs self-center flex justify-center gap-2 my-2">
           <AddIconWidget onUpload={handleSubmit} submitRef={submitIconRef} imageUrl={null} />

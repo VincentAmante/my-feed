@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWind, faRectangleList, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import CreatePost from "~/components/CreatePost";
 import UpdateFeedModal from "~/components/Feed/UpdateFeedModal";
+import { useInView } from 'react-intersection-observer';
 
 import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedSkeletons";
 import { createPortal } from "react-dom";
@@ -22,7 +23,7 @@ const Feed: NextPageWithLayout = () => {
 
   return <>
     <FeedHeader></FeedHeader>
-    <div className="flex flex-col items-center justify-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
+    <div className="flex flex-col items-center justify-center h-full w-full rounded-3xl rounded-b-none p-4 gap-4 bg-base-200">
       {canMakePost && <CreatePost></CreatePost>}
       <FeedData></FeedData>
     </div>
@@ -105,6 +106,9 @@ const FeedHeader = () => {
 // Handles collection of posts
 const FeedData = () => {
   const { ctxFeedType: type, ctxFeed: id, ctxOwner } = useContext(FeedContext);
+  const { ref, inView, entry } = useInView({
+    threshold: 0,
+  });
   const { userId } = useAuth();
 
   const { data, isLoading } = (type == "feed") ?
@@ -113,8 +117,17 @@ const FeedData = () => {
     }) : api.spaces.getSpacePostsById.useQuery({
       spaceId: id
     })
+  
+  useMemo(() => {
+      console.log('checking in view')
+      if (inView) {
+        console.log('in view')
+    }
+    }, [inView])
+  
   if (isLoading) return <LoadingSkeleton />;
   if (!data) return <ErrorSkeleton />;
+
 
   if (data?.length === 0) {
     return (
@@ -130,12 +143,17 @@ const FeedData = () => {
   }
   else
     return (
+      <>
       <div className="flex flex-col gap-4 w-full h-full items-center">
         {data.map((post) => {
           return <UserPost key={post.id} {...post} />
         })
         }
-      </div>
+        </div>
+        <div ref={ref} className="invisible">
+          <h2>{`Header inside viewport ${inView}.`}</h2>
+        </div>
+      </>
     )
 }
 

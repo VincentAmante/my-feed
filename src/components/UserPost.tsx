@@ -41,7 +41,6 @@ const UserPost = (props: PostWithUser) => {
   const {
     id,
     content,
-    image,
     createdAt,
     authorId,
     spaceId,
@@ -129,7 +128,7 @@ const UserPost = (props: PostWithUser) => {
         &&
         <DeletePostModal ref={delModal} id={id} />
       }
-      <div className="card w-full shadow-xl max-w-md bg-base-100">
+      <div className="card w-full shadow-xl max-w-lg bg-base-100">
         <div className="card-body py-4 gap-4   px-0">
           <div className="flex justify-between w-full px-4">
             <UserHeader
@@ -187,11 +186,6 @@ const CommentInput = (props: CommentInputProps) => {
   const [content, setContent] = useState("");
   const handleSubmit = () => {
     if (!content) return;
-
-    console.log("submitting comment");
-    console.log(content);
-    console.log(postId);
-
     const commentContent = content.trim();
     setContent("");
     void mutate({ postId, content: commentContent });

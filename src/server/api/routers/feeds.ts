@@ -96,7 +96,71 @@ export const feedsRouter = createTRPCRouter({
       return spaces.map((space) => space.space);
     }),
 
+  getInfiniteFeedPostsById: publicProcedure
+    .input(z.object({ feedId: z.string(), cursor: z.string().optional() }))
+    .query(async ({ input, ctx }) => {
+      let posts = null;
+      if (input.feedId === "global") {
+        posts = await ctx.prisma.post.findMany({
+          orderBy: {
+            createdAt: "desc",
+          },
+          include: {
+            Space: {
+              select: {
+                name: true,
+              }
+            },
+            Comment: {
+              take: 3,
+              orderBy: {
+                createdAt: "asc",
+              }
+            }
+          },
+          where: {
+            Space: {
+              visibility: "public",
+              softDeleted: false,
+            },
+          },
+          take: 12,
+        });
+      } else {
+        posts = await ctx.prisma.post.findMany({
+          orderBy: {
+            createdAt: "desc",
+          },
+          include: {
+            Space: {
+              select: {
+                name: true,
 
+              }
+            },
+            Comment: {
+              take: 3,
+              orderBy: {
+                createdAt: "asc",
+              }
+            }
+          },
+          where: {
+            Space: {
+              SpaceInFeed: {
+                some: {
+                  feedId: input.feedId,
+                }
+              },
+              softDeleted: false,
+            }
+          }
+        }
+        );
+      }
+    }),
+        
+  
   getFeedPostsById: publicProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -328,6 +392,7 @@ export const feedsRouter = createTRPCRouter({
       })
     )
     .query(async ({ input, ctx }) => {
+      if (input.feedId === "global") return true; // everyone is subscribed to global feed
       const userId = ctx.userId;
       const feedFollower = await ctx.prisma.feedFollower.findFirst({
         where: {

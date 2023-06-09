@@ -68,19 +68,17 @@ const SpacePage: NextPageWithLayout = () => {
     }
     else return <>
         {userOwnsSpace && createPortal(<UpdateSpaceModal spaceId={id} ref={spaceModalRef}></UpdateSpaceModal>, document.body)}
-        <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
-
+        <div className="flex text-xl w-full items-center justify-center py-4 lg:py-6 pb-4 bg-base-100">
             <span className="flex  items-center justify-center gap-2">
             <SpaceIcon imageSrc={data?.icon || undefined}></SpaceIcon>
                 {ctxFeedName}
             </span>
             {userOwnsSpace && 
-            (<button className="btn btn-ghost btn-sm ml-2 btn-circle" onClick={() => openModal()}>
-            <FontAwesomeIcon icon={faPenToSquare} />
+            (<button className="btn btn-ghost btn-md ml-2 btn-square text-xl" onClick={() => openModal()}>
+            <FontAwesomeIcon icon={faPenToSquare} className="text-3xl" />
         </button>)}
         </div>
         <div className="flex flex-col items-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
-
             {userOwnsSpace && <CreatePost></CreatePost>}
             <SpacePosts></SpacePosts>
         </div>
@@ -112,19 +110,15 @@ const EmptySpace = () => {
 const SpacePosts = () => {
     const router = useRouter();
     const id = router.query.id;
-
     const { data, isLoading } = api.spaces.getSpacePostsById.useQuery({
         spaceId: id as string
     })
-
     if (isLoading)
-        return <LoadingSkeleton />;
-        
+        return <LoadingSkeleton />;   
     if (data?.length === 0) {
         console.log('empty')
         return <EmptySpace/>
     }
-
     return (
         <>
             {data?.map((post) => (
