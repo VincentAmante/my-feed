@@ -12,12 +12,11 @@ import { faArrowUpFromBracket, faX } from '@fortawesome/free-solid-svg-icons';
 import { on } from 'stream';
 
 type Props = {
-    onImageDrop: (imageData: string) => void;
     onImagesUploaded: (imageUrls: string[]) => void;
     submitRef: React.RefObject<HTMLButtonElement>;
 };
 
-const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) => {
+const DragAndDropImages = ({ onImagesUploaded, submitRef }: Props) => {
     const [images, setImages] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
@@ -40,7 +39,7 @@ const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) 
             const reader = new FileReader();
             reader.onload = () => {
                 const imageDataUrl = reader.result as string;
-                onImageDrop(imageDataUrl);
+                // onImageDrop(imageDataUrl);
                 setImages((prevImages) => [...prevImages, imageDataUrl]);
             };
             reader.readAsDataURL(image);
@@ -52,6 +51,7 @@ const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) 
     };
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        
         const files = event.target.files as FileList;
         const uploadedImages = Array.from(files).filter(
             (file) => file.type.startsWith('image/')
@@ -122,7 +122,8 @@ const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) 
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={handleClick}
-                className='border-2 border-info border-opacity-60 transition-all flex flex-wrap max-w-lg rounded-md cursor-pointer hover:bg-info hover:bg-opacity-10'
+                    className='border-2 border-info border-opacity-60 transition-all 
+                flex  overflow-x-scroll max-w-lg rounded-md cursor-pointer hover:bg-info hover:bg-opacity-10'
             >
                 <input
                     type="file"
@@ -146,13 +147,13 @@ const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) 
                 {!isLoading && images.map((image, index) => (
                     <div
                         key={index}
-                        className='m-1 w-full max-w-[12rem] group transition-all relative  rounded-md overflow-hidden'>
+                        className='m-1 max-w-[24rem] min-w-[12rem] group transition-all relative  rounded-md'>
                         <Image
                             src={image}
                             alt={`Dropped Image ${index}`}
                             width={256}
                             height={256}
-                            className='w-full aspect-square object-cover object-center'
+                            className='aspect-square object-cover object-center'
                         />
                         <div className='absolute top-0 right-0 w-full h-full flex flex-col items-end'>
                             <button

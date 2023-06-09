@@ -7,7 +7,7 @@ export const postsRouter = createTRPCRouter({
     .input(
       z.object({
         content: z.string().min(1).max(280),
-        image: z.string(),
+        images: z.array(z.string()),
         spaceId: z.string(),
       })
     )
@@ -17,7 +17,7 @@ export const postsRouter = createTRPCRouter({
       return await ctx.prisma.post.create({
         data: {
           content: input.content,
-          image: input.image,
+          images: input.images,
           authorId,
           spaceId: input.spaceId,
         },

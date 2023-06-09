@@ -1,6 +1,5 @@
 
 import Image from "next/image";
-import { useMemo } from "react";
 
 type ImageType = {
     imageUrls: string[];
@@ -24,10 +23,10 @@ const PostImages = (props: ImageType) => {
         return (
             <>
                 {(imageUrls.length > 1) && (
-                    <div className="carousel w-full">
+                    <div className="carousel w-full scroll-py-12 snap-y">
                         {imageUrls.map((url, index) => (
                             <div key={index}
-                                className="carousel-item relative w-full"
+                                className="carousel-item snap-start relative w-full scroll-pt-10 "
                                 id={`slide${index + 1}`}
                             >
                                 <Image
@@ -38,8 +37,9 @@ const PostImages = (props: ImageType) => {
                                     alt={"An image"}
                                 />
                                 <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                                    <a href={calculateNextSlide(index + 1, imageUrls.length)} className="btn btn-circle">❮</a>
-                                    <a href={calculatePreviousSlide(index + 1, imageUrls.length)} className="btn btn-circle">❯</a>
+                                    
+                                <a href={calculatePreviousSlide(index + 1, imageUrls.length)} className="btn btn-circle">❮</a>
+                                    <a href={calculateNextSlide(index + 1, imageUrls.length)} className="btn btn-circle">❯</a>
                                 </div>
                             </div>
                         ))}
@@ -59,21 +59,6 @@ const PostImages = (props: ImageType) => {
                 )}
             </>
         )
-
-
-    // (
-    //     <>
-    //         <figure className="w-full">
-    //             <Image
-    //                 className="image object-cover w-full select-none"
-    //                 src={imageUrls[0]}
-    //                 width={400}
-    //                 height={400}
-    //                 alt={"An image"}
-    //             />
-    //         </figure>
-    //     </>
-    // );
 };
 
 export default PostImages;

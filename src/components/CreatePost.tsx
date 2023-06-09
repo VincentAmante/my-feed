@@ -9,6 +9,7 @@ import { useContext } from "react";
 import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faWind } from "@fortawesome/free-solid-svg-icons";
+import DragAndDropImages from "./DragAndDropImages";
 
 // Handler for creating a post
 const CreatePost = () => {
@@ -32,26 +33,17 @@ const CreatePost = () => {
         console.log(error);
       },
     });
-  
-    if (!user) {
-      return <></>;
-    }
-  
-    // TODO: Improve the flow of the component when uploading with or without an image
-    function handleUpload(imageUrl: string | null) {
-      if (imageUrl) {
+
+    function onImagesUploaded(imageUrls: string[]) {
         mutate({
           content: content,
-          image: imageUrl,
-          spaceId: ctxFeed,
-        });
-      } else if (imageUrl === null) {
-        mutate({
-          content: content,
-          image: '',
+          images: imageUrls,
           spaceId: ctxFeed,
         });
       }
+  
+    if (!user) {
+      return <></>;
     }
   
     function triggerUpload() {
@@ -79,7 +71,8 @@ const CreatePost = () => {
           >
           </input>
         </div>
-        <UploadWidget submitRef={submitRef} onUpload={handleUpload}></UploadWidget>
+        <DragAndDropImages submitRef={submitRef} onImagesUploaded={onImagesUploaded} />
+        {/* <UploadWidget submitRef={submitRef} onUpload={handleUpload}></UploadWidget> */}
       </div >
     )
 }
