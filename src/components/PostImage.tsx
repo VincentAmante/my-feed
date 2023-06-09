@@ -1,22 +1,25 @@
 
 import Image from "next/image";
+import { useState } from "react";
+import { faChevronRight, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ImageType = {
     imageUrls: string[];
 };
 const PostImages = (props: ImageType) => {
     const { imageUrls } = props;
+    const [activeImage, setActiveImage] = useState(1);
 
-    function calculateNextSlide(currentSlide: number, totalSlides: number) {
-        let answer = currentSlide === totalSlides ? 1 : currentSlide + 1;
-        if (answer > totalSlides) answer = 1;
-        return `#slide${answer}`;
-    }
-    function calculatePreviousSlide(currentSlide: number, totalSlides: number) {
-        let answer = currentSlide === 1 ? totalSlides : currentSlide - 1;
-        if (answer < 1) answer = totalSlides;
-        return `#slide${answer}`;
-    }
+    const prevImage = () => {
+        if (activeImage === 1) setActiveImage(imageUrls.length);
+        else setActiveImage(activeImage - 1);
+    };
+    const nextImage = () => {
+        if (activeImage === imageUrls.length) setActiveImage(1);
+        else setActiveImage(activeImage + 1);
+    };
+
 
     if (!imageUrls || imageUrls.length <= 0 || !imageUrls[0]) return <></>;
     else
@@ -24,25 +27,27 @@ const PostImages = (props: ImageType) => {
             <>
                 {(imageUrls.length > 1) && (
                     <div className="carousel w-full scroll-py-12 snap-y">
-                        {imageUrls.map((url, index) => (
-                            <div key={index}
-                                className="carousel-item snap-start relative w-full scroll-pt-10 "
-                                id={`slide${index + 1}`}
+                        <Image
+                            className="image object-cover w-full select-none"
+                            src={imageUrls[activeImage - 1] || imageUrls[0]}
+                            width={400}
+                            height={400}
+                            alt={"An image"}
+                        />
+                        <div>
+                            <button
+                                onClick={prevImage}
+                                className="absolute left-4 top-1/2 btn btn-circle btn-ghost "
                             >
-                                <Image
-                                    className="image object-cover w-full select-none"
-                                    src={url}
-                                    width={400}
-                                    height={400}
-                                    alt={"An image"}
-                                />
-                                <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                                    
-                                <a href={calculatePreviousSlide(index + 1, imageUrls.length)} className="btn btn-circle">❮</a>
-                                    <a href={calculateNextSlide(index + 1, imageUrls.length)} className="btn btn-circle">❯</a>
-                                </div>
-                            </div>
-                        ))}
+                                <FontAwesomeIcon icon={faChevronLeft} />
+                            </button>
+                            <button
+                                onClick={nextImage}
+                                className="absolute right-4 top-1/2  btn btn-circle btn-ghost"
+                            >
+                                <FontAwesomeIcon icon={faChevronRight} />
+                            </button>
+                        </div>
                     </div>
                 )}
 
