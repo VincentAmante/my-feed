@@ -9,20 +9,29 @@ import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpFromBracket, faX } from '@fortawesome/free-solid-svg-icons';
+import { on } from 'stream';
 
 type Props = {
     onImageDrop: (imageData: string) => void;
+    onImagesUploaded: (imageUrls: string[]) => void;
+    submitRef: React.RefObject<HTMLButtonElement>;
 };
 
-const DragAndDropImages = ({ onImageDrop }: Props) => {
+const DragAndDropImages = ({ onImageDrop, onImagesUploaded, submitRef }: Props) => {
     const [images, setImages] = useState<string[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [files, setFiles] = useState<File[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
-        const files = event.dataTransfer.files;
-        const droppedImages = Array.from(files).filter(
+        const droppedFiles = event.dataTransfer.files;
+
+        if (files.length > 10 || files.length + droppedFiles.length > 10) { 
+            return;
+        }
+
+        const droppedImages = Array.from(droppedFiles).filter(
             (file) => file.type.startsWith('image/')
         );
 
@@ -60,12 +69,11 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
             reader.readAsDataURL(file);
         }
 
-        // Reset file input value
+        // Resets
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
     };
-
 
     async function uploadToCloudinary(file: File) {
         const formData = new FormData();
@@ -80,11 +88,18 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
         console.log(data);
         return data.secure_url;
     }
+
     async function submitOnClick() {
+        setIsLoading(true);
+        const imageUrls: string[] = [];
         for (const file of files) {
             const url = await uploadToCloudinary(file);
-            console.log(url);
+            imageUrls.push(url);
         }
+        setImages([])
+        setFiles([])
+        setIsLoading(false);
+        onImagesUploaded(imageUrls);
     }
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -107,7 +122,7 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onClick={handleClick}
-                className='border-2 border-info border-dashed border-opacity-60 transition-all flex flex-wrap max-w-lg rounded-md cursor-pointer hover:bg-info hover:bg-opacity-10'
+                className='border-2 border-info border-opacity-60 transition-all flex flex-wrap max-w-lg rounded-md cursor-pointer hover:bg-info hover:bg-opacity-10'
             >
                 <input
                     type="file"
@@ -116,13 +131,19 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
                     className='hidden'
                     multiple
                 />
-                {images && images.length == 0 &&
+                    {
+                        isLoading &&
+                        <div className='select-none flex text-info text-opacity-60 items-center justify-center w-full h-full min-h-[10rem]'>
+                            <div className='loading loading-spinner'></div>
+                        </div>
+                }
+                {!isLoading && images && images.length == 0 &&
                     <div className='select-none flex text-info text-opacity-60 items-center justify-center w-full h-full min-h-[10rem]'>
                         <FontAwesomeIcon icon={faArrowUpFromBracket} />
                         <p>Drag and drop images here</p>
                     </div>
                 }
-                {images.map((image, index) => (
+                {!isLoading && images.map((image, index) => (
                     <div
                         key={index}
                         className='m-1 w-full max-w-[12rem] group transition-all relative  rounded-md overflow-hidden'>
@@ -145,7 +166,7 @@ const DragAndDropImages = ({ onImageDrop }: Props) => {
                 ))}
             </div>
         </form>
-            <button onClick={() => void submitOnClick()} className='btn btn-primary'>Submit</button>
+            <button onClick={() => void submitOnClick()} className='btn btn-primary hidden' ref={submitRef}>Submit</button>
         </>
     );
 };

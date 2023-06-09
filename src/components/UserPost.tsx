@@ -8,7 +8,7 @@ import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
 import React from "react";
-import PostImage from "./PostImage";
+import PostImages from "./PostImage";
 import DeletePostModal from "./DeletePostModal";
 import { animate, useAnimate } from "framer-motion"
 
@@ -48,7 +48,8 @@ const UserPost = (props: PostWithUser) => {
     likedByIDs,
     author,
     Space,
-    comments
+    comments,
+    images,
   } = props;
 
   const { userId } = useAuth();
@@ -148,8 +149,8 @@ const UserPost = (props: PostWithUser) => {
             </div>
           </div>
           <div className="px-4">{content}</div>
-          <PostImage
-            src={image} alt="" />
+          <PostImages
+            imageUrls={images} />
 
           <div className="px-4 flex flex-col gap-2 pr-8">
             <div className=" flex gap-2 items-center select-none">

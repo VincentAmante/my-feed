@@ -31,6 +31,7 @@ model Post {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   content   String?   @default("")
   image     String?   @default("")
+  images    String[]  @default([])
   published Boolean   @default(true)
   Comment   Comment[]
 
