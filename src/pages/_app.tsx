@@ -5,6 +5,7 @@ import { type AppType } from "next/app";
 import { ClerkProvider } from "@clerk/nextjs";
 import { api } from "~/utils/api";
 import { dark } from '@clerk/themes';
+import { useEffect, useState } from "react";
 
 import "~/styles/globals.css";
 
@@ -18,7 +19,6 @@ type AppPropsWithLayout = AppProps & {
 
 const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
-
   return <ClerkProvider
     appearance={{
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

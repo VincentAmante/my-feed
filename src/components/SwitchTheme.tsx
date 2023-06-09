@@ -1,24 +1,29 @@
 import React, { useEffect } from "react";
-// import { FiMoon, FiSun } from "react-icons/fi";
-// import { useLocalStorage } from "usehooks-ts";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 const SwitchTheme = () => {
-  let themeVal = "";
+  let themeVal = "dark";
 
-  //we store the theme in localStorage to preserve the state on next visit with an initial theme of dark.
+  // we store the theme in localStorage to preserve the state on next visit with an initial theme of dark.
   const [theme, setTheme] = useState(themeVal);
 
   useEffect(() => {
     if (typeof window !== undefined) {
-      setTheme(localStorage.getItem("theme") || "");
+      const localTheme = localStorage.getItem("theme");
+      console.log(localTheme);
+      setTheme(localTheme || "");
+      document.body.setAttribute("data-theme", localTheme || "");
     }
   }, []);
+
   //toggles the theme
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
-
+    setTheme(theme === "dark" ? "soft" : "dark");
     themeVal = localStorage.getItem("theme") || "";
+    console.log('setting theme to ' + themeVal);
+    localStorage.setItem("theme", themeVal === "dark" ? "soft" : "dark");
   };
 
   //modify data-theme attribute on document.body when theme changes
@@ -28,8 +33,8 @@ const SwitchTheme = () => {
   }, [theme]);
 
   return (
-    <button className="btn-circle btn" onClick={toggleTheme}>
-      {theme === "dark" ? <p>Dark</p> : <p>Light</p>}
+    <button className="btn-circle btn btn-ghost" onClick={toggleTheme}>
+      {theme === "dark" ? <FontAwesomeIcon icon={faMoon} /> : <FontAwesomeIcon icon={faSun} />}
     </button>
   );
 };

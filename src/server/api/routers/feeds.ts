@@ -97,7 +97,7 @@ export const feedsRouter = createTRPCRouter({
     }),
 
   getInfiniteFeedPostsById: publicProcedure
-    .input(z.object({ feedId: z.string(), cursor: z.string().optional() }))
+    .input(z.object({ feedId: z.string(), cursor: z.string().nullish(), limit: z.number().default(12) }))
     .query(async ({ input, ctx }) => {
       let posts = null;
       if (input.feedId === "global") {
@@ -124,7 +124,8 @@ export const feedsRouter = createTRPCRouter({
               softDeleted: false,
             },
           },
-          take: 12,
+          take: 12 + 1,
+          cursor: input.cursor ? { id: input.cursor } : undefined,
         });
       } else {
         posts = await ctx.prisma.post.findMany({
@@ -154,74 +155,14 @@ export const feedsRouter = createTRPCRouter({
               },
               softDeleted: false,
             }
-          }
-        }
-        );
-      }
-    }),
-        
-  
-  getFeedPostsById: publicProcedure
-    .input(z.object({ feedId: z.string() }))
-    .query(async ({ input, ctx }) => {
-      let posts = null;
-      if (input.feedId === "global") {
-        posts = await ctx.prisma.post.findMany({
-          orderBy: {
-            createdAt: "desc",
           },
-          include: {
-            Space: {
-              select: {
-                name: true,
-              }
-            },
-            Comment: {
-              take: 3,
-              orderBy: {
-                createdAt: "asc",
-              }
-            }
-          },
-          where: {
-            Space: {
-              visibility: "public",
-              softDeleted: false,
-            },
-          },
-          take: 12,
-        });
-      } else {
-        posts = await ctx.prisma.post.findMany({
-          orderBy: {
-            createdAt: "desc",
-          },
-          include: {
-            Space: {
-              select: {
-                name: true,
-              }
-            },
-            Comment: {
-              take: 3,
-              orderBy: {
-                createdAt: "asc",
-              }
-            }
-          },
-          where: {
-            Space: {
-              SpaceInFeed: {
-                some: {
-                  feedId: input.feedId,
-                }
-              },
-            }
-          }
+          take: 12 + 1,
+          cursor: input.cursor ? { id: input.cursor } : undefined,
         }
         );
       }
 
+      
       const users = (
         await clerkClient.users.getUserList({
           userId: posts.map((post) => post.authorId),
@@ -238,8 +179,15 @@ export const feedsRouter = createTRPCRouter({
         .map(filterUserForClient)
 
 
+
+      let nextCursor: typeof input.cursor | undefined = undefined;
+      if (posts.length > input.limit) {
+        const nextItem = posts.pop();
+        nextCursor = nextItem?.id;
+      }
+
       // includes the author and comments in the post
-      return posts.map((post) => ({
+      const postsWithUsers = posts.map((post) => ({
         ...post,
         author: users.find((user) => user.id === post.authorId),
         comments: post.Comment.map((comment) => ({
@@ -250,6 +198,11 @@ export const feedsRouter = createTRPCRouter({
         // removed so I don't accidentally use it
         Comment: undefined,
       }));
+
+      return {
+        posts: postsWithUsers.slice(0, input.limit),
+        nextCursor,
+      }
     }),
 
   createFeed: privateProcedure

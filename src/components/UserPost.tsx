@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@clerk/clerk-react";
-import { faTrash, faHeart, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faHeart, faPaperPlane, faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { api } from "~/utils/api";
@@ -73,7 +73,7 @@ const UserPost = (props: PostWithUser) => {
   const { mutate: likeUnlikePost } = api.posts.likeUnlikePost.useMutation({
     onSuccess: () => {
       void ctx.spaces.getSpacePostsById.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getInfiniteFeedPostsById.invalidate();
     }
   });
 
@@ -120,8 +120,6 @@ const UserPost = (props: PostWithUser) => {
 
   if (!props.author) return <></>;
 
-
-
   return (
     <>
       {isOwnedByUser
@@ -139,13 +137,27 @@ const UserPost = (props: PostWithUser) => {
               createdAt={createdAt}
               profileImageUrl={author?.profileImageUrl || ""}
             />
-            <div>
-              {isOwnedByUser &&
-                <button className="btn btn-ghost btn-circle text-error btn-sm " onClick={() => delModal.current?.show()}>
-                  <FontAwesomeIcon icon={faTrash} />
-                </button>
-              }
-            </div>
+
+            {isOwnedByUser &&
+              <div className="dropdown dropdown-left dropdown-end">
+                <label tabIndex={0} className="btn m-1 btn-circle btn-ghost btn-sm">
+                  <FontAwesomeIcon icon={faEllipsisVertical}></FontAwesomeIcon>
+                </label>
+                <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-neutral rounded-box w-fit">
+                  <li className="flex items-center justify-center">
+                    <button className="btn btn-ghost text-error btn-sm w-full"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        delModal.current?.show()
+                      }}>
+                      <span>Delete Post</span>
+                      <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            }
           </div>
           <div className="px-4">{content}</div>
           <PostImages
@@ -157,7 +169,11 @@ const UserPost = (props: PostWithUser) => {
                 ref={likeScope}
                 className="text-lg text-secondary cursor-pointer"
                 icon={isLiked ? faHeart : faHeartOutline}
-                onClick={handleLike}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLike();
+                }}
               />
               <p className="text-lg text-secondary opacity-50 font-bold">{likeCount}</p>
               {!isLikesUnique && <UniqueLikeEnforcer postId={id} />}
@@ -195,7 +211,7 @@ const CommentInput = (props: CommentInputProps) => {
   const { mutate } = api.posts.createComment.useMutation({
     onSuccess: () => {
       void ctx.spaces.getSpacePostsById.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getInfiniteFeedPostsById.invalidate();
     }
   });
 
@@ -213,7 +229,11 @@ const CommentInput = (props: CommentInputProps) => {
       />
       <button
         className="btn join-item btn-sm"
-        onClick={handleSubmit}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleSubmit();
+        }}
       >
         <FontAwesomeIcon icon={faPaperPlane} />
       </button>
@@ -233,7 +253,7 @@ const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
   const { mutate } = api.posts.enforceUniqueLikes.useMutation({
     onSuccess: () => {
       void ctx.spaces.getSpacePostsById.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getInfiniteFeedPostsById.invalidate();
     }
   });
   useMemo(() => {

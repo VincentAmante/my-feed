@@ -10,7 +10,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import CreateSpaceModal from "./Space/CreateSpaceModal";
 import CreateFeedModal from "./Feed/CreateFeedModal";
-
+import { set } from "zod";
 interface SidebarProps {
   handleSelectFeed: (
     id: string,
@@ -101,9 +101,10 @@ const useSidebarToggle = () => {
 
   const handleOnClick = () => {
     setIsToggled(!isToggled);
+    console.log(isToggled);
 
     if (isToggled) {
-      setSidebarStyle("transform-none drop-shadow-xl");
+      setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
     } else {
       setSidebarStyle("-translate-x-full");
     }
@@ -120,18 +121,40 @@ type SidebarWrapperProps = {
 // Container
 const SidebarWrapper = (props: SidebarWrapperProps) => {
   const { sidebarStyle, handleOnClick } = useSidebarToggle();
+  const [isToggled, setIsToggled] = useState(false);
 
   return (
-    <aside className={`fixed left-0 flex h-full w-full max-w-xs md:h-auto ${sidebarStyle} transform flex-col
-    gap-4 bg-base-100  p-4 py-8 md:drop-shadow-none  transition-all md:static md:transform-none `}>
-      {props.children}
+    <>
+    <aside className={`fixed z-[200] ${sidebarStyle} left-0 flex h-full overflow-y-auto w-full max-w-xs transform flex-col
+    gap-4 bg-base-100  p-4 py-8 md:drop-shadow-none transition-all md:static md:transform-none `}>
+        <div className="flex flex-col gap-4">
+        {props.children}
+        </div>
+      {
+        createPortal(
+          <div
+            onClick={(e) => {
+              handleOnClick();
+              e.stopPropagation();
+              setIsToggled(!isToggled);
+            }}
+            className="fixed pointer-events-auto z-100 top-0 left-0 mt-4 flex aspect-square  bg-base-100 scale-x-110 flex-col items-center justify-center rounded-r-lg pl-3 border-base-200 border-2 text-primary  p-2 md:hidden text-2xl"
+          >
+            <FontAwesomeIcon icon={faBars} />
+          </div>
+          , document.body
+        )
+      }
+      </aside>
       <div
-        onClick={handleOnClick}
-        className="absolute z-10 right-0 top-0 mt-4 flex aspect-square  transform translate-x-full bg-base-100 scale-x-110 flex-col items-center justify-center rounded-r-lg pl-3  p-2 md:hidden text-2xl"
-      >
-        <FontAwesomeIcon icon={faBars} />
+        onClick={() => {
+          handleOnClick();
+          setIsToggled(!isToggled);
+        }
+        }
+        className="fixed z-[100] w-screen h-screen bg-black bg-opacity-5">
       </div>
-    </aside>
+    </>
   )
 };
 

@@ -10,7 +10,7 @@ const DeletePostModal = React.forwardRef(function DeletePostModal(
     const { mutate } = api.posts.deletePost.useMutation({
         onSuccess: () => {
             void ctx.spaces.getSpacePostsById.invalidate();
-            void ctx.feeds.getFeedPostsById.invalidate();
+            void ctx.feeds.getInfiniteFeedPostsById.invalidate();
         },
 
         onError: (error) => {

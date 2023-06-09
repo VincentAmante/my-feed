@@ -119,7 +119,7 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) =
 
     return (
         <>
-            <form className='flex flex-col items-center justify-center'>
+            <form className='flex flex-col items-center justify-center'>  
                 <div
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
@@ -162,12 +162,19 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) =
                     ))}
                 </div>
             </form>
+
+            {/* These are triggered externally */}
             <button
                 onClick={() => fileInputRef.current?.click()}
                 ref={fileBtnRef}
                 className='hidden'>
             </button>
-            <button onClick={() => void submitOnClick()} className='btn btn-primary hidden' ref={submitRef}>Submit</button>
+            <button
+                onClick={() => void submitOnClick()}
+                ref={submitRef}
+                className='btn btn-primary hidden'>
+                Submit
+            </button>
         </>
     );
 };

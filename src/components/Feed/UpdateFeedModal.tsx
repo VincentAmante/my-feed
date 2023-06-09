@@ -161,14 +161,14 @@ const FeedSpaceManager = (props: { feedId: string }) => {
     onSuccess: () => {
       void ctx.feeds.getUnfollowedSpaces.refetch();
       void ctx.feeds.getSpacesByFeedId.refetch();
-      void ctx.feeds.getFeedPostsById.refetch();
+      void ctx.feeds.getInfiniteFeedPostsById.refetch();
     }
   });
   const { mutate: removeFeedFromSpace } = api.feeds.removeSpaceFromFeed.useMutation({
     onSuccess: () => {
       void ctx.feeds.getSpacesByFeedId.refetch();
       void ctx.feeds.getUnfollowedSpaces.refetch();
-      void ctx.feeds.getFeedPostsById.refetch();
+      void ctx.feeds.getInfiniteFeedPostsById.refetch();
     }
   });
 

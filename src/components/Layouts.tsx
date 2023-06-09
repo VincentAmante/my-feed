@@ -93,7 +93,7 @@ const DefaultLayout = ({ children }: LayoutProps) => {
 
     return (
         <>
-            <main className="flex h-full w-full  items-stretch">
+            <main className="flex w-full  items-stretch">
                 <FeedContext.Provider value={{
                     ctxFeed: activeFeed,
                     ctxFeedType: activeFeedType,

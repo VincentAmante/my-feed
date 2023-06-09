@@ -1,5 +1,4 @@
-import { useState, useRef } from "react";
-import DragAndDropImages from "~/components/DragAndDropImages";
+import {TagParsingInput, TagInput} from "~/components/TagParsingInput";
 
 const Test = () => {
     
@@ -7,6 +6,10 @@ const Test = () => {
   return (
     <>
       <main>
+        <div className="flex flex-col">
+          <TagParsingInput />
+          <TagInput />
+        </div>
       </main>
     </>
   );

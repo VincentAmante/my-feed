@@ -8,17 +8,18 @@ import DefaultLayout from "~/components/Layouts";
 import { useContext } from "react";
 import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWind, faRectangleList, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
-import CreatePost from "~/components/CreatePost";
+import { faWind, faPenToSquare, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
+import CreatePost from "~/components/Post/CreatePost";
 import UpdateFeedModal from "~/components/Feed/UpdateFeedModal";
 import { useInView } from 'react-intersection-observer';
+import Head from "next/head";
 
 import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedSkeletons";
 import { createPortal } from "react-dom";
 
 // Final output
 const Feed: NextPageWithLayout = () => {
-  const { ctxFeedType, ctxUserId, ctxOwner, ctxFeedName, ctxFeed } = useContext(FeedContext);
+  const { ctxFeedType, ctxUserId, ctxOwner } = useContext(FeedContext);
   const canMakePost = (ctxFeedType == "space" && ctxOwner == ctxUserId);
 
   return <>
@@ -38,7 +39,6 @@ Feed.getLayout = (page: ReactElement) => {
 }
 
 export default Feed;
-
 const FeedHeader = () => {
   const { ctxFeedType, ctxUserId, ctxOwner, ctxFeedName, ctxFeed, addToast } = useContext(FeedContext);
   const userOwnsFeed = (ctxFeedType == "feed" && ctxOwner == ctxUserId)
@@ -71,16 +71,19 @@ const FeedHeader = () => {
 
   return (
     <>
+      <Head>
+        <title>{ctxFeedName} | Kiurate</title>
+      </Head>
       {userOwnsFeed && createPortal(<UpdateFeedModal feedId={ctxFeed} ref={feedModalRef} />, document.body)}
-      <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
-        <span>
+      <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100 gap-4">
+        <span className="text-2xl font-bold">
           {ctxFeedName}
         </span>
         {userOwnsFeed && (
-            <button className="btn btn-ghost btn-sm ml-2 btn-circle" onClick={() => feedModalRef.current?.show()}>
-              <FontAwesomeIcon icon={faRectangleList} />
-            </button>
-          )
+          <button className="btn btn-ghost btn-sm text-2xl ml-2 btn-circle" onClick={() => feedModalRef.current?.show()}>
+            <FontAwesomeIcon icon={faPenToSquare} />
+          </button>
+        )
         }
         {
           (ctxFeedName !== 'Global') && !userOwnsFeed && isSubscribed.data && (
@@ -111,25 +114,25 @@ const FeedData = () => {
   });
   const { userId } = useAuth();
 
-  const { data, isLoading } = (type == "feed") ?
-    api.feeds.getFeedPostsById.useQuery({
-      feedId: id
-    }) : api.spaces.getSpacePostsById.useQuery({
-      spaceId: id
-    })
-  
-  useMemo(() => {
-      console.log('checking in view')
-      if (inView) {
-        console.log('in view')
+
+  const { isLoading, isError, data, error, isFetchingNextPage, fetchNextPage, hasNextPage } = api.feeds.getInfiniteFeedPostsById.useInfiniteQuery({
+    feedId: id,
+    limit: 10,
+  },
+    {
+      getNextPageParam: (lastPage) => lastPage.nextCursor,
     }
-    }, [inView])
-  
+  )
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      void fetchNextPage()
+    }
+  }, [inView])
+
   if (isLoading) return <LoadingSkeleton />;
-  if (!data) return <ErrorSkeleton />;
-
-
-  if (data?.length === 0) {
+  if (isError) return <ErrorSkeleton />;
+  if (data.pages[0]?.posts.length == 0) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full">
         <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
@@ -144,15 +147,34 @@ const FeedData = () => {
   else
     return (
       <>
-      <div className="flex flex-col gap-4 w-full h-full items-center">
-        {data.map((post) => {
-          return <UserPost key={post.id} {...post} />
-        })
+        <div className="flex flex-col gap-4 w-full h-full items-center">
+          {
+            data && data.pages.map((page) => {
+              return page.posts.map((post) => {
+                return <UserPost key={post.id} {...post} />
+              })
+            }
+            )
+          }
+        </div>
+        {
+          isFetchingNextPage && <LoadingSkeleton />
         }
-        </div>
-        <div ref={ref} className="invisible">
-          <h2>{`Header inside viewport ${inView}.`}</h2>
-        </div>
+        {
+          !isFetchingNextPage && (
+            <div ref={ref} className="invisible">
+              <h2>{`Header inside viewport ${inView.toString()}.`}</h2>
+            </div>
+          )
+        }
+        {
+          !hasNextPage && <div className="flex flex-col items-center justify-center w-full h-full select-none">
+            <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
+            <span className="text-2xl font-bold opacity-30">
+              No more posts
+            </span>
+          </div>
+        }
       </>
     )
 }

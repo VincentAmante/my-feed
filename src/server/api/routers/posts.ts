@@ -23,12 +23,12 @@ export const postsRouter = createTRPCRouter({
         },
       });
     }),
-  
+
   deletePost: privateProcedure
     .input(
       z.object({
         postId: z.string(),
-        })
+      })
     )
     .mutation(async ({ input, ctx }) => {
       const authorId = ctx.userId;
@@ -39,15 +39,15 @@ export const postsRouter = createTRPCRouter({
         },
       });
     }
-  ),
-  
+    ),
+
   createComment: privateProcedure
     .input(
       z.object({
         content: z.string().min(1).max(280),
         postId: z.string(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       const authorId = ctx.userId;
       const postId = input.postId;
@@ -61,13 +61,35 @@ export const postsRouter = createTRPCRouter({
       });
     }),
 
-  
+  updateComment: privateProcedure
+    .input(
+      z.object({
+        commentId: z.string(),
+        content: z.string().min(1).max(280),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const authorId = ctx.userId;
+      const commentId = input.commentId;
+
+      return await ctx.prisma.comment.updateMany({
+        where: {
+          id: commentId,
+          authorId,
+        },
+        data: {
+          content: input.content,
+        },
+      });
+    }),
+
+
   deleteComment: privateProcedure
     .input(
       z.object({
         commentId: z.string(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       const authorId = ctx.userId;
       return await ctx.prisma.comment.deleteMany({
@@ -77,7 +99,7 @@ export const postsRouter = createTRPCRouter({
         },
       });
     }),
-  
+
   likeUnlikePost: privateProcedure
     .input(
       z.object({
@@ -125,7 +147,7 @@ export const postsRouter = createTRPCRouter({
         });
       }
     }),
-  
+
   enforceUniqueLikes: privateProcedure
     .input(
       z.object({

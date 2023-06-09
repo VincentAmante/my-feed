@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus, faMinus, faImage } from "@fortawesome/free-solid-svg-icons"
 import Link from "next/link"
 import { FeedContext } from "~/components/Layouts"
+import Head from "next/head"
 
 
 const UserPage: NextPageWithLayout = () => {
@@ -41,6 +42,9 @@ const UserPage: NextPageWithLayout = () => {
   }
 
   return <>
+    <Head>
+      <title>{usernameString} | Kiurate</title>
+    </Head>
     <div className=" flex text-xl w-full items-center px-8 py-8">
       {data?.profileImageUrl
         &&
@@ -74,25 +78,6 @@ const UserPage: NextPageWithLayout = () => {
 UserPage.getLayout = (page: React.ReactNode) => <DefaultLayout>{page}</DefaultLayout>
 
 
-type UserPageProps = {
-  username: string,
-  profileImageUrl: string,
-}
-const UserHeader = (props: UserPageProps) => {
-  const { username, profileImageUrl } = props;
-
-  return <>
-    <div className=" flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-200">
-      {profileImageUrl
-        &&
-        <Image src={profileImageUrl} alt="profile picture" width={100} height={100} className="rounded-full mr-2 w-28" />}
-      <span>
-        @{username}
-      </span>
-    </div>
-  </>
-}
-
 type UserFeedsProps = {
   userId: string,
   setFeedCount: (count: number) => void,
@@ -103,7 +88,7 @@ const UserFeeds = (props: UserFeedsProps) => {
     userId: userId
   })
 
-  const {setCtxFeed, setCtxFeedName, setCtxFeedType, setCtxOwner} = useContext(FeedContext);
+  const { setCtxFeed, setCtxFeedName, setCtxFeedType, setCtxOwner } = useContext(FeedContext);
 
   useMemo(() => {
     if (data) {
@@ -132,7 +117,7 @@ const UserFeeds = (props: UserFeedsProps) => {
       {data.map((feed: Feed) => {
         // return <UserFeed key={feed.id} feed={feed} />
         return (
-          <Link key={feed.id}  onClick={() => handleOnClick(feed.id, feed.name, feed.ownerId)} href='/feed' className="w-full max-w-xs flex flex-col items-center gap-4 rounded-md shadow-xl p-4 bg-neutral">
+          <Link key={feed.id} onClick={() => handleOnClick(feed.id, feed.name, feed.ownerId)} href='/feed' className="w-full max-w-xs flex flex-col items-center gap-4 rounded-md shadow-xl p-4 bg-neutral">
             {feed.icon &&
               <div className="avatar">
                 <div className="w-20">

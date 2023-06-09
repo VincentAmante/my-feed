@@ -7,7 +7,7 @@ import { api } from "~/utils/api";
 import Post from "~/components/UserPost";
 import { useMemo } from "react";
 import { useAuth } from "@clerk/nextjs";
-import CreatePost from "~/components/CreatePost";
+import CreatePost from "~/components/Post/CreatePost";
 import React from "react";
 import UpdateSpaceModal from "~/components/Space/UpdateSpaceModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,6 +16,7 @@ import { LoadingSkeleton, ErrorSkeleton } from "~/components/SkeletonViews/FeedS
 import { createPortal } from "react-dom";
 import { useRef } from "react";
 import SpaceIcon from "~/components/AppIcon";
+import Head from "next/head";
 
 const SpacePage: NextPageWithLayout = () => {
     const { setCtxFeedType, setCtxFeedName, setCtxOwner, setCtxFeed, ctxFeedName } = useContext(FeedContext);
@@ -67,18 +68,21 @@ const SpacePage: NextPageWithLayout = () => {
         )
     }
     else return <>
+        <Head>
+            <title>{ctxFeedName} | Kiurate</title>
+        </Head>
         {userOwnsSpace && createPortal(<UpdateSpaceModal spaceId={id} ref={spaceModalRef}></UpdateSpaceModal>, document.body)}
-        <div className="flex text-xl w-full items-center justify-center py-4 lg:py-6 pb-4 bg-base-100">
+        <div className="flex text-xl w-full items-center justify-center py-4 lg:py-4 bg-base-100">
             <span className="flex  items-center justify-center gap-2">
-            <SpaceIcon imageSrc={data?.icon || undefined}></SpaceIcon>
+                <SpaceIcon imageSrc={data?.icon || undefined}></SpaceIcon>
                 {ctxFeedName}
             </span>
-            {userOwnsSpace && 
-            (<button className="btn btn-ghost btn-md ml-2 btn-square text-xl" onClick={() => openModal()}>
-            <FontAwesomeIcon icon={faPenToSquare} className="text-3xl" />
-        </button>)}
+            {userOwnsSpace &&
+                (<button className="btn btn-ghost btn-md ml-2 btn-square text-xl" onClick={() => openModal()}>
+                    <FontAwesomeIcon icon={faPenToSquare} className="text-3xl" />
+                </button>)}
         </div>
-        <div className="flex flex-col items-center h-full w-full rounded-3xl rounded-b-none p-4 gap-2 bg-base-300">
+        <div className="flex flex-col items-center h-full w-full rounded-3xl rounded-b-none p-4 gap-4 bg-base-200">
             {userOwnsSpace && <CreatePost></CreatePost>}
             <SpacePosts></SpacePosts>
         </div>
@@ -100,10 +104,10 @@ const EmptySpace = () => {
 
     return (
         <div className="flex flex-col items-center justify-center w-full h-full">
-        <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
-        <span className="text-2xl font-bold opacity-30">This space is empty</span>
-        {userId === ctxOwner && <span className="text-md opacity-30">Fill it up with some posts!</span>}
-    </div>
+            <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />
+            <span className="text-2xl font-bold opacity-30">This space is empty</span>
+            {userId === ctxOwner && <span className="text-md opacity-30">Fill it up with some posts!</span>}
+        </div>
     )
 }
 
@@ -114,10 +118,10 @@ const SpacePosts = () => {
         spaceId: id as string
     })
     if (isLoading)
-        return <LoadingSkeleton />;   
+        return <LoadingSkeleton />;
     if (data?.length === 0) {
         console.log('empty')
-        return <EmptySpace/>
+        return <EmptySpace />
     }
     return (
         <>

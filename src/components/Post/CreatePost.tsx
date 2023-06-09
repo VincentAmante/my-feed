@@ -8,7 +8,7 @@ import { useContext } from "react";
 import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-import DragAndDropImages from "./DragAndDropImages";
+import DragAndDropImages from "../ImagePostWidget";
 
 // Handler for creating a post
 const CreatePost = () => {
@@ -33,7 +33,7 @@ const CreatePost = () => {
     onSuccess: () => {
       setContent("");
       void ctx.spaces.getSpacePostsById.invalidate();
-      void ctx.feeds.getFeedPostsById.invalidate();
+      void ctx.feeds.getInfiniteFeedPostsById.invalidate();
     },
 
     onError: (error) => {
@@ -58,7 +58,7 @@ const CreatePost = () => {
   }
 
   return (
-    <div className="bg-base-200 flex gap-2 flex-col w-full max-w-lg px-4 py-4 pb-6 mb-2">
+    <div className="bg-base-300 bg-opacity-50 rounded-2xl flex gap-2 flex-col w-full max-w-lg px-4 py-4 pb-6 mb-2">
       <div className=" flex flex-col gap-4 w-full">
         <div className="flex gap-2">
           <Image
@@ -69,7 +69,7 @@ const CreatePost = () => {
         </div>
         <div className="relative">
           <textarea
-            className="input py-2 w-full resize-none min-h-[6rem] pr-12"
+            className="input py-2 w-full resize-none min-h-[8rem] pr-12 pt-2"
             maxLength={maxTextLimit}
             placeholder="Write your thoughts here.."
             value={content}
@@ -96,7 +96,6 @@ const CreatePost = () => {
           <span>Post</span>
         </button>
       </div>
-      {/* <UploadWidget submitRef={submitRef} onUpload={handleUpload}></UploadWidget> */}
     </div >
   )
 }
