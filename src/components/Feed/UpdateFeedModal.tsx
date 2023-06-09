@@ -16,7 +16,7 @@ type UpdateSpaceModal = {
 }
 const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateSpaceModal, ref: ForwardedRef<HTMLDialogElement>) {
   const { userId } = useAuth();
-  const { setCtxFeedName } = React.useContext(FeedContext);
+  const { setCtxFeedName, addToast } = React.useContext(FeedContext);
   const ctx = api.useContext();
 
   const { data: feedData, isLoading: feedLoading } = api.feeds.getFeedById.useQuery({
@@ -36,7 +36,12 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
 
   const { mutate: updateFeed } = api.feeds.updateFeed.useMutation({
     onSuccess: () => {
-      void ctx.spaces.getSpacesByUserId.invalidate();
+      void ctx.spaces.getSpacesByUserId.invalidate({
+        ownerId: userId as string
+      });
+      void ctx.spaces.getSpacesByUserId.refetch({
+        ownerId: userId as string
+      });
     }
   });
 
@@ -52,8 +57,8 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
       visibility
     })
     setIsLoading(false);
-
     setCtxFeedName(name);
+    addToast('Feed updated successfully', 'success');
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
     (window as any).update_space_ref.close();
@@ -63,6 +68,7 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
   function toggleDelete(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
     setDeleteToggled(!deleteToggled);
+    addToast('Feed deleted', 'info');
   }
 
   useMemo(() => {
@@ -70,7 +76,6 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
   }, [])
 
   const [tab, setTab] = useState<"details" | "feedSelect">("details");
-
 
   return (
     <dialog id="update_space_ref" ref={ref} className="modal absolute flex flex-col items-center justify-center">
@@ -86,7 +91,8 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
       </div>
       <div className="modal-box rounded-t-none">
         {tab === "details" &&
-          <form method="dialog" onSubmit={updateSpaceHandler} className="flex flex-col items-center gap-2">
+          <>
+                    <form method="dialog" onSubmit={updateSpaceHandler} className="flex flex-col items-center gap-2">
             <label className="text-2xl font-bold">Update a Feed</label>
             <div className="form-control w-full max-w-xs">
               <label className="label">
@@ -118,6 +124,7 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(props: UpdateS
                 </button>)
             }
           </form>
+        </>
         }
         {
           tab === "feedSelect" &&
@@ -204,7 +211,7 @@ const FeedSpaceManager = (props: { feedId: string }) => {
             onChange={() => setUnfollowedSpaceToggled(!unfollowedSpaceToggled)}
           />
           <h2 className="collapse-title">
-            <span>Unfollowed Spaces</span>
+            <span>Suggested Spaces</span>
           </h2>
           <div className="collapse-content flex flex-col gap-2">
             {spacesNotFollowed.map((space) => {

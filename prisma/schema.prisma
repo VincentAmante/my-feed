@@ -16,6 +16,8 @@ model User {
   clerkId     String   @unique
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
+  displayName String   @default("")
+  bio         String   @default("")
 
   Comment Comment[]
   Post    Post[]

@@ -1,7 +1,8 @@
 import { set } from 'zod';
 import Sidebar from './Sidebar';
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import { useAuth } from '@clerk/nextjs';
+import { Toast, ToastContainer, type ToastProps} from './Toast';
 
 // Handles shared state between pages
 export const FeedContext = createContext({
@@ -10,10 +11,13 @@ export const FeedContext = createContext({
     ctxOwner: '',
     ctxFeedName: 'Global',
     ctxUserId: '',
+    toastList: [] as ToastProps[],
     setCtxFeed: (feed: string) => { console.log(feed) },
     setCtxFeedType: (feedType: string) => { console.log(feedType) },
     setCtxOwner: (owner: string) => { console.log(owner) },
     setCtxFeedName: (feedName: string) => { console.log(feedName) },
+    addToast: (message: string, type: "info" | "error" | "success" | "warning") => { console.log(message, type) },
+    setToastList: (toastList: ToastProps[]) => { console.log(toastList) },
 });
 
 type LayoutProps = {
@@ -35,6 +39,29 @@ const Header = () => {
     )
 }
 
+const ToastHandler = () => {
+    const { toastList, setToastList } = useContext(FeedContext);
+
+    function handleOnDelete(index: number) {
+        setToastList(toastList.filter((_, i) => i !== index))
+    }
+
+    if (toastList.length == 0) return <></>
+    return (
+        <ToastContainer>
+            {toastList.map((toast, i) => {
+                return (
+                    <Toast
+                        key={i}
+                        message={toast.message}
+                        type={toast.type}
+                        onDelete={() => handleOnDelete(i)} />
+                )
+            })}
+        </ToastContainer>
+    )
+}
+
 
 const DefaultLayout = ({ children }: LayoutProps) => {
     const { ctxFeed, ctxFeedType, ctxOwner, ctxFeedName } = useContext(FeedContext);
@@ -42,6 +69,7 @@ const DefaultLayout = ({ children }: LayoutProps) => {
     const [activeFeedType, setActiveFeedType] = useState(ctxFeedType);
     const [activeOwner, setActiveOwner] = useState(ctxOwner);
     const [activeFeedName, setActiveFeedName] = useState(ctxFeedName);
+    const [toastList, setToastList] = useState([] as ToastProps[]);
     const { userId } = useAuth()
 
     function handleFeedChange(feed: string, feedType: string, feedName: string, ownerId: string,) {
@@ -49,6 +77,10 @@ const DefaultLayout = ({ children }: LayoutProps) => {
         setActiveFeedType(feedType);
         setActiveOwner(ownerId);
         setActiveFeedName(feedName);
+    }
+
+    function addToast(message: string, type: "success" | "info" | "error" | "warning") {
+        setToastList([...toastList, { message: message, type: type, onDelete: () => { console.log('onDelete not implemented') } }])
     }
 
     if (!userId) return (
@@ -68,19 +100,24 @@ const DefaultLayout = ({ children }: LayoutProps) => {
                     ctxOwner: activeOwner,
                     ctxFeedName: activeFeedName,
                     ctxUserId: userId,
+                    toastList: toastList,
 
                     setCtxFeed: setActiveFeed,
                     setCtxFeedType: setActiveFeedType,
                     setCtxOwner: setActiveOwner,
                     setCtxFeedName: setActiveFeedName,
+                    addToast: addToast,
+                    setToastList: setToastList,
                 }}>
                     <Sidebar handleSelectFeed={handleFeedChange} />
+
                     <div className='relative flex min-h-screen w-full flex-col items-center'>
 
                         <div className='h-full w-full bg-base-100'>
                             {children}
                         </div>
                     </div>
+                    <ToastHandler />
                 </FeedContext.Provider>
             </main>
         </>

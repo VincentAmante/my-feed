@@ -5,6 +5,7 @@ import { Post, Feed } from "@prisma/client";
 
 
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 const filterUserForClient = (user: ClerkUser) => {
   return {
     id: user.id,
@@ -21,23 +22,27 @@ export const feedsRouter = createTRPCRouter({
       const userId = ctx.userId;
       const ownedFeeds = await ctx.prisma.feed.findMany({
         where: {
-          ownerId: userId,
+          OR: [
+            {
+
+              ownerId: userId,
+            },
+            {
+              FeedFollower: {
+                some: {
+                  userId: userId,
+                },
+              },
+            }
+          ]
         },
       });
 
-      const subscribedFeeds = await ctx.prisma.feed.findMany({
-        where: {
-          FeedFollower: {
-            some: {
-              userId: userId,
-            },
-          },
-        },
-      });
-      return [...ownedFeeds, ...subscribedFeeds] as Feed[];
+      return ownedFeeds;
     }),
-  
-  
+
+
+
   getProfileFeeds: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -56,7 +61,7 @@ export const feedsRouter = createTRPCRouter({
       });
       return feeds;
     }),
-  
+
   getUnfollowedSpaces: privateProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -75,7 +80,7 @@ export const feedsRouter = createTRPCRouter({
       return unownedFeeds;
     }),
 
-  
+
   getSpacesByFeedId: publicProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -90,7 +95,7 @@ export const feedsRouter = createTRPCRouter({
 
       return spaces.map((space) => space.space);
     }),
-  
+
 
   getFeedPostsById: publicProcedure
     .input(z.object({ feedId: z.string() }))
@@ -155,19 +160,19 @@ export const feedsRouter = createTRPCRouter({
 
       const users = (
         await clerkClient.users.getUserList({
-        userId: posts.map((post) => post.authorId),
-        limit: 100
+          userId: posts.map((post) => post.authorId),
+          limit: 100
         }))
         .map(filterUserForClient)
-      
+
       // Maps users to comments
       const userComments = (
         await clerkClient.users.getUserList({
-        userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
+          userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
           limit: 3
         }))
         .map(filterUserForClient)
-          
+
 
       // includes the author and comments in the post
       return posts.map((post) => ({
@@ -186,8 +191,9 @@ export const feedsRouter = createTRPCRouter({
   createFeed: privateProcedure
     .input(
       z.object({
-        name: z.string().min(1).max(64),
+        name: z.string().min(1).max(86),
         visibility: z.string(),
+        icon: z.string().optional().nullable(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -197,11 +203,12 @@ export const feedsRouter = createTRPCRouter({
         data: {
           name: input.name,
           visibility: input.visibility,
-          ownerId: userId
+          ownerId: userId,
+          icon: input.icon
         },
       });
     }),
-  
+
   getFeedById: publicProcedure
     .input(z.object({ feedId: z.string() }))
     .query(async ({ input, ctx }) => {
@@ -211,7 +218,7 @@ export const feedsRouter = createTRPCRouter({
         },
       });
     }
-  ),
+    ),
 
   updateFeed: publicProcedure
     .input(
@@ -219,8 +226,9 @@ export const feedsRouter = createTRPCRouter({
         feedId: z.string(),
         name: z.string().min(1).max(64),
         visibility: z.string(),
+        icon: z.string().optional().nullable(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.feed.update({
         where: {
@@ -229,10 +237,11 @@ export const feedsRouter = createTRPCRouter({
         data: {
           name: input.name,
           visibility: input.visibility,
+          icon: input.icon
         },
       });
     }
-  ),
+    ),
 
   deleteFeed: publicProcedure
     .input(z.object({ feedId: z.string() }))
@@ -243,7 +252,7 @@ export const feedsRouter = createTRPCRouter({
         },
       });
     }
-  ),
+    ),
 
   addSpaceToFeed: privateProcedure
     .input(
@@ -251,7 +260,7 @@ export const feedsRouter = createTRPCRouter({
         feedId: z.string(),
         spaceId: z.string(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.spaceInFeed.create({
         data: {
@@ -260,7 +269,7 @@ export const feedsRouter = createTRPCRouter({
         },
       });
     }
-  ),
+    ),
 
   removeSpaceFromFeed: privateProcedure
     .input(
@@ -268,7 +277,7 @@ export const feedsRouter = createTRPCRouter({
         feedId: z.string(),
         spaceId: z.string(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       await ctx.prisma.spaceInFeed.deleteMany({
         where: {
@@ -277,5 +286,56 @@ export const feedsRouter = createTRPCRouter({
         },
       });
     }
-  ),
+    ),
+
+  subscribeToFeed: privateProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      await ctx.prisma.feedFollower.create({
+        data: {
+          feedId: input.feedId,
+          userId: userId,
+        },
+      });
+    }),
+
+  unsubscribeFromFeed: privateProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      await ctx.prisma.feedFollower.deleteMany({
+        where: {
+          feedId: input.feedId,
+          userId: userId,
+        },
+      });
+    }
+    ),
+
+  isUserSubscribedToFeed: privateProcedure
+    .input(
+      z.object({
+        feedId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const userId = ctx.userId;
+      const feedFollower = await ctx.prisma.feedFollower.findFirst({
+        where: {
+          feedId: input.feedId,
+          userId: userId,
+        },
+      });
+      return feedFollower !== null;
+    }
+    ),
 });

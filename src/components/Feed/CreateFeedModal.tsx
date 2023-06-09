@@ -1,66 +1,86 @@
 import { useAuth } from "@clerk/nextjs";
-import {useState } from "react";
+import { useState, useContext } from "react";
 import { api } from "~/utils/api";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShield, faLock, faEye, faPlus, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import type { ForwardedRef } from "react";
 import React from "react";
+import AddIconWidget from "../CreateIcon";
+import { useRef } from "react";
+import { FeedContext } from "../Layouts";
 
 type visibilityType = "public" | "private" | "obscure" | "protected";
 const CreateFeedModal = React.forwardRef(function CreateFeedModal(props, ref: ForwardedRef<HTMLDialogElement>) {
+  const {addToast} = useContext(FeedContext);
   const ctx = api.useContext();
   const [isLoading, setIsLoading] = useState(false);
+
+  const submitIconRef = useRef<HTMLButtonElement>(null);
+  const submitFormRef = useRef<HTMLButtonElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [icon, setIcon] = useState<string>("");
+
   const { mutate: createFeed } = api.feeds.createFeed.useMutation({
     onSuccess: () => {
+      addToast('Feed created successfully', 'success');
       setIsLoading(false);
       void ctx.feeds.getUserFeeds.invalidate();
     }
   });
 
-  function createFeedHandler(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function submitForm(imgSrc: string | null) {
+    if (formRef.current) {
+      console.log('formRef.current', formRef.current);
+      const formData = new FormData(formRef.current);
+      const name = formData.get("name") as string;
+      // TODO: Improve validation
+      if (formData.get("name") === "") {
+        return;
+      }
+      const visibility = formData.get("visibility") as visibilityType;
 
-    if (isLoading) return;
-
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const visibility = formData.get("visibility") as visibilityType;
-
-    setIsLoading(true);
-
+      setIsLoading(true);
       void createFeed({
-          name, visibility
+        name, visibility, icon: imgSrc
       });
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
-    (window as any).create_feed_ref.close();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+      (window as any).create_feed_ref.close();
+    }
   }
 
-  useMemo(() => {
-    console.log('created')
-  }, [])
+  function handleSubmit(url: string | null) {
+    // Wait for image to upload then run createSpaceHandle
+    console.log('url', url);
+    if (url) {
+      submitForm(url);
+    }
+    else {
+      submitForm(null)
+    }
+  }
+
+  function triggerUpload(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.preventDefault();
+    submitIconRef.current?.click();
+  }
 
   return (
     <dialog id="create_feed_ref" ref={ref} className="modal absolute">
-      <form method="dialog" onSubmit={createFeedHandler} className="modal-box flex flex-col items-center gap-2">
-        <label className="text-2xl font-bold">Create a Feed</label>
-        <div className="form-control w-full max-w-xs">
-          <label className="label">
-            <span className="label-text">Name</span>
-          </label>
-          <input type="text" max={24} name="name" placeholder="My Feed" className="input input-bordered w-full max-w-xs" />
+      <div className="modal-box">
+        <div className="w-full max-w-xs self-center flex justify-center gap-2 my-2">
+          <AddIconWidget onUpload={handleSubmit} submitRef={submitIconRef} imageUrl={null} />
         </div>
-        <SelectVisibility />
-        <button className="btn btn-primary">
-          {isLoading ?
-            <span className="loading loading-dots text-accent"></span>
-            : <>
-              <FontAwesomeIcon icon={faPlus} />
-              <span>Create Feed</span>
-            </>}
-        </button>
-      </form>
+        <form method="dialog" ref={formRef} onSubmit={() => handleSubmit(null)} className="flex flex-col items-center gap-2">
+          <label className="text-2xl font-bold">Create a Feed</label>
+          <NameField />
+          <SelectVisibility />
+          <TriggerButton isLoading={isLoading} triggerUpload={triggerUpload} />
+          <button className="hidden" ref={submitFormRef} >
+            Create Feed
+          </button>
+        </form>
+      </div>
       <form method="dialog" className="modal-backdrop">
         <button>close</button>
       </form>
@@ -70,10 +90,36 @@ const CreateFeedModal = React.forwardRef(function CreateFeedModal(props, ref: Fo
 
 export default CreateFeedModal
 
+// Form Fields
+
+type TriggerButtonProps = {
+  isLoading: boolean;
+  triggerUpload: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+}
+const TriggerButton = (props: TriggerButtonProps) => {
+  const { isLoading, triggerUpload } = props;
+  return <button onClick={triggerUpload} className="btn btn-primary">
+    {isLoading ?
+      <span className="loading  loading-dots text-accent"></span>
+      : <>
+        <FontAwesomeIcon icon={faPlus} />
+        <span>Create Feed</span>
+      </>}
+  </button>
+}
+
+
+const NameField = () => {
+  return <div className="form-control w-full max-w-xs">
+    <label className="label">
+      <span className="label-text">Name</span>
+    </label>
+    <input type="text" max={24} name="name" placeholder="My Feed" className="input input-bordered w-full max-w-xs" />
+  </div>
+}
+
 const SelectVisibility = () => {
   const options = ['obscure', 'public', 'protected', 'private'];
-
-
   const [selected, setSelected] = useState(options[0]);
 
   const description = useMemo(() => {

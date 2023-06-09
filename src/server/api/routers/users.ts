@@ -1,7 +1,7 @@
 import z from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import { clerkClient } from "@clerk/nextjs/server";
+import { type User, clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "../../helpers/filterUserForClient";
 
 // For creating spaces
@@ -22,8 +22,8 @@ export const usersRouter = createTRPCRouter({
     }))
     .query(async ({ input, ctx }) => {
 
-        // Clause guard
-        if (input.clerkId === "") return null;
+      // Clause guard
+      if (input.clerkId === "") return null;
 
       const doesUserExist = await ctx.prisma.user.findMany({
         where: {
@@ -32,17 +32,38 @@ export const usersRouter = createTRPCRouter({
       });
 
       if (doesUserExist.length < 1) {
+        const userInfo: User[] = await clerkClient.users.getUserList({
+          userId: [input.clerkId],
+          limit: 5,
+        });
+
+        if (userInfo.length < 1) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "User not found",
+          });
+        }
+        const clerkUser = userInfo[0];
+
+        if (clerkUser?.username === undefined || clerkUser?.username === null) throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Username not found",
+        }); 
+
+        const username = clerkUser.username;
+
         const user = await ctx.prisma.user.create({
           data: {
             clerkId: input.clerkId,
+            displayName: username,
           },
         });
 
-        const userName = (input.firstName) ? addPossessiveSuffix(input.firstName) : addPossessiveSuffix(input.username);
+        const firstSpaceName = (input.firstName) ? addPossessiveSuffix(input.firstName) : addPossessiveSuffix(input.username);
 
         await ctx.prisma.space.create({
           data: {
-            name: `${userName} Space`,
+            name: `${firstSpaceName} Space`,
             ownerId: input.clerkId,
           },
         });

@@ -1,4 +1,4 @@
-import { useState, useRef, type ReactElement, useEffect } from "react";
+import { useState, useRef, type ReactElement, useEffect, useMemo } from "react";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
 import { useAuth, useUser } from "@clerk/nextjs";
@@ -8,7 +8,7 @@ import DefaultLayout from "~/components/Layouts";
 import { useContext } from "react";
 import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWind, faRectangleList } from "@fortawesome/free-solid-svg-icons";
+import { faWind, faRectangleList, faPlus, faMinus } from "@fortawesome/free-solid-svg-icons";
 import CreatePost from "~/components/CreatePost";
 import UpdateFeedModal from "~/components/Feed/UpdateFeedModal";
 
@@ -39,22 +39,63 @@ Feed.getLayout = (page: ReactElement) => {
 export default Feed;
 
 const FeedHeader = () => {
-  const { ctxFeedType, ctxUserId, ctxOwner, ctxFeedName, ctxFeed } = useContext(FeedContext);
+  const { ctxFeedType, ctxUserId, ctxOwner, ctxFeedName, ctxFeed, addToast } = useContext(FeedContext);
   const userOwnsFeed = (ctxFeedType == "feed" && ctxOwner == ctxUserId)
-  const feedModalRef = useRef<HTMLDialogElement>(null); 
+  const feedModalRef = useRef<HTMLDialogElement>(null);
+
+  const isSubscribed = api.feeds.isUserSubscribedToFeed.useQuery({
+    feedId: ctxFeed
+  })
+
+  const ctx = api.useContext();
+  const { mutate: subscribeToFeed } = api.feeds.subscribeToFeed.useMutation({
+    onSuccess: () => {
+      void ctx.feeds.isUserSubscribedToFeed.refetch({
+        feedId: ctxFeed
+      })
+      void ctx.feeds.getUserFeeds.refetch()
+
+      addToast('Subscribed to feed', 'success')
+    },
+  })
+  const { mutate: unsubscribeFromFeed } = api.feeds.unsubscribeFromFeed.useMutation({
+    onSuccess: () => {
+      void ctx.feeds.isUserSubscribedToFeed.refetch({
+        feedId: ctxFeed
+      })
+      void ctx.feeds.getUserFeeds.refetch()
+      addToast('Unsubscribed from feed', 'info')
+    },
+  })
 
   return (
     <>
-    {userOwnsFeed && createPortal(<UpdateFeedModal feedId={ctxFeed} ref={feedModalRef} />, document.body)}
-    <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
-      <span>
+      {userOwnsFeed && createPortal(<UpdateFeedModal feedId={ctxFeed} ref={feedModalRef} />, document.body)}
+      <div className="flex text-xl w-full items-center justify-center py-6 pb-4 bg-base-100">
+        <span>
           {ctxFeedName}
         </span>
         {userOwnsFeed && (
-          <button className="btn btn-ghost btn-sm ml-2 btn-circle" onClick={() => feedModalRef.current?.show()}>
-            <FontAwesomeIcon icon={faRectangleList} />
-          </button>
-        )
+            <button className="btn btn-ghost btn-sm ml-2 btn-circle" onClick={() => feedModalRef.current?.show()}>
+              <FontAwesomeIcon icon={faRectangleList} />
+            </button>
+          )
+        }
+        {
+          (ctxFeedName !== 'Global') && !userOwnsFeed && isSubscribed.data && (
+            <button className="btn btn-error btn-sm ml-2" onClick={() => unsubscribeFromFeed({ feedId: ctxFeed })}>
+              <span>Unsubscribe</span>
+              <FontAwesomeIcon icon={faMinus} />
+            </button>
+          )
+        }
+        {
+          (ctxFeedName !== 'Global') && !userOwnsFeed && !isSubscribed.data && (
+            <button className="btn btn-success btn-sm ml-2" onClick={() => subscribeToFeed({ feedId: ctxFeed })}>
+              <span>Subscribe</span>
+              <FontAwesomeIcon icon={faPlus} />
+            </button>
+          )
         }
       </div>
     </>
@@ -76,7 +117,6 @@ const FeedData = () => {
   if (!data) return <ErrorSkeleton />;
 
   if (data?.length === 0) {
-    console.log('empty')
     return (
       <div className="flex flex-col items-center justify-center w-full h-full">
         <FontAwesomeIcon icon={faWind} className="text-6xl opacity-30" />

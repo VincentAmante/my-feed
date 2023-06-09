@@ -12,7 +12,6 @@ import PostImage from "./PostImage";
 import DeletePostModal from "./DeletePostModal";
 import { animate, useAnimate } from "framer-motion"
 
-
 // Comments
 import Comment from "./Comment";
 import type { CommentWithUser } from "./Comment";
@@ -114,7 +113,14 @@ const UserPost = (props: PostWithUser) => {
     return answer;
   }, [likedByIDs]);
 
+  const userUrl = useMemo(() => {
+    if (author?.username) return `/user/@${author.username}`;
+    else return "";
+  }, [author?.username]);
+
   if (!props.author) return <></>;
+
+
 
   return (
     <>
@@ -125,30 +131,14 @@ const UserPost = (props: PostWithUser) => {
       <div className="card w-full shadow-xl max-w-md bg-base-100">
         <div className="card-body py-4 gap-4   px-0">
           <div className="flex justify-between w-full px-4">
-            <div className="flex items-center gap-2 ">
-              <div className="avatar">
-                <div className="w-12 rounded-full bg-neutral-focus text-neutral-content">
-                  <Image
-                    width={64}
-                    height={64}
-                    src={props.author.profileImageUrl}
-                    alt="Profile Picture" />
-                </div>
-              </div>
-              <div className="flex flex-col justify-center">
-                <div className="flex gap-2 items-center">
-                  <Link href={`/user/@${props.author.username || ''}`}>
-                  <p className="flex">{nameDisplay}</p>
-                  </Link>
-                  <p className="text-xs italic opacity-50">{`· ${dayjs(createdAt).fromNow()}`}</p>
-                </div>
-                <Link href={spaceUrl} className="flex gap-1">
-                  <span className="badge badge-primary hover:badge-secondary">
-                    {Space?.name}
-                  </span>
-                </Link>
-              </div>
-            </div>
+            <UserHeader
+              userUrl={userUrl}
+              nameDisplay={nameDisplay}
+              spaceUrl={spaceUrl}
+              spaceName={Space?.name}
+              createdAt={createdAt}
+              profileImageUrl={author?.profileImageUrl || ""}
+            />
             <div>
               {isOwnedByUser &&
                 <button className="btn btn-ghost btn-circle text-error btn-sm " onClick={() => delModal.current?.show()}>
@@ -174,8 +164,8 @@ const UserPost = (props: PostWithUser) => {
             </div>
             {comments && comments.length > 0 && (
               <>
-            <div className="divider py-0 my-0"></div>
-            <div className="flex flex-col gap-2">
+                <div className="divider py-0 my-0"></div>
+                <div className="flex flex-col gap-2">
                   {comments.map((comment) => <Comment key={comment.id} {...comment} userId={userId || ""} />)}
                 </div>
               </>
@@ -205,7 +195,7 @@ const CommentInput = (props: CommentInputProps) => {
     setContent("");
     void mutate({ postId, content: commentContent });
   }
-  
+
   const ctx = api.useContext();
   const { mutate } = api.posts.createComment.useMutation({
     onSuccess: () => {
@@ -213,7 +203,7 @@ const CommentInput = (props: CommentInputProps) => {
       void ctx.feeds.getFeedPostsById.invalidate();
     }
   });
-  
+
   return (
     <div className="join w-full">
       <input
@@ -239,6 +229,7 @@ const CommentInput = (props: CommentInputProps) => {
 type UniqueLikeEnforcerProps = {
   postId: string;
 }
+
 // if likes are not unique, this sets a call to the server to enforce unique likes
 // This fix is gimmicky and should be fixed on the server side
 const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
@@ -256,3 +247,42 @@ const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
   return <></>
 }
 export default UserPost;
+
+type UserHeaderProps = {
+  userUrl: string;
+  spaceUrl: string;
+  createdAt: Date;
+  spaceName: string | undefined;
+  profileImageUrl: string;
+  nameDisplay: string | undefined | React.JSX.Element;
+}
+const UserHeader = (props: UserHeaderProps) => {
+  const { userUrl, spaceUrl, createdAt, spaceName, profileImageUrl, nameDisplay } = props;
+
+  return <>
+    <div className="flex items-center gap-2 ">
+      <Link href={userUrl} className="avatar">
+        <div className="w-12 rounded-full bg-neutral-focus text-neutral-content">
+          <Image
+            width={64}
+            height={64}
+            src={profileImageUrl}
+            alt="Profile Picture" />
+        </div>
+      </Link>
+      <div className="flex flex-col justify-center">
+        <div className="flex gap-2 items-center">
+          <Link className="btn btn-ghost btn-sm flex justify-start px-1 lowercase" href={userUrl}>
+            <p className="flex">{nameDisplay}</p>
+          </Link>
+          <p className="text-xs italic opacity-50">{`· ${dayjs(createdAt).fromNow()}`}</p>
+        </div>
+        <Link href={spaceUrl} className="flex gap-1">
+          <span className="badge badge-primary hover:badge-secondary">
+            {spaceName}
+          </span>
+        </Link>
+      </div>
+    </div>
+  </>
+}

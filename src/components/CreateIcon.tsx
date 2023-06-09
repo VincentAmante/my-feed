@@ -17,7 +17,7 @@ type _ImageUploader = {
     submitRef: React.RefObject<HTMLButtonElement>;
     imageUrl: string  | null | undefined;
 }
-const UploadWidgetProfile = (props: _ImageUploader) => {
+const AddIconWidget = (props: _ImageUploader) => {
     const { onUpload, submitRef, imageUrl } = props;
     const [imageSrc, setImageSrc] = useState<string | undefined>();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -139,4 +139,4 @@ const UploadWidgetProfile = (props: _ImageUploader) => {
         </>
     )
 }
-export default UploadWidgetProfile;
+export default AddIconWidget;

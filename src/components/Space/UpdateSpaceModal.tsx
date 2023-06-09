@@ -7,7 +7,7 @@ import { faShield, faLock, faEye, faPlus, faPenToSquare, faTrash, faExclamationT
 import type { ForwardedRef } from "react";
 import React from "react";
 import { FeedContext } from "../Layouts";
-import UploadWidgetProfile from "../UpdateIcon";
+import UpdateIconWidget from "../UpdateIcon";
 
 type visibilityType = "public" | "private" | "obscure" | "protected";
 
@@ -36,18 +36,19 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
   }, [spaceData])
 
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const { mutate: updateSpace } = api.spaces.updateSpace.useMutation({
     onSuccess: () => {
-      void ctx.spaces.getSpacesByUserId.invalidate();
+      // Invalidates the cache for the spaces owned by the user
+      void ctx.spaces.getSpacesByUserId.invalidate({
+        ownerId: userId as string
+      });
     }
   });
-
-
+  
+  const [isLoading, setIsLoading] = useState(false);
+  // Add submission logic here
   function updateSpaceHandler(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     if (isLoading) return;
     setIsLoading(true);
     void updateSpace({
@@ -55,8 +56,8 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
       name,
       visibility
     })
-    setIsLoading(false);
 
+    setIsLoading(false);
     setCtxFeedName(name);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
@@ -90,30 +91,16 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
     })
   }
 
-  useMemo(() => {
-    console.log('created')
-  }, [])
-
 
   return (
     <dialog id="update_space_ref" ref={ref} className="modal absolute">
       <div className="modal-box flex flex-col">
         <label className="text-2xl font-bold text-center">Update a Space</label>
         <div className="w-full max-w-xs self-center flex justify-center gap-2 my-2">
-          <UploadWidgetProfile onUpload={handleOnUpload} submitRef={spaceUploadRef} imageUrl={spaceData?.icon || null} />
+          <UpdateIconWidget onUpload={handleOnUpload} submitRef={spaceUploadRef} imageUrl={spaceData?.icon || null} />
         </div>
         <form method="dialog" onSubmit={updateSpaceHandler} className="flex flex-col items-center gap-2">
-          <div className="form-control w-full max-w-xs">
-            <label className="label">
-              <span className="label-text">Name</span>
-            </label>
-            <input
-              type="text" max={24}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              name="name"
-              placeholder="My Space" className="input input-bordered w-full max-w-xs" />
-          </div>
+          <NameInput name={name} setName={setName} />
           <SelectVisibility selected={visibility} setSelected={setVisibility} />
           <button className="btn btn-primary">
             {isLoading ?
@@ -135,8 +122,8 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(props: Updat
         </form>
       </div>
       <form method="dialog" className="modal-backdrop">
-          <button onClick={() => setDeleteToggled(false)}>close</button>
-        </form>
+        <button onClick={() => setDeleteToggled(false)}>close</button>
+      </form>
     </dialog>
   )
 });
@@ -146,6 +133,26 @@ export default UpdateSpaceModal
 type SelectVisibilityProps = {
   selected: string;
   setSelected: React.Dispatch<React.SetStateAction<visibilityType>>;
+}
+
+type NameInputProps = {
+  name: string,
+  setName: React.Dispatch<React.SetStateAction<string>>
+}
+const NameInput = (props: NameInputProps) => {
+  const { name, setName } = props;
+
+  return <div className="form-control w-full max-w-xs">
+    <label className="label">
+      <span className="label-text">Name</span>
+    </label>
+    <input
+      type="text" max={24}
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      name="name"
+      placeholder="My Space" className="input input-bordered w-full max-w-xs" />
+  </div>
 }
 
 const SelectVisibility = (props: SelectVisibilityProps) => {

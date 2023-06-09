@@ -144,7 +144,7 @@ export const spacesRouter = createTRPCRouter({
     .input(
       z.object({
         spaceId: z.string(),
-        name: z.string(),
+        name: z.string().min(1).max(160),
         visibility: z.enum(["public", "private", "obscure", "protected"]),
       })
     )
