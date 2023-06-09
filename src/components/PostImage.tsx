@@ -26,7 +26,7 @@ const PostImages = (props: ImageType) => {
         return (
             <>
                 {(imageUrls.length > 1) && (
-                    <div className="carousel w-full scroll-py-12 snap-y">
+                    <div className="carousel w-full scroll-py-12 snap-y relative">
                         <Image
                             className="image object-cover w-full select-none"
                             src={imageUrls[activeImage - 1] || imageUrls[0]}
@@ -34,16 +34,16 @@ const PostImages = (props: ImageType) => {
                             height={400}
                             alt={"An image"}
                         />
-                        <div>
+                        <div className="absolute h-full w-full flex items-center">
                             <button
                                 onClick={prevImage}
-                                className="absolute left-4 top-1/2 btn btn-circle btn-ghost "
+                                className="absolute left-4 btn btn-circle btn-ghost "
                             >
                                 <FontAwesomeIcon icon={faChevronLeft} />
                             </button>
                             <button
                                 onClick={nextImage}
-                                className="absolute right-4 top-1/2  btn btn-circle btn-ghost"
+                                className="absolute right-4 btn btn-circle btn-ghost"
                             >
                                 <FontAwesomeIcon icon={faChevronRight} />
                             </button>
