@@ -103,11 +103,11 @@ const Sidebar = (sidebarProps: SidebarProps) => {
       <div>
         <UserDisplayContainer />
       </div>
-      <div className="btn-lg btn uppercase">
+      {/* <div className="btn-lg btn uppercase">
         <SignOutButton>
           <span>Sign Out</span>
         </SignOutButton>
-      </div>
+      </div> */}
     </SidebarWrapper>
   );
 };
