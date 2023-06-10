@@ -15,7 +15,7 @@ import {
 import PostImages from "~/components/PostImage";
 import { createPortal } from "react-dom";
 import { useRef } from "react";
-import SpaceIcon from "~/components/AppIcon";
+import AppIcon from "~/components/AppIcon";
 import Head from "next/head";
 
 const PostPage: NextPageWithLayout = () => {

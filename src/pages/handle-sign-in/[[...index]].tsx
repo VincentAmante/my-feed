@@ -10,7 +10,7 @@ const PostSignUp = () => {
 
   const user = api.users.initUser.useQuery({
     clerkId: userId || "",
-    firstName: clerkUser?.firstName || "",
+    firstName: clerkUser?.firstName || "",  
     lastName: clerkUser?.lastName || "",
     username: clerkUser?.username || "",
   });

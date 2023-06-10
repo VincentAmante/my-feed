@@ -1,8 +1,9 @@
 import z from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { type User, clerkClient } from "@clerk/nextjs/server";
 import { filterUserForClient } from "../../helpers/filterUserForClient";
+import { privateDecrypt } from "crypto";
 
 // For creating spaces
 function addPossessiveSuffix(name: string): string {
@@ -102,6 +103,20 @@ export const usersRouter = createTRPCRouter({
 
         return true;
       }
+    }),
+
+  getCurrentUser: privateProcedure
+    .input(z.object({}))
+    .query(async ({ ctx }) => {
+      const userId = ctx.userId;
+      const user = await clerkClient.users.getUser(userId);
+      if (!user) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "User not found",
+        });
+      }
+      return filterUserForClient(user);
     }),
 
   getUserByUsername: publicProcedure

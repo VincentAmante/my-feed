@@ -4,18 +4,23 @@ import {
   UserButton,
   SignInButton,
 } from "@clerk/clerk-react";
+import { useRef } from "react";
 
-const UserDisplay = () => (
-  <>
-    <SignedIn>
-      {/* Mount the UserButton component */}
-      <UserButton />
-    </SignedIn>
-    <SignedOut>
-      {/* Signed out users get sign in button */}
-      <SignInButton />
-    </SignedOut>
-  </>
-);
+const UserDisplay = () => {
+  return (
+    <>
+      <SignedIn>
+        {/* Mount the UserButton component */}
+        <div>
+          <UserButton />
+        </div>
+      </SignedIn>
+      <SignedOut>
+        {/* Signed out users get sign in button */}
+        <SignInButton />
+      </SignedOut>
+    </>
+  );
+};
 
 export default UserDisplay;

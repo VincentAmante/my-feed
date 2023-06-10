@@ -1,16 +1,30 @@
 import { use, useContext, useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import UserDisplay from "~/components/UserDisplay";
-import { useMemo } from "react";
+import {
+  SignOutButton,
+  UserProfile,
+  SignedIn,
+  UserButton,
+} from "@clerk/nextjs";
+import { useMemo, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faPlus,
+  faCircleHalfStroke,
+  faEarthAsia,
+  faGear,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FeedContext } from "./Layouts";
 import Link from "next/link";
 import React from "react";
 import { createPortal } from "react-dom";
 import CreateSpaceModal from "./Space/CreateSpaceModal";
 import CreateFeedModal from "./Feed/CreateFeedModal";
-
+import AppIcon from "./AppIcon";
+import Image from "next/image";
 interface SidebarProps {
   handleSelectFeed: (
     id: string,
@@ -39,8 +53,15 @@ const Sidebar = (sidebarProps: SidebarProps) => {
 
   return (
     <SidebarWrapper>
-      <div>
-        <UserDisplay />
+      <div className="w-full">
+        <Link
+          href="/"
+          onClick={() => feedOnClick("global", "Global", "global")}
+          className="btn-lg btn btn w-full text-xl"
+        >
+          <FontAwesomeIcon className="text-3xl" icon={faEarthAsia} />
+          <span>Global</span>
+        </Link>
       </div>
       <div className="collapse-arrow collapse rounded-lg bg-base-200 p-2 font-light">
         <input
@@ -48,7 +69,7 @@ const Sidebar = (sidebarProps: SidebarProps) => {
           checked={spaceListToggle}
           onChange={() => setSpaceListToggle(!spaceListToggle)}
         />
-        <div className="collapse-title text-xl">
+        <div className="collapse-title text-xl font-bold">
           <span>Your Spaces</span>
         </div>
         <div className="collapse-content">{spaceListElement}</div>
@@ -59,19 +80,10 @@ const Sidebar = (sidebarProps: SidebarProps) => {
           checked={feedListToggle}
           onChange={() => setFeedListToggle(!feedListToggle)}
         />
-        <div className="collapse-title">
-          <div className="px-3 py-2 text-xl">Feeds</div>
+        <div className="collapse-title text-xl font-bold">
+          <span>Feeds</span>
         </div>
         <ul className="collapse-content flex flex-col gap-2 text-lg">
-          <li className="w-full">
-            <Link
-              href="/"
-              onClick={() => feedOnClick("global", "Global", "global")}
-              className="btn-ghost btn w-full justify-start font-normal normal-case"
-            >
-              Global
-            </Link>
-          </li>
           <FeedList handleSelectFeed={feedOnClick} />
           {createPortal(
             <CreateFeedModal ref={createFeedModal} />,
@@ -88,36 +100,67 @@ const Sidebar = (sidebarProps: SidebarProps) => {
           </li>
         </ul>
       </div>
+      <div>
+        <UserDisplayContainer />
+      </div>
+      <div className="btn-lg btn uppercase">
+        <SignOutButton>
+          <span>Sign Out</span>
+        </SignOutButton>
+      </div>
     </SidebarWrapper>
   );
 };
 export default Sidebar;
 
-// TODO: Move this to a custom hook or refactor
-// const useSidebarToggle = () => {
-//   const [isToggled, setIsToggled] = useState(false);
-//   const [sidebarStyle, setSidebarStyle] = useState(
-//     ["-translate-x-full"].join(" ")
-//   );
+const UserDisplayContainer = () => {
+  const { data, isLoading } = api.users.getCurrentUser.useQuery({});
 
-//   const handleOnClick = () => {
-//     setIsToggled(!isToggled);
-//     console.log(isToggled);
-
-//     if (isToggled) {
-//       setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
-//     } else {
-//       setSidebarStyle("-translate-x-full");
-//     }
-//   };
-
-//   return { sidebarStyle, handleOnClick };
-// };
+  if (isLoading) {
+    return (
+      <div>
+        <div className="loading loading-dots"></div>
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div>
+        <p>Not logged in</p>
+      </div>
+    );
+  }
+  return (
+    <div className="join flex w-full max-w-xs">
+      <Link
+        href={`/user/${data?.username || ""}`}
+        className="btn-lg join-item btn flex grow  justify-evenly"
+      >
+        <FontAwesomeIcon className="text-3xl" icon={faUser} />
+        <span>Profile</span>
+      </Link>
+      <div className=" group join-item relative h-full text-3xl">
+        <UserButton
+          appearance={{
+            elements: {
+              rootBox: "h-full aspect-square",
+              userButtonBox: "h-full",
+              userButtonTrigger: "w-full h-full opacity-0",
+              avatarBox: "w-16 h-16",
+            },
+          }}
+        />
+        <div className="justify-cente pointer-events-autor pointer-events-none absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center bg-base-200 group-hover:bg-base-300">
+          <FontAwesomeIcon className="" icon={faGear} />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 type SidebarWrapperProps = {
   children: React.ReactNode;
 };
-
 // Container
 const SidebarWrapper = (props: SidebarWrapperProps) => {
   // const { sidebarStyle, handleOnClick } = useSidebarToggle();
@@ -138,7 +181,7 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
     <>
       <aside
         className={`${sidebarStyle} fixed left-0 z-[200] flex h-full w-full max-w-xs transform flex-col gap-4
-    overflow-y-auto bg-base-100 p-4 py-8 transition-all md:static md:transform-none md:drop-shadow-none `}
+    overflow-y-auto bg-base-100 p-4 py-8 pt-20 transition-all md:static md:transform-none  md:drop-shadow-none`}
       >
         <div className="flex flex-col gap-4">{props.children}</div>
         {createPortal(
@@ -195,6 +238,27 @@ const FeedList = (props: FeedListProps) => {
               onClick={() => handleSelectFeed(feed.id, feed.name, feed.ownerId)}
               className="btn-ghost btn w-full justify-start font-normal normal-case"
             >
+              {feed.icon && (
+                <div className="avatar">
+                  <div className="w-8">
+                    <Image
+                      src={feed.icon}
+                      alt={feed.name}
+                      layout="responsive"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  </div>
+                </div>
+              )}
+              {!feed.icon && (
+                <div className="avatar">
+                  <div className="w-8 text-2xl">
+                    <FontAwesomeIcon icon={faCircleHalfStroke} />
+                  </div>
+                </div>
+              )}
               {feed.name}
             </Link>
           </li>
@@ -233,7 +297,28 @@ const SpaceList = () => {
                 href={`/space/${space.id}`}
                 className="btn-ghost btn w-full justify-start font-normal normal-case"
               >
-                {space.name}
+                {space.icon && (
+                  <div className="avatar">
+                    <div className="w-8">
+                      <Image
+                        src={space.icon}
+                        alt={space.name}
+                        layout="responsive"
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!space.icon && (
+                  <div className="avatar">
+                    <div className="w-8 text-2xl">
+                      <FontAwesomeIcon icon={faCircleHalfStroke} />
+                    </div>
+                  </div>
+                )}
+                <span>{space.name}</span>
               </Link>
             </li>
           );

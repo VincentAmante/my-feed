@@ -93,6 +93,7 @@ export const spacesRouter = createTRPCRouter({
           id: true,
           name: true,
           ownerId: true,
+          icon: true,
         }
       });
     }),

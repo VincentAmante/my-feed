@@ -18,7 +18,7 @@ import {
 } from "~/components/SkeletonViews/FeedSkeletons";
 import { createPortal } from "react-dom";
 import { useRef } from "react";
-import SpaceIcon from "~/components/AppIcon";
+import AppIcon from "~/components/AppIcon";
 import Head from "next/head";
 
 const SpacePage: NextPageWithLayout = () => {
@@ -41,7 +41,6 @@ const SpacePage: NextPageWithLayout = () => {
     id = routerId;
   }
 
-  console.log("spaceId", id);
   const { data, isLoading } = api.spaces.getSpaceById.useQuery({
     spaceId: id,
   });
@@ -97,7 +96,7 @@ const SpacePage: NextPageWithLayout = () => {
           )}
         <div className="flex w-full items-center justify-center bg-base-100 py-4 text-xl lg:py-4">
           <span className="flex  items-center justify-center gap-2">
-            <SpaceIcon imageSrc={data?.icon || undefined}></SpaceIcon>
+            <AppIcon imageSrc={data?.icon || undefined}></AppIcon>
             {ctxFeedName}
           </span>
           {userOwnsSpace && (

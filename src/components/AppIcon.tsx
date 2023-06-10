@@ -6,7 +6,7 @@ type SpaceIconProps = {
   imageSrc?: string;
 };
 
-const SpaceIcon = (props: SpaceIconProps) => {
+const AppIcon = (props: SpaceIconProps) => {
   const { imageSrc } = props;
 
   return (
@@ -40,4 +40,4 @@ const SpaceIcon = (props: SpaceIconProps) => {
   );
 };
 
-export default SpaceIcon;
+export default AppIcon;
