@@ -27,7 +27,7 @@ export default function Page() {
 
       {/* Sign in from Clerk */}
       <section className="flex flex-col items-center justify-center px-4 lg:items-start lg:justify-start lg:px-0">
-        <SignIn />
+        <SignIn redirectUrl={`/handle-sign-in`} />
         <SignedIn>
           <Redirect />
         </SignedIn>

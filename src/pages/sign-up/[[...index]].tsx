@@ -22,7 +22,7 @@ const SignUpPage = () => (
     </section>
     <section className="flex flex-col items-center">
       <div className="flex flex-col items-center gap-4">
-        <SignUp />
+        <SignUp redirectUrl={`/handle-sign-in`} />
         <SignedIn>{/* <Redirect /> */}</SignedIn>
       </div>
     </section>
