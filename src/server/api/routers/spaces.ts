@@ -29,7 +29,7 @@ export const spacesRouter = createTRPCRouter({
       const posts = await ctx.prisma.post.findMany({
         where: {
           spaceId: input.spaceId,
-        }, 
+        },
         include: {
           Space: {
             select: {
@@ -47,14 +47,14 @@ export const spacesRouter = createTRPCRouter({
           createdAt: "desc",
         },
       });
-      
+
       const users = (
         await clerkClient.users.getUserList({
           userId: posts.map((post) => post.authorId),
           limit: 100
         }))
         .map(filterUserForClient)
-      
+
       // Goes through comments and posts
       // and then attaches the user's data
       const userComments = (
@@ -63,7 +63,7 @@ export const spacesRouter = createTRPCRouter({
           limit: 3
         }))
         .map(filterUserForClient)
-            
+
       return posts.map((post) => ({
         ...post,
         author: users.find((user) => user.id === post.authorId),
@@ -95,8 +95,8 @@ export const spacesRouter = createTRPCRouter({
         }
       });
     }),
-  
-    getProfileSpaces: publicProcedure
+
+  getProfileSpaces: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
       const feeds = await ctx.prisma.space.findMany({
@@ -114,7 +114,7 @@ export const spacesRouter = createTRPCRouter({
       });
       return feeds;
     }),
-  
+
   createSpace: privateProcedure
     .input(
       z.object({
@@ -139,7 +139,7 @@ export const spacesRouter = createTRPCRouter({
         }
       });
     }),
-  
+
   updateSpace: privateProcedure
     .input(
       z.object({
@@ -162,7 +162,7 @@ export const spacesRouter = createTRPCRouter({
       });
       return space;
     }),
-  
+
   deleteSpace: privateProcedure
     .input(
       z.object({
@@ -179,14 +179,14 @@ export const spacesRouter = createTRPCRouter({
       });
       return space;
     }),
-  
+
   updateSpaceIcon: privateProcedure
     .input(
       z.object({
         spaceId: z.string(),
         icon: z.string(),
       })
-  )
+    )
     .mutation(async ({ input, ctx }) => {
       const userId = ctx.userId;
       const space = await ctx.prisma.space.updateMany({
@@ -200,5 +200,5 @@ export const spacesRouter = createTRPCRouter({
       });
       return space;
     }
-  ),
+    ),
 });

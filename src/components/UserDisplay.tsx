@@ -1,15 +1,21 @@
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/clerk-react";
+import {
+  SignedIn,
+  SignedOut,
+  UserButton,
+  SignInButton,
+} from "@clerk/clerk-react";
 
-const UserDisplay = () => 
-<>
+const UserDisplay = () => (
+  <>
     <SignedIn>
-    {/* Mount the UserButton component */}
-        <UserButton />
+      {/* Mount the UserButton component */}
+      <UserButton />
     </SignedIn>
     <SignedOut>
-            {/* Signed out users get sign in button */}
-        <SignInButton />
+      {/* Signed out users get sign in button */}
+      <SignInButton />
     </SignedOut>
-</>
+  </>
+);
 
 export default UserDisplay;

@@ -22,7 +22,7 @@ const SwitchTheme = () => {
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "soft" : "dark");
     themeVal = localStorage.getItem("theme") || "";
-    console.log('setting theme to ' + themeVal);
+    console.log("setting theme to " + themeVal);
     localStorage.setItem("theme", themeVal === "dark" ? "soft" : "dark");
   };
 
@@ -33,8 +33,12 @@ const SwitchTheme = () => {
   }, [theme]);
 
   return (
-    <button className="btn-circle btn btn-ghost" onClick={toggleTheme}>
-      {theme === "dark" ? <FontAwesomeIcon icon={faMoon} /> : <FontAwesomeIcon icon={faSun} />}
+    <button className="btn-ghost btn-circle btn" onClick={toggleTheme}>
+      {theme === "dark" ? (
+        <FontAwesomeIcon icon={faMoon} />
+      ) : (
+        <FontAwesomeIcon icon={faSun} />
+      )}
     </button>
   );
 };

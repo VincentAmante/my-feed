@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { use, useContext, useState, useEffect } from "react";
 import { api } from "~/utils/api";
 import UserDisplay from "~/components/UserDisplay";
 import { useMemo } from "react";
@@ -41,19 +41,19 @@ const Sidebar = (sidebarProps: SidebarProps) => {
       <div>
         <UserDisplay />
       </div>
-      <div className="collapse collapse-arrow rounded-lg p-2 font-light bg-base-200">
+      <div className="p-2 font-light rounded-lg collapse collapse-arrow bg-base-200">
         <input type="checkbox"
           checked={spaceListToggle}
           onChange={() => setSpaceListToggle(!spaceListToggle)}
         />
-        <div className="collapse-title text-xl">
+        <div className="text-xl collapse-title">
           <span>Your Spaces</span>
         </div>
         <div className="collapse-content">
           {spaceListElement}
         </div>
       </div>
-      <div className="collapse collapse-arrow rounded-lg p-2 font-light bg-base-200">
+      <div className="p-2 font-light rounded-lg collapse collapse-arrow bg-base-200">
         <input type="checkbox"
           checked={feedListToggle}
           onChange={() => setFeedListToggle(!feedListToggle)}
@@ -61,12 +61,12 @@ const Sidebar = (sidebarProps: SidebarProps) => {
         <div className="collapse-title">
           <div className="px-3 py-2 text-xl">Feeds</div>
         </div>
-        <ul className="collapse-content flex flex-col gap-2 text-lg">
+        <ul className="flex flex-col gap-2 text-lg collapse-content">
           <li className="w-full">
             <Link
               href="/feed"
               onClick={() => feedOnClick("global", "Global", "global")}
-              className="w-full btn-ghost btn justify-start font-normal normal-case"
+              className="justify-start w-full font-normal normal-case btn-ghost btn"
             >
               Global
             </Link>
@@ -79,7 +79,7 @@ const Sidebar = (sidebarProps: SidebarProps) => {
             )
           }
           <li className="w-full">
-            <button onClick={() => createFeedModal.current?.show()} className="btn btn-ghost opacity-30 hover:opacity-100 w-full flex justify-start gap-1">
+            <button onClick={() => createFeedModal.current?.show()} className="flex justify-start w-full gap-1 btn btn-ghost opacity-30 hover:opacity-100">
               <FontAwesomeIcon icon={faPlus} />
               <span className="text-xs">Create new Feed</span>
             </button>
@@ -93,25 +93,25 @@ export default Sidebar;
 
 
 // TODO: Move this to a custom hook or refactor
-const useSidebarToggle = () => {
-  const [isToggled, setIsToggled] = useState(false);
-  const [sidebarStyle, setSidebarStyle] = useState(
-    ["-translate-x-full"].join(" ")
-  );
+// const useSidebarToggle = () => {
+//   const [isToggled, setIsToggled] = useState(false);
+//   const [sidebarStyle, setSidebarStyle] = useState(
+//     ["-translate-x-full"].join(" ")
+//   );
 
-  const handleOnClick = () => {
-    setIsToggled(!isToggled);
-    console.log(isToggled);
+//   const handleOnClick = () => {
+//     setIsToggled(!isToggled);
+//     console.log(isToggled);
 
-    if (isToggled) {
-      setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
-    } else {
-      setSidebarStyle("-translate-x-full");
-    }
-  };
+//     if (isToggled) {
+//       setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
+//     } else {
+//       setSidebarStyle("-translate-x-full");
+//     }
+//   };
 
-  return { sidebarStyle, handleOnClick };
-};
+//   return { sidebarStyle, handleOnClick };
+// };
 
 
 type SidebarWrapperProps = {
@@ -120,41 +120,55 @@ type SidebarWrapperProps = {
 
 // Container
 const SidebarWrapper = (props: SidebarWrapperProps) => {
-  const { sidebarStyle, handleOnClick } = useSidebarToggle();
+  // const { sidebarStyle, handleOnClick } = useSidebarToggle();
   const [isToggled, setIsToggled] = useState(false);
+  const [sidebarStyle, setSidebarStyle] = useState(
+    ["-translate-x-full"].join(" ")
+  );
+
+  useEffect(() => {
+    if (isToggled) {
+      setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
+    } else {
+      setSidebarStyle("-translate-x-full");
+    }
+  }, [isToggled]);
+
+
 
   return (
     <>
-    <aside className={`fixed z-[200] ${sidebarStyle} left-0 flex h-full overflow-y-auto w-full max-w-xs transform flex-col
-    gap-4 bg-base-100  p-4 py-8 md:drop-shadow-none transition-all md:static md:transform-none `}>
-        <div className="flex flex-col gap-4">
-        {props.children}
+      <aside className={`${sidebarStyle} fixed z-[200] left-0 flex h-full overflow-y-auto w-full max-w-xs transform flex-col
+    gap-4 bg-base-100 p-4 py-8 md:drop-shadow-none transition-all md:static md:transform-none `}>
+        <div className="flex-col gap-4 flex">
+          {props.children}
         </div>
-      {
-        createPortal(
-          <div
-            onClick={(e) => {
-              handleOnClick();
-              e.stopPropagation();
-              setIsToggled(!isToggled);
-            }}
-            className="fixed pointer-events-auto z-100 top-0 left-0 mt-4 flex aspect-square  bg-base-100 scale-x-110 flex-col items-center justify-center rounded-r-lg pl-3 border-base-200 border-2 text-primary  p-2 md:hidden text-2xl"
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </div>
-          , document.body
-        )
-      }
+        {
+          createPortal(
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsToggled(!isToggled);
+              }}
+              className="fixed top-0 left-0 flex flex-col items-center justify-center p-2 pl-3 mt-4 text-2xl scale-x-110 border-2 rounded-r-lg z-100 aspect-square bg-base-100 border-base-200 text-primary md:hidden"
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </div>
+            , document.body
+          )
+        }
       </aside>
       {
         isToggled && (
           <div
-          onClick={() => {
-            handleOnClick();
-            setIsToggled(!isToggled);
-          }
-          }
-          className="fixed z-[100] w-screen h-screen bg-black bg-opacity-5">
+            onClick={() => {
+              console.log("clicked", isToggled);
+              setIsToggled(!isToggled);
+            }
+            }
+            className="fixed z-[100] w-screen h-screen bg-black bg-opacity-30 overflow-scroll overscroll-none overscroll-y-none lg:overflow-auto lg:hidden">
+            <div className="w-full h-full pointer-events-none">
+            </div>
           </div>
         )
       }
@@ -176,7 +190,7 @@ const FeedList = (props: FeedListProps) => {
 
   if (postsLoading)
     return (
-      <div className="flex w-full px-2 items-center grow">
+      <div className="flex items-center w-full px-2 grow">
         <span className="loading loading-dots text-accent"></span>
       </div>
     );
@@ -192,7 +206,7 @@ const FeedList = (props: FeedListProps) => {
             <Link
               href={`/feed/`}
               onClick={() => handleSelectFeed(feed.id, feed.name, feed.ownerId)}
-              className="w-full btn btn-ghost justify-start font-normal normal-case">
+              className="justify-start w-full font-normal normal-case btn btn-ghost">
               {feed.name}
             </Link>
           </li>
@@ -215,7 +229,7 @@ const SpaceList = () => {
 
   if (postsLoading)
     return (
-      <div className="flex w-full px-2 items-center grow">
+      <div className="flex items-center w-full px-2 grow">
         <span className="loading loading-dots text-accent"></span>
       </div>
     );
@@ -232,7 +246,7 @@ const SpaceList = () => {
             >
               <Link
                 href={`/space/${space.id}`}
-                className="w-full btn btn-ghost justify-start font-normal normal-case">
+                className="justify-start w-full font-normal normal-case btn btn-ghost">
                 {space.name}
               </Link>
             </li>
@@ -242,7 +256,7 @@ const SpaceList = () => {
           <CreateSpaceModal ref={createSpaceModal} />,
           document.body
         )}
-        <button onClick={() => createSpaceModal.current?.show()} className="btn btn-ghost opacity-30 hover:opacity-100 w-full flex justify-start gap-1">
+        <button onClick={() => createSpaceModal.current?.show()} className="flex justify-start w-full gap-1 btn btn-ghost opacity-30 hover:opacity-100">
           <FontAwesomeIcon icon={faPlus} />
           <span className="text-xs">Create new Space</span>
         </button>

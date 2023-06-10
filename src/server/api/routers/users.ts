@@ -48,7 +48,7 @@ export const usersRouter = createTRPCRouter({
         if (clerkUser?.username === undefined || clerkUser?.username === null) throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Username not found",
-        }); 
+        });
 
         const username = clerkUser.username;
 
@@ -90,21 +90,21 @@ export const usersRouter = createTRPCRouter({
 
       if (isUserInClerk.length == 0) {
         if (doesUserExist.length == 0) {
-            await ctx.prisma.user.deleteMany({
-                where: {
-                    clerkId: input.clerkId,
-                },
-            });
+          await ctx.prisma.user.deleteMany({
+            where: {
+              clerkId: input.clerkId,
+            },
+          });
         }
 
         return false;
       } else {
-        
+
         return true;
       }
     }),
-  
-    getUserByUsername: publicProcedure
+
+  getUserByUsername: publicProcedure
     .input(z.object({ username: z.string() }))
     .query(async ({ input }) => {
       const [user] = await clerkClient.users.getUserList({
