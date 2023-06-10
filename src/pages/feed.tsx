@@ -109,27 +109,29 @@ const FeedHeader = () => {
 // Handles collection of posts
 const FeedData = () => {
   const { ctxFeedType: type, ctxFeed: id, ctxOwner } = useContext(FeedContext);
-  const { ref, inView, entry } = useInView({
+  const { isLoading, isError, data,
+    isFetchingNextPage, fetchNextPage, hasNextPage } = api.feeds.getInfiniteFeedPostsById.useInfiniteQuery({
+      feedId: id,
+      limit: 10,
+    },
+      {
+        // function for fetching next page
+        getNextPageParam: (lastPage: { nextCursor: unknown; }) => lastPage.nextCursor,
+      }
+    )
+  
+  const { ref, inView } = useInView({
     threshold: 0,
   });
-  const { userId } = useAuth();
-
-
-  const { isLoading, isError, data, error, isFetchingNextPage, fetchNextPage, hasNextPage } = api.feeds.getInfiniteFeedPostsById.useInfiniteQuery({
-    feedId: id,
-    limit: 10,
-  },
-    {
-      getNextPageParam: (lastPage) => lastPage.nextCursor,
-    }
-  )
-
+  
   useEffect(() => {
     if (inView && hasNextPage) {
       void fetchNextPage()
     }
   }, [inView])
 
+  const { userId } = useAuth();
+  
   if (isLoading) return <LoadingSkeleton />;
   if (isError) return <ErrorSkeleton />;
   if (data.pages[0]?.posts.length == 0) {

@@ -124,7 +124,7 @@ export const feedsRouter = createTRPCRouter({
               softDeleted: false,
             },
           },
-          take: 12 + 1,
+          take: input.limit + 1,
           cursor: input.cursor ? { id: input.cursor } : undefined,
         });
       } else {
@@ -162,7 +162,7 @@ export const feedsRouter = createTRPCRouter({
         );
       }
 
-      
+
       const users = (
         await clerkClient.users.getUserList({
           userId: posts.map((post) => post.authorId),

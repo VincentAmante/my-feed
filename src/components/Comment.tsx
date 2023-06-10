@@ -55,8 +55,10 @@ const Comment = (props: CommentWithUser & {
 
     
     const timeStamp = useMemo(() => {
+        // const lastWeek: Date = new Date(new Date().getTime() - 3 * 24 * 60 * 60 * 1000);
+        // const isAWeekAgo = dayjs(createdAt).isAfter(lastWeek)
         if (!createdAt) return <></>;
-        if (updatedAt) return <>Edited: {dayjs(updatedAt).fromNow()}</>;
+        if (updatedAt.getTime() !== createdAt.getTime()) return <>Edited: {dayjs(updatedAt).fromNow()}</>;
         else return <>· {dayjs(createdAt).fromNow()}</>;
     }, [createdAt, updatedAt])
 

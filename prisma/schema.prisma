@@ -12,12 +12,13 @@ datasource db {
 }
 
 model User {
+  // the <id> field is to satisfy MongoDB's requirement of having an _id field
+  // clerkId is how we identify users in Kiurate
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId     String   @unique
+
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
-  displayName String   @default("")
-  bio         String   @default("")
 
   Comment Comment[]
   Post    Post[]
@@ -29,21 +30,22 @@ model User {
 
 model Post {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  content   String?   @default("")
-  images    String[]  @default([])
-  published Boolean   @default(true)
-  Comment   Comment[]
-
+  // Cascade deletes the post if any of the associated fields are deleted
   author   User    @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
   authorId String
   Space    Space?  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
   spaceId  String? @db.ObjectId
 
+  content   String?   @default("")
+  images    String[]  @default([])
+  published Boolean   @default(true)
+  Comment   Comment[]
+
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   likedByIDs String[] @default([])
-
   softDeleted Boolean @default(false)
 }
 

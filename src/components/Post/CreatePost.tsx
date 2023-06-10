@@ -13,9 +13,12 @@ import DragAndDropImages from "../ImagePostWidget";
 // Handler for creating a post
 const CreatePost = () => {
   const { ctxFeed } = useContext(FeedContext);
-
   const { user } = useUser();
+
   const [content, setContent] = useState("");
+
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const fileBtnRef = useRef<HTMLButtonElement>(null);
 
   const maxTextLimit = 280;
   const [textLimitCount, setTextLimitCount] = useState(0);
@@ -24,14 +27,16 @@ const CreatePost = () => {
     setTextLimitCount(content.length);
   }, [content])
 
-  const submitRef = useRef<HTMLButtonElement>(null);
-  const fileBtnRef = useRef<HTMLButtonElement>(null);
 
   const ctx = api.useContext();
 
+  // Handler for post creating
   const { mutate } = api.posts.createPost.useMutation({
     onSuccess: () => {
+      // Resets the text content
       setContent("");
+
+      // Invalidates the cache for the feed and space posts
       void ctx.spaces.getSpacePostsById.invalidate();
       void ctx.feeds.getInfiniteFeedPostsById.invalidate();
     },
@@ -41,6 +46,7 @@ const CreatePost = () => {
     },
   });
 
+  // Even if images is empty, it will still create a post
   function onImagesUploaded(imageUrls: string[]) {
     mutate({
       content: content,
@@ -49,14 +55,14 @@ const CreatePost = () => {
     });
   }
 
-  if (!user) {
-    return <></>;
-  }
-
   function triggerUpload() {
     submitRef.current?.click();
   }
 
+
+  if (!user) {
+    return <></>;
+  }
   return (
     <div className="bg-base-300 bg-opacity-50 rounded-2xl flex gap-2 flex-col w-full max-w-lg px-4 py-4 pb-6 mb-2">
       <div className=" flex flex-col gap-4 w-full">
@@ -84,13 +90,23 @@ const CreatePost = () => {
           <span className="absolute right-0 m-1 text-xs opacity-20">{textLimitCount} / { maxTextLimit }</span>
         </div>
       </div>
-      <DragAndDropImages submitRef={submitRef} onImagesUploaded={onImagesUploaded} fileBtnRef={fileBtnRef} />
+
+      {/* 
+          The refs interact with the component, when it submits, it runs
+          the onImagesUploaded function, which is passed in as a prop
+      */}
+      <DragAndDropImages onImagesUploaded={onImagesUploaded} submitRef={submitRef} fileBtnRef={fileBtnRef} />
       <div className="flex justify-between">
+        
+        {/* this button clicks a button embedded inside the DragAndDropImages form
+            this opens up the file dialog */}
         <button
           onClick={() => fileBtnRef.current?.click()}
           className='btn btn-ghost btn-square mx-4 mb-2 text-3xl'>
           <FontAwesomeIcon icon={faImage} />
         </button>
+
+        {/* This button triggers DragAndDropImages to attempt an upload */}
         <button onClick={triggerUpload} className="btn btn-primary px-8 btn-md">
           <FontAwesomeIcon icon={faPaperPlane} />
           <span>Post</span>

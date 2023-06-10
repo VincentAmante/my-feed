@@ -3,6 +3,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 // import { UserButton } from "@clerk/clerk-react";
+import LogoAnimated from "~/components/Logo/Animated";
 import {
   SignedIn,
 } from "@clerk/nextjs";
@@ -24,6 +25,7 @@ const Home: NextPage = () => {
       </Head>
       <main className="flex flex-col gap-4 min-h-screen items-center justify-center">
         <section className="px-4 flex flex-col items-center text-center gap-2 border-b-primary border-b-2 py-4">
+          <LogoAnimated />
           <h1 className="text-6xl font-semibold">
             Welcome to Kiurate
           </h1>

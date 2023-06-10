@@ -58,14 +58,13 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) =
             (file) => file.type.startsWith('image/')
         );
 
+
         for (const file of uploadedImages) {
             const reader = new FileReader();
             reader.onload = () => {
                 const imageDataUrl = reader.result as string;
-                // onImageDrop(imageDataUrl);
                 setImages((prevImages) => [...prevImages, imageDataUrl]);
                 setFiles((prevFiles) => [...prevFiles, file]);
-                console.log(file);
             };
             reader.readAsDataURL(file);
         }
@@ -86,11 +85,12 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) =
                 body: formData
             })
             .then((r: any) => r.json());
-        console.log(data);
+        
+        // This url is the one that will be saved in the database
         return data.secure_url;
     }
 
-    async function submitOnClick() {
+    async function submit() {
         setIsLoading(true);
         const imageUrls: string[] = [];
         for (const file of files) {
@@ -170,7 +170,7 @@ const DragAndDropImages = ({ onImagesUploaded, submitRef, fileBtnRef }: Props) =
                 className='hidden'>
             </button>
             <button
-                onClick={() => void submitOnClick()}
+                onClick={() => void submit()}
                 ref={submitRef}
                 className='btn btn-primary hidden'>
                 Submit

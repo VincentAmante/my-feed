@@ -10,7 +10,7 @@ import React from "react";
 import { createPortal } from "react-dom";
 import CreateSpaceModal from "./Space/CreateSpaceModal";
 import CreateFeedModal from "./Feed/CreateFeedModal";
-import { set } from "zod";
+
 interface SidebarProps {
   handleSelectFeed: (
     id: string,

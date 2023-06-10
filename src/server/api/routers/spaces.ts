@@ -27,9 +27,9 @@ export const spacesRouter = createTRPCRouter({
     )
     .query(async ({ input, ctx }) => {
       const posts = await ctx.prisma.post.findMany({
-        orderBy: {
-          createdAt: "desc",
-        },
+        where: {
+          spaceId: input.spaceId,
+        }, 
         include: {
           Space: {
             select: {
@@ -37,14 +37,14 @@ export const spacesRouter = createTRPCRouter({
             }
           },
           Comment: {
-            take: 3,
+            take: 5,
             orderBy: {
               createdAt: "asc",
             }
           }
         },
-        where: {
-          spaceId: input.spaceId,
+        orderBy: {
+          createdAt: "desc",
         },
       });
       
@@ -55,6 +55,8 @@ export const spacesRouter = createTRPCRouter({
         }))
         .map(filterUserForClient)
       
+      // Goes through comments and posts
+      // and then attaches the user's data
       const userComments = (
         await clerkClient.users.getUserList({
           userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
@@ -62,7 +64,6 @@ export const spacesRouter = createTRPCRouter({
         }))
         .map(filterUserForClient)
             
-
       return posts.map((post) => ({
         ...post,
         author: users.find((user) => user.id === post.authorId),
@@ -139,7 +140,6 @@ export const spacesRouter = createTRPCRouter({
       });
     }),
   
-
   updateSpace: privateProcedure
     .input(
       z.object({

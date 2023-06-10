@@ -12,6 +12,8 @@ export const postsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ input, ctx }) => {
+      // Doing it this way ensures the data is attached to
+      // the logged-in user
       const authorId = ctx.userId;
 
       return await ctx.prisma.post.create({

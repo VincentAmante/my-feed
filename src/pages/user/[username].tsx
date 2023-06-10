@@ -21,6 +21,7 @@ const UserPage: NextPageWithLayout = () => {
   const [feedCount, setFeedCount] = useState<number>(0);
   const [spaceCount, setSpaceCount] = useState<number>(0);
 
+  // Ensures that the username is a string
   if (typeof username === 'string') {
     usernameString = username;
   } else if (typeof username === 'object' && username[0] !== null) {
