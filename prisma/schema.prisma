@@ -16,6 +16,8 @@ model User {
   // clerkId is how we identify users in Kiurate
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId     String   @unique
+  displayName String   @default("")
+  bio         String   @default("")
 
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
