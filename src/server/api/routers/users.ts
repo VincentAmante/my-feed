@@ -21,7 +21,7 @@ export const usersRouter = createTRPCRouter({
       lastName: z.string(),
       username: z.string(),
     }))
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
 
       // Clause guard
       if (input.clerkId === "") return null;

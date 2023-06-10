@@ -56,6 +56,23 @@ const FeedHeader = () => {
   });
 
   const ctx = api.useContext();
+  const { user: clerkUser } = useUser();
+  const { userId } = useAuth();
+  const {mutate} = api.users.initUser.useMutation({
+    onSuccess: () => {
+      void ctx.feeds.getUserFeeds.refetch();
+    }
+  });
+
+  useMemo(() => {
+    mutate({
+      clerkId: userId || "",
+      firstName: clerkUser?.firstName || "",
+      lastName: clerkUser?.lastName || "",
+      username: clerkUser?.username || "",
+    })
+  }, [])
+
   const { mutate: subscribeToFeed } = api.feeds.subscribeToFeed.useMutation({
     onSuccess: () => {
       void ctx.feeds.isUserSubscribedToFeed.refetch({
