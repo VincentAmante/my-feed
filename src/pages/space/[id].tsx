@@ -41,6 +41,7 @@ const SpacePage: NextPageWithLayout = () => {
     id = routerId;
   }
 
+  console.log("spaceId", id);
   const { data, isLoading } = api.spaces.getSpaceById.useQuery({
     spaceId: id,
   });
@@ -74,14 +75,13 @@ const SpacePage: NextPageWithLayout = () => {
         <span className="text-2xl font-bold">This space is private</span>
         <button
           className="btn-primary btn "
-          onClick={() => void router.push("/feed")}
+          onClick={() => void router.push("/")}
         >
           Go Back
         </button>
       </div>
     );
   } else
-      
     return (
       <>
         <Head>

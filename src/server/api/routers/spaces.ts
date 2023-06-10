@@ -5,6 +5,7 @@ import { filterUserForClient } from "../../helpers/filterUserForClient";
 import { createTRPCRouter, publicProcedure, privateProcedure } from "~/server/api/trpc";
 
 export const spacesRouter = createTRPCRouter({
+
   getSpaceById: publicProcedure
     .input(
       z.object({

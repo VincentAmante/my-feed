@@ -1,6 +1,9 @@
 import { z } from "zod";
 
-import { createTRPCRouter, privateProcedure } from "~/server/api/trpc";
+import { clerkClient } from "@clerk/nextjs";
+import { createTRPCRouter, privateProcedure, publicProcedure, } from "~/server/api/trpc";
+import { filterUserForClient } from "~/server/helpers/filterUserForClient";
+import { TRPCError } from "@trpc/server";
 
 export const postsRouter = createTRPCRouter({
   createPost: privateProcedure
@@ -61,7 +64,8 @@ export const postsRouter = createTRPCRouter({
           postId,
         },
       });
-    }),
+    }
+    ),
 
   updateComment: privateProcedure
     .input(
@@ -83,6 +87,81 @@ export const postsRouter = createTRPCRouter({
           content: input.content,
         },
       });
+    }),
+
+  getPostById: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const postId = input.postId;
+
+      const post = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+        },
+      });
+
+      if (!post) {
+        // throw new TRPCError({
+        //   code: "NOT_FOUND",
+        //   message: "Post not found",
+        // });
+        return null;
+      }
+
+      const user = await clerkClient.users.getUser(post.authorId);
+      const postWithUser = {
+        ...post,
+        author: filterUserForClient(user),
+      };
+      return postWithUser;
+    }),
+
+
+  getInfiniteComments: privateProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+        cursor: z.string().optional(),
+        limit: z.number().optional().default(6),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+
+      const postId = input.postId;
+      const cursor = input.cursor;
+
+      const comments = await ctx.prisma.comment.findMany({
+        where: {
+          postId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 10,
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: cursor } : undefined,
+      });
+
+      const users = (
+        await clerkClient.users.getUserList({
+          userId: comments.map((post) => post.authorId),
+          limit: 100
+        }))
+        .map(filterUserForClient)
+
+      const commentsWithUsers = comments.map((comment) => {
+        const user = users.find((user) => user.id === comment.authorId);
+        return {
+          ...comment,
+          author: user,
+        };
+      });
+
+      return commentsWithUsers;
     }),
 
 

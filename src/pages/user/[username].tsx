@@ -138,7 +138,7 @@ const UserFeeds = (props: UserFeedsProps) => {
             <Link
               key={feed.id}
               onClick={() => handleOnClick(feed.id, feed.name, feed.ownerId)}
-              href="/feed"
+              href="/"
               className="flex w-full max-w-xs flex-col items-center gap-4 rounded-md bg-neutral p-4 shadow-xl"
             >
               {feed.icon && (

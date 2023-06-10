@@ -8,6 +8,8 @@ import {
   faHeart,
   faPaperPlane,
   faEllipsisVertical,
+  faEye,
+  faArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -172,6 +174,16 @@ const UserPost = (props: PostWithUser) => {
                       <span>Delete Post</span>
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
+                  </li>
+
+                  <li className="flex items-center justify-center">
+                    <Link
+                      href={`/post/${id}`}
+                      className="btn-ghost btn-sm btn w-full"
+                    >
+                      <span>Go to Post</span>
+                      <FontAwesomeIcon icon={faArrowRight} />
+                    </Link>
                   </li>
                 </ul>
               </div>

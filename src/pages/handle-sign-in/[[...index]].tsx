@@ -17,7 +17,7 @@ const PostSignUp = () => {
 
   useEffect(() => {
     if ((user.data && userId !== undefined) || userId !== "") {
-      void router.push("/feed");
+      void router.push("/");
     }
   }, [user, router, userId]);
 
