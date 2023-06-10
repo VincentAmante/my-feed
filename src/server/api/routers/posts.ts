@@ -102,6 +102,9 @@ export const postsRouter = createTRPCRouter({
         where: {
           id: postId,
         },
+        include: {
+          Space: true,
+        },
       });
 
       if (!post) {

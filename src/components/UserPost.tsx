@@ -8,8 +8,7 @@ import {
   faHeart,
   faPaperPlane,
   faEllipsisVertical,
-  faEye,
-  faArrowRight
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as faHeartOutline } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -151,7 +150,7 @@ const UserPost = (props: PostWithUser) => {
             />
 
             {isOwnedByUser && (
-              <div className="dropdown-left dropdown-end dropdown">
+              <div className="dropdown-end dropdown-left dropdown">
                 <label
                   tabIndex={0}
                   className="btn-ghost btn-sm btn-circle btn m-1"
@@ -176,7 +175,7 @@ const UserPost = (props: PostWithUser) => {
                     </button>
                   </li>
 
-                  <li className="flex items-center justify-center">
+                  {/* <li className="flex items-center justify-center">
                     <Link
                       href={`/post/${id}`}
                       className="btn-ghost btn-sm btn w-full"
@@ -184,7 +183,7 @@ const UserPost = (props: PostWithUser) => {
                       <span>Go to Post</span>
                       <FontAwesomeIcon icon={faArrowRight} />
                     </Link>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
             )}
