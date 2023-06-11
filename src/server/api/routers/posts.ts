@@ -9,7 +9,7 @@ export const postsRouter = createTRPCRouter({
   createPost: privateProcedure
     .input(
       z.object({
-        content: z.string().min(1).max(280),
+        content: z.string().min(1).max(280).trim(),
         images: z.array(z.string()),
         spaceId: z.string(),
       })
@@ -49,7 +49,7 @@ export const postsRouter = createTRPCRouter({
   createComment: privateProcedure
     .input(
       z.object({
-        content: z.string().min(1).max(280),
+        content: z.string().min(1).max(280).trim(),
         postId: z.string(),
       })
     )

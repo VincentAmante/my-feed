@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, ChangeEvent } from "react";
 // import SwitchTheme from "~/components/SwitchTheme";
 import { api } from "~/utils/api";
 
@@ -16,6 +16,25 @@ const CreatePost = () => {
   const { user } = useUser();
 
   const [content, setContent] = useState("");
+
+  const MAX_CONSECUTIVE_NEW_LINES = 2; // Maximum number of consecutive new lines between lines
+
+  // Handle text input change
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const text: string = event.target.value;
+    const cleanedText: string = cleanText(text);
+    setContent(cleanedText);
+  };
+
+  // Clean text by limiting consecutive new lines between lines
+  const cleanText = (text: string): string => {
+    const cleanedText: string = text.replace(
+      /\n{3,}/g,
+      "\n".repeat(MAX_CONSECUTIVE_NEW_LINES)
+    );
+
+    return cleanedText;
+  };
 
   const submitRef = useRef<HTMLButtonElement>(null);
   const fileBtnRef = useRef<HTMLButtonElement>(null);
@@ -79,9 +98,9 @@ const CreatePost = () => {
             maxLength={maxTextLimit}
             placeholder="Write your thoughts here.."
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={(e) => {
-              if (e.key === "Enter") {
+              if (e.key === "Enter" && e.shiftKey === false) {
                 triggerUpload();
               }
             }}

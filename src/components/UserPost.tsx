@@ -187,7 +187,7 @@ const UserPost = (props: PostWithUser) => {
               </div>
             )}
           </div>
-          <div className="px-4">{content}</div>
+          <div className="whitespace-pre-wrap  px-4">{content}</div>
           <PostImages imageUrls={images} />
 
           <div className="flex flex-col gap-2 px-4 pr-8">
