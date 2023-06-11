@@ -193,7 +193,7 @@ export const feedsRouter = createTRPCRouter({
       const userComments = (
         await clerkClient.users.getUserList({
           userId: posts.flatMap((post) => post.Comment.map((comment) => comment.authorId)),
-          limit: 3
+          limit: 6
         }))
         .map(filterUserForClient)
 
