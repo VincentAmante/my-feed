@@ -41,16 +41,6 @@ const Sidebar = (sidebarProps: SidebarProps) => {
 
   const [spaceListToggle, setSpaceListToggle] = useState(true);
   const [feedListToggle, setFeedListToggle] = useState(true);
-
-  const swipeHandler = useSwipeable({
-    onSwipedLeft: () => {
-      setSpaceListToggle(false);
-    },
-    onSwipedRight: () => {
-      setSpaceListToggle(true);
-    },
-  });
-
   const createFeedModal: React.RefObject<HTMLDialogElement> =
     React.useRef(null);
 
@@ -92,11 +82,6 @@ const Sidebar = (sidebarProps: SidebarProps) => {
             {createPortal(
               <>
                 <CreateFeedModal ref={createFeedModal} />
-                <div
-                  id="swipe-handler"
-                  {...swipeHandler}
-                  className="pointer-events-none fixed left-0 top-0 h-screen w-screen lg:hidden"
-                ></div>
               </>,
               document.body
             )}
@@ -187,6 +172,12 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
     ["-translate-x-full"].join(" ")
   );
 
+  const swipeHandler = useSwipeable({
+    onSwipedLeft: () => setIsToggled(false),
+    onSwipedRight: () => setIsToggled(true),
+    trackMouse: true,
+  });
+
   useEffect(() => {
     if (isToggled) {
       setSidebarStyle("transform-none translate-x-none drop-shadow-xl z-100");
@@ -198,20 +189,24 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
   return (
     <>
       <aside
+        {...swipeHandler}
         className={`${sidebarStyle} fixed left-0 z-[200] flex h-full w-full max-w-xs transform flex-col gap-4
     overflow-y-auto bg-base-100 p-4 py-8 pt-20 transition-all md:static md:transform-none  md:drop-shadow-none`}
       >
         <div className="flex flex-col gap-4">{props.children}</div>
         {createPortal(
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsToggled(!isToggled);
-            }}
-            className="z-100 fixed left-0 top-0 mt-4 flex aspect-square scale-x-110 flex-col items-center justify-center rounded-r-lg border-2 border-base-200 bg-base-100 p-2 pl-3 text-2xl md:hidden"
-          >
-            <FontAwesomeIcon icon={faBars} />
-          </div>,
+          <>
+            <div
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsToggled(!isToggled);
+              }}
+              {...swipeHandler}
+              className="z-100 fixed left-0 top-0 mt-4 flex aspect-square scale-x-110 flex-col items-center justify-center rounded-r-lg border-2 border-base-200 bg-base-100 p-2 pl-3 text-2xl md:hidden"
+            >
+              <FontAwesomeIcon icon={faBars} />
+            </div>
+          </>,
           document.body
         )}
       </aside>
