@@ -1,12 +1,6 @@
-import { use, useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { api } from "~/utils/api";
-import UserDisplay from "~/components/UserDisplay";
-import {
-  SignOutButton,
-  UserProfile,
-  SignedIn,
-  UserButton,
-} from "@clerk/nextjs";
+import { UserButton } from "@clerk/nextjs";
 import { useMemo, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -23,8 +17,8 @@ import React from "react";
 import { createPortal } from "react-dom";
 import CreateSpaceModal from "./Space/CreateSpaceModal";
 import CreateFeedModal from "./Feed/CreateFeedModal";
-import AppIcon from "./AppIcon";
 import Image from "next/image";
+import { useSwipeable } from "react-swipeable";
 interface SidebarProps {
   handleSelectFeed: (
     id: string,
@@ -48,62 +42,80 @@ const Sidebar = (sidebarProps: SidebarProps) => {
   const [spaceListToggle, setSpaceListToggle] = useState(true);
   const [feedListToggle, setFeedListToggle] = useState(true);
 
+  const swipeHandler = useSwipeable({
+    onSwipedLeft: () => {
+      setSpaceListToggle(false);
+    },
+    onSwipedRight: () => {
+      setSpaceListToggle(true);
+    },
+  });
+
   const createFeedModal: React.RefObject<HTMLDialogElement> =
     React.useRef(null);
 
   return (
-    <SidebarWrapper>
-      <div className="w-full">
-        <Link
-          href="/"
-          onClick={() => feedOnClick("global", "Global", "global")}
-          className="btn-lg btn btn w-full text-xl"
-        >
-          <FontAwesomeIcon className="text-3xl" icon={faEarthAsia} />
-          <span>Global</span>
-        </Link>
-      </div>
-      <div className="collapse-arrow collapse rounded-lg bg-base-200 p-2 font-light">
-        <input
-          type="checkbox"
-          checked={spaceListToggle}
-          onChange={() => setSpaceListToggle(!spaceListToggle)}
-        />
-        <div className="collapse-title text-xl font-bold">
-          <span>Your Spaces</span>
+    <>
+      <SidebarWrapper>
+        <div className="w-full">
+          <Link
+            href="/"
+            onClick={() => feedOnClick("global", "Global", "global")}
+            className="btn-lg btn w-full text-xl"
+          >
+            <FontAwesomeIcon className="text-3xl" icon={faEarthAsia} />
+            <span>Global</span>
+          </Link>
         </div>
-        <div className="collapse-content">{spaceListElement}</div>
-      </div>
-      <div className="collapse-arrow collapse rounded-lg bg-base-200 p-2 font-light">
-        <input
-          type="checkbox"
-          checked={feedListToggle}
-          onChange={() => setFeedListToggle(!feedListToggle)}
-        />
-        <div className="collapse-title text-xl font-bold">
-          <span>Feeds</span>
+        <div className="collapse-arrow collapse rounded-lg bg-base-200 p-2 font-light">
+          <input
+            type="checkbox"
+            checked={spaceListToggle}
+            onChange={() => setSpaceListToggle(!spaceListToggle)}
+          />
+          <div className="collapse-title text-xl font-bold">
+            <span>Your Spaces</span>
+          </div>
+          <div className="collapse-content">{spaceListElement}</div>
         </div>
-        <ul className="collapse-content flex flex-col gap-2 text-lg">
-          <FeedList handleSelectFeed={feedOnClick} />
-          {createPortal(
-            <CreateFeedModal ref={createFeedModal} />,
-            document.body
-          )}
-          <li className="w-full">
-            <button
-              onClick={() => createFeedModal.current?.show()}
-              className="btn-ghost btn flex w-full justify-start gap-1 opacity-30 hover:opacity-100"
-            >
-              <FontAwesomeIcon icon={faPlus} />
-              <span className="text-xs">Create new Feed</span>
-            </button>
-          </li>
-        </ul>
-      </div>
-      <div>
-        <UserDisplayContainer />
-      </div>
-    </SidebarWrapper>
+        <div className="collapse-arrow collapse rounded-lg bg-base-200 p-2 font-light">
+          <input
+            type="checkbox"
+            checked={feedListToggle}
+            onChange={() => setFeedListToggle(!feedListToggle)}
+          />
+          <div className="collapse-title text-xl font-bold">
+            <span>Feeds</span>
+          </div>
+          <ul className="collapse-content flex flex-col gap-2 text-lg">
+            <FeedList handleSelectFeed={feedOnClick} />
+            {createPortal(
+              <>
+                <CreateFeedModal ref={createFeedModal} />
+                <div
+                  id="swipe-handler"
+                  {...swipeHandler}
+                  className="pointer-events-none fixed left-0 top-0 h-screen w-screen lg:hidden"
+                ></div>
+              </>,
+              document.body
+            )}
+            <li className="w-full">
+              <button
+                onClick={() => createFeedModal.current?.show()}
+                className="btn-ghost btn flex w-full justify-start gap-1 opacity-30 hover:opacity-100"
+              >
+                <FontAwesomeIcon icon={faPlus} />
+                <span className="text-xs">Create new Feed</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <UserDisplayContainer />
+        </div>
+      </SidebarWrapper>
+    </>
   );
 };
 export default Sidebar;
