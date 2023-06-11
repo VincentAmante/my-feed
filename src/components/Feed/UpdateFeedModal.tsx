@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,11 +12,13 @@ import {
   faTrash,
   faExclamationTriangle,
   faMinus,
+  faHashtag,
 } from "@fortawesome/free-solid-svg-icons";
 import type { ForwardedRef } from "react";
 import React from "react";
 import { FeedContext } from "../Layouts";
 import { LoadingSkeleton, ErrorSkeleton } from "../SkeletonViews/FeedSkeletons";
+import Image from "next/image";
 
 type visibilityType = "public" | "private" | "obscure" | "protected";
 
@@ -187,10 +189,36 @@ const FeedSpaceManager = (props: { feedId: string }) => {
     api.feeds.getSpacesByFeedId.useQuery({
       feedId,
     });
+
   const { data: spacesNotFollowed, isLoading: spacesNotFollowedLoading } =
     api.feeds.getUnfollowedSpaces.useQuery({
       feedId,
     });
+
+  const {
+    mutate: getFilteredUnfollowedSpaces,
+    data: filteredUnfollowed,
+    isLoading: filterIsLoading,
+  } = api.feeds.getFilteredUnfollowedSpaces.useMutation({
+    onSuccess: () => {
+      void ctx.feeds.getUnfollowedSpaces.refetch();
+    },
+  });
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    void getFilteredUnfollowedSpaces({
+      feedId,
+      filter: search,
+    });
+  }, [feedId, getFilteredUnfollowedSpaces, search]);
+
+  useMemo(() => {
+    getFilteredUnfollowedSpaces({
+      feedId,
+      filter: "",
+    });
+  }, []);
+
   const { mutate: addFeedToSpace } = api.feeds.addSpaceToFeed.useMutation({
     onSuccess: () => {
       void ctx.feeds.getUnfollowedSpaces.refetch();
@@ -198,6 +226,7 @@ const FeedSpaceManager = (props: { feedId: string }) => {
       void ctx.feeds.getInfiniteFeedPostsById.refetch();
     },
   });
+
   const { mutate: removeFeedFromSpace } =
     api.feeds.removeSpaceFromFeed.useMutation({
       onSuccess: () => {
@@ -237,7 +266,10 @@ const FeedSpaceManager = (props: { feedId: string }) => {
                   key={space.id}
                   className="btn-ghost btn-sm btn flex w-full flex-row items-center justify-between font-light normal-case"
                 >
-                  <p>{space.name}</p>
+                  <div className="flex items-center gap-2">
+                    <FeedIcon icon={space.icon} />
+                    <p>{space.name}</p>
+                  </div>
                   <FontAwesomeIcon icon={faMinus} />
                 </button>
               );
@@ -254,26 +286,80 @@ const FeedSpaceManager = (props: { feedId: string }) => {
             <span>Suggested Spaces</span>
           </h2>
           <div className="collapse-content flex flex-col gap-2">
-            {spacesNotFollowed.map((space) => {
-              return (
-                <button
-                  key={space.id}
-                  onClick={() => {
-                    void addFeedToSpace({
-                      feedId,
-                      spaceId: space.id,
-                    });
-                  }}
-                  className="btn-ghost btn-sm btn flex w-full flex-row items-center justify-between font-light normal-case"
-                >
-                  <p>{space.name}</p>
-                  <FontAwesomeIcon icon={faPlus} />
-                </button>
-              );
-            })}
+            <input
+              type="text"
+              className="input-bordered input input-md"
+              placeholder="Search Spaces"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            {filteredUnfollowed &&
+              filteredUnfollowed.map((space) => {
+                return (
+                  <button
+                    key={space.id}
+                    onClick={() => {
+                      void addFeedToSpace({
+                        feedId,
+                        spaceId: space.id,
+                      });
+                    }}
+                    className="btn-ghost btn-sm btn flex w-full flex-row items-center justify-between font-light normal-case"
+                  >
+                    <div className="flex items-center gap-2">
+                      <FeedIcon icon={space.icon} />
+                      <p>{space.name}</p>
+                    </div>
+                    <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                );
+              })}
+            {filterIsLoading && (
+              <div className="flex w-full flex-col items-center justify-center gap-2">
+                <div className="loading-secondary loading flex items-center"></div>
+              </div>
+            )}
           </div>
         </div>
       </div>
+    </>
+  );
+};
+
+type FeedIconProps = {
+  icon: string | null;
+};
+
+const FeedIcon = (props: FeedIconProps) => {
+  const { icon } = props;
+
+  return (
+    <>
+      {icon && (
+        <div className="avatar rounded-full">
+          <div className="w-6 lg:w-6">
+            <Image
+              className="rounded-lg"
+              src={icon}
+              alt="Avatar"
+              width={100}
+              height={100}
+            />
+          </div>
+        </div>
+      )}
+      {!icon && (
+        <div className="placeholder avatar aspect-square rounded-full">
+          <div className="w-6 lg:w-6">
+            {
+              <FontAwesomeIcon
+                icon={faHashtag}
+                className="text-xl text-base-content opacity-20"
+              />
+            }
+          </div>
+        </div>
+      )}
     </>
   );
 };

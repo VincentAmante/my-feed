@@ -103,11 +103,6 @@ const Sidebar = (sidebarProps: SidebarProps) => {
       <div>
         <UserDisplayContainer />
       </div>
-      {/* <div className="btn-lg btn uppercase">
-        <SignOutButton>
-          <span>Sign Out</span>
-        </SignOutButton>
-      </div> */}
     </SidebarWrapper>
   );
 };
@@ -136,7 +131,18 @@ const UserDisplayContainer = () => {
         href={`/user/${data?.username || ""}`}
         className="btn-lg join-item btn flex grow  justify-evenly"
       >
-        <FontAwesomeIcon className="text-3xl" icon={faUser} />
+        {data?.profileImageUrl && (
+          <Image
+            width={128}
+            height={128}
+            src={data?.profileImageUrl}
+            alt="Profile Image"
+            className="h-12 w-12 rounded-full border-2 border-solid border-opacity-5"
+          />
+        )}
+        {!data?.profileImageUrl && (
+          <FontAwesomeIcon className="text-3xl" icon={faUser} />
+        )}
         <span>Profile</span>
       </Link>
       <div className=" group join-item relative h-full text-3xl">

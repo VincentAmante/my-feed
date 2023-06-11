@@ -24,7 +24,6 @@ export const feedsRouter = createTRPCRouter({
         where: {
           OR: [
             {
-
               ownerId: userId,
             },
             {
@@ -80,6 +79,26 @@ export const feedsRouter = createTRPCRouter({
       return unownedFeeds;
     }),
 
+  getFilteredUnfollowedSpaces: privateProcedure
+    .input(z.object({ feedId: z.string(), filter: z.string().default("") }))
+    .mutation(async ({ input, ctx }) => {
+      const unownedFeeds = await ctx.prisma.space.findMany({
+        where: {
+          SpaceInFeed: {
+            none: {
+              feedId: input.feedId,
+            }
+          },
+          visibility: "public",
+          name: {
+            contains: input.filter,
+            mode: "insensitive",
+          }
+        },
+        take: 6,
+      })
+      return unownedFeeds;
+    }),
 
   getSpacesByFeedId: publicProcedure
     .input(z.object({ feedId: z.string() }))
