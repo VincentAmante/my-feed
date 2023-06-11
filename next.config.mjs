@@ -8,7 +8,13 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ['picsum.photos', 'res.cloudinary.com', 'images.clerk.dev', 'www.gravatar.com'],
+    domains: [
+      "picsum.photos",
+      "res.cloudinary.com",
+      "images.clerk.dev",
+      "www.gravatar.com",
+      "googleusercontent.com",
+    ],
   },
   /**
    * If you have `experimental: { appDir: true }` set, then you must comment the below `i18n` config
