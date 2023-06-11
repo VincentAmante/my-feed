@@ -196,7 +196,7 @@ const SidebarWrapper = (props: SidebarWrapperProps) => {
               e.stopPropagation();
               setIsToggled(!isToggled);
             }}
-            className="z-100 fixed left-0 top-0 mt-4 flex aspect-square scale-x-110 flex-col items-center justify-center rounded-r-lg border-2 border-base-200 bg-base-100 p-2 pl-3 text-2xl text-primary md:hidden"
+            className="z-100 fixed left-0 top-0 mt-4 flex aspect-square scale-x-110 flex-col items-center justify-center rounded-r-lg border-2 border-base-200 bg-base-100 p-2 pl-3 text-2xl md:hidden"
           >
             <FontAwesomeIcon icon={faBars} />
           </div>,
