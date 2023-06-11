@@ -110,7 +110,7 @@ const UserDisplayContainer = () => {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="btn-lg btn w-full">
         <div className="loading loading-dots"></div>
       </div>
     );
@@ -154,7 +154,7 @@ const UserDisplayContainer = () => {
           }}
         />
         <div className="justify-cente pointer-events-autor pointer-events-none absolute left-0 top-0 flex h-full w-full flex-col items-center justify-center bg-base-200 group-hover:bg-base-300">
-          <FontAwesomeIcon className="" icon={faGear} />
+          <FontAwesomeIcon className="group-hover:animate-spin" icon={faGear} />
         </div>
       </div>
     </div>
