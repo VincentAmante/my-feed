@@ -22,11 +22,9 @@ const DeletePostModal = React.forwardRef(function DeletePostModal(
   return (
     <dialog ref={ref} className="modal">
       <form method="dialog" className="modal-box flex flex-col  items-center">
-        <h3 className="text-xl font-bold text-error">Delete Post?</h3>
-        <p className="pt-4">You might not be able to recover this again</p>
-        <p className="max-w-xs py-0 text-center text-xs italic text-info opacity-30">
-          dev-note: If this fails and [comments, likes] are implemented, please
-          contact me.
+        <h3 className="text-2xl font-bold text-error">Delete Post?</h3>
+        <p className="pt-4 text-center text-lg">
+          You might not be able to recover this again
         </p>
         <div className="modal-action flex gap-4">
           {/* if there is a button in form, it will close the modal */}
