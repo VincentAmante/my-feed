@@ -60,7 +60,7 @@ const FeedHeader = () => {
   const { userId } = useAuth();
   const { mutate } = api.users.initUser.useMutation({
     onSuccess: () => {
-      void ctx.feeds.getUserFeeds.refetch();
+      void ctx.spaces.getSpacesByUserId.refetch();
     },
   });
 

@@ -14,10 +14,10 @@ datasource db {
 model User {
   // the <id> field is to satisfy MongoDB's requirement of having an _id field
   // clerkId is how we identify users in Kiurate
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId     String   @unique
-  displayName String   @default("")
-  bio         String   @default("")
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId     String @unique
+  displayName String @default("")
+  bio         String @default("")
 
   softDeleted Boolean  @default(false)
   createdAt   DateTime @default(now())
@@ -31,7 +31,7 @@ model User {
 }
 
 model Post {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   // Cascade deletes the post if any of the associated fields are deleted
   author   User    @relation(fields: [authorId], references: [clerkId], onDelete: Cascade)
   authorId String
@@ -43,12 +43,11 @@ model Post {
   published Boolean   @default(true)
   Comment   Comment[]
 
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  likedByIDs String[] @default([])
-  softDeleted Boolean @default(false)
+  likedByIDs  String[] @default([])
+  softDeleted Boolean  @default(false)
 }
 
 model Feed {
@@ -83,7 +82,7 @@ model FeedFollower {
 
   user   User   @relation(fields: [userId], references: [clerkId])
   userId String
-  feed   Feed   @relation(fields: [feedId], references: [id]) 
+  feed   Feed   @relation(fields: [feedId], references: [id])
   feedId String @db.ObjectId
 }
 
@@ -91,7 +90,7 @@ model Space {
   id   String @id @default(auto()) @map("_id") @db.ObjectId
   name String @default("")
 
-  owner   User   @relation(fields: [ownerId], references: [clerkId])
+  owner   User   @relation(fields: [ownerId], references: [clerkId], onDelete: Cascade)
   ownerId String
 
   followersIds String[] @default([])
