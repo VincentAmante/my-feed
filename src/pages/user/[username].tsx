@@ -72,7 +72,7 @@ const UserPage: NextPageWithLayout = () => {
           </div>
         </div>
       </div>
-      <div className="flex h-full flex-col gap-12 rounded-2xl bg-base-200 px-4 py-8">
+      <div className="lg:p12 flex h-full flex-col gap-12 rounded-2xl bg-base-200 p-8">
         <section id="spaces" className="flex max-w-4xl flex-col gap-4">
           <h1 className="text-4xl font-bold">Feeds</h1>
           <div className="grid gap-4 lg:grid-cols-3">

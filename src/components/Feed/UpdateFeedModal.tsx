@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "~/utils/api";
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import UpdateIconWidget from "../UpdateIcon";
 import {
   faShield,
   faLock,
