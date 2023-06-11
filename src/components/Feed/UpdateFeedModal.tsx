@@ -223,6 +223,10 @@ const FeedSpaceManager = (props: { feedId: string }) => {
     onSuccess: () => {
       void ctx.feeds.getUnfollowedSpaces.refetch();
       void ctx.feeds.getSpacesByFeedId.refetch();
+      getFilteredUnfollowedSpaces({
+        feedId,
+        filter: search,
+      });
       void ctx.feeds.getInfiniteFeedPostsById.refetch();
     },
   });
