@@ -148,19 +148,18 @@ const UserPost = (props: PostWithUser) => {
               createdAt={createdAt}
               profileImageUrl={author?.profileImageUrl || ""}
             />
-
-            {isOwnedByUser && (
-              <div className="dropdown-end dropdown-left dropdown">
-                <label
-                  tabIndex={0}
-                  className="btn-ghost btn-sm btn-circle btn m-1"
-                >
-                  <FontAwesomeIcon icon={faEllipsisVertical}></FontAwesomeIcon>
-                </label>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu rounded-box w-fit bg-neutral p-2 shadow"
-                >
+            <div className="dropdown-end dropdown-left dropdown">
+              <label
+                tabIndex={0}
+                className="btn-ghost btn-sm btn-circle btn m-1"
+              >
+                <FontAwesomeIcon icon={faEllipsisVertical}></FontAwesomeIcon>
+              </label>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu rounded-box w-fit bg-neutral p-2 shadow"
+              >
+                {isOwnedByUser && (
                   <li className="flex items-center justify-center">
                     <button
                       className="btn-ghost btn-sm btn w-full text-error"
@@ -174,18 +173,18 @@ const UserPost = (props: PostWithUser) => {
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </li>
-                  <li className="flex items-center justify-center">
-                    <Link
-                      href={`/post/${id}`}
-                      className="btn-ghost btn-sm btn w-full"
-                    >
-                      <span>Go to Post</span>
-                      <FontAwesomeIcon icon={faArrowRight} />
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            )}
+                )}
+                <li className="flex items-center justify-center">
+                  <Link
+                    href={`/post/${id}`}
+                    className="btn-ghost btn-sm btn w-full"
+                  >
+                    <span>Go to Post</span>
+                    <FontAwesomeIcon icon={faArrowRight} />
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
           <div className="whitespace-pre-wrap  px-4">{content}</div>
           <PostImages imageUrls={images} />
