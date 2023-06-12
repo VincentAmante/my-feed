@@ -109,6 +109,7 @@ const FeedHeader = () => {
           content={"Your content, your space, your feeds!"}
         />
         <meta property="og:image" content={""} />
+        <meta property="og:url" content={"https://kiurate.vercel.app"} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {userOwnsFeed &&
