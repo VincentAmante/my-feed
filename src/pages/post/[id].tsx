@@ -391,6 +391,7 @@ const UserHeader = (props: UserHeaderProps) => {
 
 const Comments = (props: { postId: string }) => {
   const { postId } = props;
+  const { userId } = useAuth();
 
   const {
     isLoading,
@@ -418,11 +419,7 @@ const Comments = (props: { postId: string }) => {
           comments.pages.map((page) =>
             page.comments.map((comment) => (
               <>
-                <Comment
-                  key={comment.id}
-                  {...comment}
-                  userId={comment.authorId}
-                />
+                <Comment key={comment.id} {...comment} userId={userId || ""} />
               </>
             ))
           )}
