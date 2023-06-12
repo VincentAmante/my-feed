@@ -30,14 +30,11 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
     >
       <Head>
         <title>Kiurate</title>
-        <meta
-          name="description"
-          content="Your space, your content, your experience."
-        />
         <meta itemProp="name" content="Kiurate" />
         <meta
           itemProp="description"
           content="Your space, your content, your experience."
+          key="desc"
         />
         <meta
           itemProp="image"
