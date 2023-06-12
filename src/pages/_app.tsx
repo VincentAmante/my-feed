@@ -34,24 +34,41 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           name="description"
           content="Your space, your content, your experience."
         />
-        <meta property="og:title" content={`Kiurate`} key="title" />
+        <meta itemProp="name" content="Kiurate" />
+        <meta
+          itemProp="description"
+          content="Your space, your content, your experience."
+        />
+        <meta
+          itemProp="image"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+        />
+
+        <meta
+          property="og:url"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/"
+        />
+        <meta property="og:type" content="website" />
         <meta property="og:title" content="Kiurate" />
         <meta
           property="og:description"
-          content={"Your content, your space, your feeds!"}
+          content="Your space, your content, your experience."
         />
-        <meta property="og:image" content={"/logo.png"} />
-        <meta property="og:url" content={"https://kiurate.vercel.app"} />
+        <meta
+          property="og:image"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+        />
+
         <meta name="twitter:card" content="summary_large_image" />
-        <meta property="og:site_name" content="Kiurate" />
-        <meta name="twitter:image:alt" content="Kiurate" />
         <meta name="twitter:title" content="Kiurate" />
         <meta
           name="twitter:description"
-          content={"Your content, your space, your feeds!"}
+          content="Your space, your content, your experience."
         />
-        <meta name="twitter:image" content={"/public/logo.png"} />
-        <meta name="twitter:url" content={"https://kiurate.vercel.app"} />
+        <meta
+          name="twitter:image"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {getLayout(<Component {...pageProps} />)}
