@@ -56,7 +56,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         />
         <meta
           property="og:image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
         />
 
         <meta name="twitter:card" content="summary_large_image" />
@@ -67,7 +67,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         />
         <meta
           name="twitter:image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
