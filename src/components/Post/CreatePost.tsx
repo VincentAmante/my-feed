@@ -9,6 +9,7 @@ import { FeedContext } from "~/components/Layouts";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import DragAndDropImages from "../ImagePostWidget";
+import { LoadingSkeleton } from "../SkeletonViews/FeedSkeletons";
 
 // Handler for creating a post
 const CreatePost = () => {
@@ -16,6 +17,7 @@ const CreatePost = () => {
   const { user } = useUser();
 
   const [content, setContent] = useState("");
+  const [isPosting, setIsPosting] = useState(false);
 
   const MAX_CONSECUTIVE_NEW_LINES = 2; // Maximum number of consecutive new lines between lines
 
@@ -52,6 +54,7 @@ const CreatePost = () => {
   const { mutate } = api.posts.createPost.useMutation({
     onSuccess: () => {
       // Resets the text content
+      setIsPosting(false);
       setContent("");
 
       // Invalidates the cache for the feed and space posts
@@ -66,11 +69,19 @@ const CreatePost = () => {
 
   // Even if images is empty, it will still create a post
   function onImagesUploaded(imageUrls: string[]) {
-    mutate({
+    if (content.length === 0 && imageUrls.length === 0) {
+      return;
+    }
+    if (content.trim().length === 0 && imageUrls.length === 0) {
+      return;
+    }
+
+    void mutate({
       content: content,
       images: imageUrls,
       spaceId: ctxFeed,
     });
+    setContent("");
   }
 
   function triggerUpload() {
@@ -92,23 +103,29 @@ const CreatePost = () => {
             className="h-14 w-14 rounded-full"
           />
         </div>
-        <div className="relative">
-          <textarea
-            className="input min-h-[8rem] w-full resize-none py-2 pr-12 pt-2"
-            maxLength={maxTextLimit}
-            placeholder="Write your thoughts here.."
-            value={content}
-            onChange={handleInputChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && e.shiftKey === false) {
-                triggerUpload();
-              }
-            }}
-          ></textarea>
-          <span className="absolute right-0 m-1 text-xs opacity-20">
-            {textLimitCount} / {maxTextLimit}
-          </span>
-        </div>
+        {!isPosting && (
+          <div className="relative">
+            <textarea
+              className="input min-h-[8rem] w-full resize-none py-2 pr-12 pt-2 "
+              maxLength={maxTextLimit}
+              placeholder="Write your thoughts here.."
+              value={content}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.shiftKey === false) {
+                  triggerUpload();
+                  setIsPosting(true);
+                }
+              }}
+            ></textarea>
+            <span className="absolute right-0 m-1 text-xs opacity-20">
+              {textLimitCount} / {maxTextLimit}
+            </span>
+          </div>
+        )}
+        {isPosting && (
+          <div className="flex h-full min-h-[8rem] w-full animate-pulse flex-col items-center justify-center bg-base-300 py-2 pr-12 pt-2"></div>
+        )}
       </div>
 
       {/* 

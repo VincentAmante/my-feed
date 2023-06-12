@@ -232,6 +232,7 @@ const UserPost = (props: PostWithUser) => {
 const CommentInput = (props: { postId: string }) => {
   const { postId } = props;
   const [content, setContent] = useState("");
+
   const handleSubmit = () => {
     if (!content) return;
     const commentContent = content.trim();
