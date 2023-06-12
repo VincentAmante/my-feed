@@ -41,7 +41,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         />
         <meta
           itemProp="image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png?"
         />
 
         <meta
@@ -54,9 +54,10 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           property="og:description"
           content="Your space, your content, your experience."
         />
+        <meta property="og:site_name" content="Kiurate" />
         <meta
           property="og:image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png?"
         />
 
         <meta name="twitter:card" content="summary_large_image" />
@@ -67,7 +68,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         />
         <meta
           name="twitter:image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png?"
         />
         <meta name="theme-color" content="#FF7E36" />
         <link rel="icon" href="/favicon.ico" />
