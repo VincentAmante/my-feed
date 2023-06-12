@@ -69,6 +69,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           name="twitter:image"
           content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
         />
+        <meta name="theme-color" content="#FF7E36" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {getLayout(<Component {...pageProps} />)}
