@@ -110,6 +110,16 @@ const FeedHeader = () => {
         />
         <meta property="og:image" content={"/public/logo.png"} />
         <meta property="og:url" content={"https://kiurate.vercel.app"} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:site_name" content="Kiurate" />
+        <meta name="twitter:image:alt" content="Kiurate" />
+        <meta name="twitter:title" content="Kiurate" />
+        <meta
+          name="twitter:description"
+          content={"Your content, your space, your feeds!"}
+        />
+        <meta name="twitter:image" content={"/public/logo.png"} />
+        <meta name="twitter:url" content={"https://kiurate.vercel.app"} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {userOwnsFeed &&
