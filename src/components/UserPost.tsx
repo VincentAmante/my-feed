@@ -174,7 +174,7 @@ const UserPost = (props: PostWithUser) => {
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </li>
-                  {/* <li className="flex items-center justify-center">
+                  <li className="flex items-center justify-center">
                     <Link
                       href={`/post/${id}`}
                       className="btn-ghost btn-sm btn w-full"
@@ -182,7 +182,7 @@ const UserPost = (props: PostWithUser) => {
                       <span>Go to Post</span>
                       <FontAwesomeIcon icon={faArrowRight} />
                     </Link>
-                  </li> */}
+                  </li>
                 </ul>
               </div>
             )}

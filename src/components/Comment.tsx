@@ -138,6 +138,7 @@ const Comment = (
             )}
           </div>
         </div>
+
         <div className="relative px-0">
           {userId === author.id && (
             <div className="dropdown-end dropdown-left dropdown lg:dropdown-right ">

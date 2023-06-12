@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ImageType = {
   imageUrls: string[];
+  className?: string;
 };
 const PostImages = (props: ImageType) => {
   const { imageUrls } = props;
@@ -27,7 +28,11 @@ const PostImages = (props: ImageType) => {
     return (
       <>
         {imageUrls.length > 1 && (
-          <div className="carousel relative w-full snap-y scroll-py-12">
+          <div
+            className={`carousel relative w-full snap-y scroll-py-12 
+            ${props.className || ""}
+            `}
+          >
             <Image
               className="image w-full select-none object-cover"
               src={imageUrls[activeImage - 1] || imageUrls[0]}
