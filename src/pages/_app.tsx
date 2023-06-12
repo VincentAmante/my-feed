@@ -40,7 +40,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
           property="og:description"
           content={"Your content, your space, your feeds!"}
         />
-        <meta property="og:image" content={"/public/logo.png"} />
+        <meta property="og:image" content={"/logo.png"} />
         <meta property="og:url" content={"https://kiurate.vercel.app"} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta property="og:site_name" content="Kiurate" />
