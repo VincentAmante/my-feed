@@ -125,7 +125,7 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(
           <SelectVisibility selected={visibility} setSelected={setVisibility} />
           <button className="btn-primary btn">
             {isLoading ? (
-              <span className="loading loading-dots text-accent"></span>
+              <span className="loading loading-dots"></span>
             ) : (
               <>
                 <FontAwesomeIcon icon={faPenToSquare} />

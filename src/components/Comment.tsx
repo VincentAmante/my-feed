@@ -30,6 +30,7 @@ export type CommentWithUser = TypeComment & {
 const Comment = (
   props: CommentWithUser & {
     userId: string;
+    postId: string;
   }
 ) => {
   const { author, content, userId, createdAt, updatedAt } = props;
@@ -38,6 +39,9 @@ const Comment = (
     onSuccess: () => {
       void ctx.spaces.getSpacePostsById.invalidate();
       void ctx.feeds.getInfiniteFeedPostsById.invalidate();
+      void ctx.posts.getInfiniteComments.invalidate({
+        postId: props.postId,
+      });
     },
   });
   const [toggleEdit, setToggleEdit] = useState(false);

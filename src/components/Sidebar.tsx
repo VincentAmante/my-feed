@@ -236,7 +236,7 @@ const FeedList = (props: FeedListProps) => {
   if (postsLoading)
     return (
       <div className="flex w-full grow items-center px-2">
-        <span className="loading loading-dots text-accent"></span>
+        <span className="loading loading-dots"></span>
       </div>
     );
   if (!data) return <div>Something went wrong</div>;
@@ -295,7 +295,7 @@ const SpaceList = () => {
   if (postsLoading)
     return (
       <div className="flex w-full grow items-center px-2">
-        <span className="loading loading-dots text-accent"></span>
+        <span className="loading loading-dots"></span>
       </div>
     );
   if (!data) return <div>Something went wrong</div>;

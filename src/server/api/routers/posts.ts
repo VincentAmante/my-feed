@@ -239,6 +239,28 @@ export const postsRouter = createTRPCRouter({
       }
     }),
 
+  getPostLikeData: publicProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const postId = input.postId;
+
+      const post = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+        },
+        select: {
+          likedByIDs: true,
+        },
+      });
+
+      return post?.likedByIDs
+    }),
+
+
   enforceUniqueLikes: privateProcedure
     .input(
       z.object({

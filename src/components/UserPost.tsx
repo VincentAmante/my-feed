@@ -193,7 +193,7 @@ const UserPost = (props: PostWithUser) => {
             <div className=" flex select-none items-center gap-2">
               <FontAwesomeIcon
                 ref={likeScope}
-                className="cursor-pointer text-lg text-secondary"
+                className="cursor-pointer text-lg text-secondary transition-all hover:scale-110 hover:transform"
                 icon={isLiked ? faHeart : faHeartOutline}
                 onClick={(e) => {
                   e.preventDefault();
@@ -215,6 +215,7 @@ const UserPost = (props: PostWithUser) => {
                       key={comment.id}
                       {...comment}
                       userId={userId || ""}
+                      postId={id}
                     />
                   ))}
                 </div>
@@ -228,10 +229,7 @@ const UserPost = (props: PostWithUser) => {
   );
 };
 
-type CommentInputProps = {
-  postId: string;
-};
-const CommentInput = (props: CommentInputProps) => {
+const CommentInput = (props: { postId: string }) => {
   const { postId } = props;
   const [content, setContent] = useState("");
   const handleSubmit = () => {
@@ -275,14 +273,9 @@ const CommentInput = (props: CommentInputProps) => {
   );
 };
 
-type UniqueLikeEnforcerProps = {
-  postId: string;
-};
-
 // if likes are not unique, this sets a call to the server to enforce unique likes
 // This fix is gimmicky and should be fixed on the server side
-const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
-  console.log("enforcing unique likes");
+export const UniqueLikeEnforcer = (props: { postId: string }) => {
   const ctx = api.useContext();
   const { mutate } = api.posts.enforceUniqueLikes.useMutation({
     onSuccess: () => {
@@ -295,6 +288,7 @@ const UniqueLikeEnforcer = (props: UniqueLikeEnforcerProps) => {
   }, [props.postId, mutate]);
   return <></>;
 };
+
 export default UserPost;
 
 type UserHeaderProps = {

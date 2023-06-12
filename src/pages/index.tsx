@@ -71,7 +71,7 @@ const FeedHeader = () => {
       lastName: clerkUser?.lastName || "",
       username: clerkUser?.username || "",
     });
-  }, []);
+  }, [clerkUser, userId, mutate]);
 
   const { mutate: subscribeToFeed } = api.feeds.subscribeToFeed.useMutation({
     onSuccess: () => {

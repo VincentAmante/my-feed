@@ -144,7 +144,7 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(
               />
               <button className="btn-primary btn">
                 {isLoading ? (
-                  <span className="loading loading-dots text-accent"></span>
+                  <span className="loading loading-dots"></span>
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faPenToSquare} />
