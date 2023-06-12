@@ -41,7 +41,7 @@ const MyApp: AppType = ({ Component, pageProps }: AppPropsWithLayout) => {
         />
         <meta
           itemProp="image"
-          content="https://kiurate-git-dev-vincentamante.vercel.app/logo.png"
+          content="https://kiurate-git-dev-vincentamante.vercel.app/card.png"
         />
 
         <meta
