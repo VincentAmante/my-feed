@@ -102,6 +102,13 @@ const FeedHeader = () => {
           name="description"
           content="Your space, your content, your experience."
         />
+        <meta property="og:title" content={`Kiurate`} key="title" />
+        <meta property="og:title" content="Kiurate" />
+        <meta
+          property="og:description"
+          content={"Your content, your space, your feeds!"}
+        />
+        <meta property="og:image" content={""} />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {userOwnsFeed &&

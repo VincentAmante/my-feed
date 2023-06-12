@@ -26,6 +26,7 @@ import Comment from "~/components/Comment";
 import { animate, useAnimate } from "framer-motion";
 import { UniqueLikeEnforcer } from "~/components/UserPost";
 import DeletePostModal from "~/components/DeletePostModal";
+import Head from "next/head";
 
 // For relative time
 import dayjs from "dayjs";
@@ -87,6 +88,17 @@ const PostPage: NextPageWithLayout = () => {
   const userUrl = `/user/${post.author.username || ""}`;
   return (
     <>
+      <Head>
+        <title>Post by {post.author.username} | Kiurate</title>
+        <meta
+          property="og:title"
+          content={`Post by ${post.author.username || "a kiurator"} | Kiurate`}
+          key="title"
+        />
+        <meta property="og:title" content="Social Title for Cool Page" />
+        <meta property="og:description" content={post.content || ""} />
+        <meta property="og:image" content={post.images[0] || ""} />
+      </Head>
       {isOwnedByUser && <DeletePostModal ref={delModal} id={postId} />}
       <div className="flex h-full w-full flex-col items-center gap-2 bg-base-200 p-4 pt-12 lg:px-12">
         <div className="card flex w-full max-w-2xl bg-base-300">
