@@ -53,12 +53,8 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(
 
   const { mutate: updateFeed } = api.feeds.updateFeed.useMutation({
     onSuccess: () => {
-      void ctx.spaces.getSpacesByUserId.invalidate({
-        ownerId: userId as string,
-      });
-      void ctx.spaces.getSpacesByUserId.refetch({
-        ownerId: userId as string,
-      });
+      void ctx.feeds.getUserFeeds.invalidate();
+      void ctx.feeds.getProfileFeeds.invalidate();
     },
   });
 
