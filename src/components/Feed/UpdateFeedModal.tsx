@@ -54,7 +54,9 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(
   const { mutate: updateFeed } = api.feeds.updateFeed.useMutation({
     onSuccess: () => {
       void ctx.feeds.getUserFeeds.invalidate();
-      void ctx.feeds.getProfileFeeds.invalidate();
+      void ctx.feeds.getProfileFeeds.invalidate({
+        userId: userId as string,
+      });
     },
   });
 
