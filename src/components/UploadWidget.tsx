@@ -84,7 +84,7 @@ const UploadWidget = (props: _ImageUploader) => {
       {imageSrc && (
         <Image
           width={300}
-          alt="An image you're uploadeding"
+          alt="An image you're uploading"
           height={300}
           className="w-full rounded-lg"
           src={imageSrc}
