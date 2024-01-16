@@ -53,11 +53,9 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(
 
   const { mutate: updateFeed } = api.feeds.updateFeed.useMutation({
     onSuccess: () => {
-      void ctx.spaces.getSpacesByUserId.invalidate({
-        ownerId: userId as string,
-      });
-      void ctx.spaces.getSpacesByUserId.refetch({
-        ownerId: userId as string,
+      void ctx.feeds.getUserFeeds.invalidate();
+      void ctx.feeds.getProfileFeeds.invalidate({
+        userId: userId as string,
       });
     },
   });
@@ -144,7 +142,7 @@ const UpdateFeedModal = React.forwardRef(function CreateFeedModal(
               />
               <button className="btn-primary btn">
                 {isLoading ? (
-                  <span className="loading loading-dots text-accent"></span>
+                  <span className="loading loading-dots"></span>
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faPenToSquare} />

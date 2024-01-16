@@ -71,7 +71,7 @@ const FeedHeader = () => {
       lastName: clerkUser?.lastName || "",
       username: clerkUser?.username || "",
     });
-  }, []);
+  }, [clerkUser, userId, mutate]);
 
   const { mutate: subscribeToFeed } = api.feeds.subscribeToFeed.useMutation({
     onSuccess: () => {
@@ -96,14 +96,6 @@ const FeedHeader = () => {
 
   return (
     <>
-      <Head>
-        <title>{ctxFeedName} | Kiurate</title>
-        <meta
-          name="description"
-          content="Your space, your content, your experience."
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
       {userOwnsFeed &&
         createPortal(
           <UpdateFeedModal feedId={ctxFeed} ref={feedModalRef} />,

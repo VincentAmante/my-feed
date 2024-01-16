@@ -128,12 +128,11 @@ export const postsRouter = createTRPCRouter({
     .input(
       z.object({
         postId: z.string(),
-        cursor: z.string().optional(),
-        limit: z.number().optional().default(6),
+        cursor: z.string().nullish(),
+        limit: z.number().optional().default(4),
       })
     )
     .query(async ({ input, ctx }) => {
-
       const postId = input.postId;
       const cursor = input.cursor;
 
@@ -142,10 +141,9 @@ export const postsRouter = createTRPCRouter({
           postId,
         },
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
-        take: 10,
-        skip: cursor ? 1 : 0,
+        take: input.limit + 1,
         cursor: cursor ? { id: cursor } : undefined,
       });
 
@@ -164,7 +162,16 @@ export const postsRouter = createTRPCRouter({
         };
       });
 
-      return commentsWithUsers;
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (commentsWithUsers.length > input.limit) {
+        const nextComment = commentsWithUsers.pop();
+        nextCursor = nextComment?.id;
+      }
+
+      return {
+        comments: commentsWithUsers.slice(0, input.limit),
+        nextCursor,
+      };
     }),
 
 
@@ -231,6 +238,28 @@ export const postsRouter = createTRPCRouter({
         });
       }
     }),
+
+  getPostLikeData: publicProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .query(async ({ input, ctx }) => {
+      const postId = input.postId;
+
+      const post = await ctx.prisma.post.findFirst({
+        where: {
+          id: postId,
+        },
+        select: {
+          likedByIDs: true,
+        },
+      });
+
+      return post?.likedByIDs
+    }),
+
 
   enforceUniqueLikes: privateProcedure
     .input(

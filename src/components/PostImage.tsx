@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 type ImageType = {
   imageUrls: string[];
+  className?: string;
 };
 const PostImages = (props: ImageType) => {
   const { imageUrls } = props;
@@ -27,12 +28,16 @@ const PostImages = (props: ImageType) => {
     return (
       <>
         {imageUrls.length > 1 && (
-          <div className="carousel relative w-full snap-y scroll-py-12">
+          <div
+            className={`carousel relative w-full snap-y scroll-py-12 
+            ${props.className || ""}
+            `}
+          >
             <Image
-              className="image w-full select-none object-cover"
+              className="image w-full select-none bg-base-300 object-contain"
               src={imageUrls[activeImage - 1] || imageUrls[0]}
-              width={768}
-              height={768}
+              width={1024}
+              height={1024}
               alt={"An image"}
             />
             <div className="absolute flex h-full w-full items-center">
@@ -49,16 +54,19 @@ const PostImages = (props: ImageType) => {
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
             </div>
+            <div className="badge absolute right-0 top-0 m-2 select-none bg-base-300 text-xs">
+              {activeImage} / {imageUrls.length}
+            </div>
           </div>
         )}
 
         {imageUrls.length === 1 && (
           <figure className="w-full">
             <Image
-              className="image w-full select-none object-cover"
+              className="image max-h-[36rem] w-full select-none bg-base-100 object-contain"
               src={imageUrls[0]}
-              width={400}
-              height={400}
+              width={1024}
+              height={1024}
               alt={"An image"}
             />
           </figure>

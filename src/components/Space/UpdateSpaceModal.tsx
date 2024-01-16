@@ -115,6 +115,7 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(
             imageUrl={spaceData?.icon || null}
           />
         </div>
+
         <form
           method="dialog"
           onSubmit={updateSpaceHandler}
@@ -124,7 +125,7 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(
           <SelectVisibility selected={visibility} setSelected={setVisibility} />
           <button className="btn-primary btn">
             {isLoading ? (
-              <span className="loading loading-dots text-accent"></span>
+              <span className="loading loading-dots"></span>
             ) : (
               <>
                 <FontAwesomeIcon icon={faPenToSquare} />
@@ -145,6 +146,7 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(
           )}
         </form>
       </div>
+
       <form method="dialog" className="modal-backdrop">
         <button onClick={() => setDeleteToggled(false)}>close</button>
       </form>
@@ -153,11 +155,6 @@ const UpdateSpaceModal = React.forwardRef(function CreateSpaceModal(
 });
 
 export default UpdateSpaceModal;
-
-type SelectVisibilityProps = {
-  selected: string;
-  setSelected: React.Dispatch<React.SetStateAction<visibilityType>>;
-};
 
 type NameInputProps = {
   name: string;
@@ -184,6 +181,10 @@ const NameInput = (props: NameInputProps) => {
   );
 };
 
+type SelectVisibilityProps = {
+  selected: string;
+  setSelected: React.Dispatch<React.SetStateAction<visibilityType>>;
+};
 const SelectVisibility = (props: SelectVisibilityProps) => {
   const { selected, setSelected } = props;
   const options = ["public", "obscure", "protected", "private"];

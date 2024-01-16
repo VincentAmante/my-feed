@@ -128,7 +128,7 @@ const TriggerButton = (props: TriggerButtonProps) => {
   return (
     <button onClick={triggerUpload} className="btn-primary btn">
       {isLoading ? (
-        <span className="loading  loading-dots text-accent"></span>
+        <span className="loading  loading-dots"></span>
       ) : (
         <>
           <FontAwesomeIcon icon={faPlus} />
